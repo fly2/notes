@@ -17,8 +17,18 @@ c2(no)->op2->
 ```
 
 ```flow
-st=>start: 开始
-e=>end: 结束
+st=>start: 通话录音
+op1=>operation: 音转字系统
+op2=>operation: 录音文本
+op3=>operation: 分类模型
+cond=>condition: 是否销售误导
+op4=>operation: 文本语料库
+op5=>condition: 人工质检发现误导原因
+e=>end: 对业务员进行相关培训
 
-st->e
+st(right)->op1->op2
+op2->op3->cond
+cond(no)->op5(yes)->e
+cond(yes)->op4(left)->op3
+op5(no)->op4
 ```
