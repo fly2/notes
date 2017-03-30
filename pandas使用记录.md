@@ -69,3 +69,23 @@ df1.录音编号=np.int64(df1.录音编号)
 #用utf-8-sig格式读取
 df1=pd.read_csv('/home/weblogic/DATA/private/shangguanxf/cc_txt2/疑似误导录音/疑似诱导录音文本.csv',encoding='utf-8-sig',header=None,names=['录音编号','通话文本'])
 ```
+8. dict转DataFrame的三种方法。转成列表再导入速度最快。
+
+```python
+#用for循环主键，依次导入。用时：45.9755654335022   
+df1=pd.DataFrame(columns=('word','value'))
+n=0
+for i in one_hot.keys():
+   df1.loc[n]=[i,one_hot[i]]
+   n=n+1
+    
+#将dict转成列表，导入list。用时：0.010346174240112305
+df1=pd.DataFrame(list(one_hot.items()), columns=['Date', 'DateValue'])
+
+#将dict直接导入，再重命名列名。用时：0.024332761764526367
+df1=pd.DataFrame({'value':one_hot})
+df1.index.name='key'
+df1=df1.reset_index()
+```
+
+   ​
