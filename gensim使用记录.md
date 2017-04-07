@@ -1,12 +1,12 @@
 1.词向量模型，对词的表示进行降维
 ```python
 model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4,sg=0，seed=0)
+#sentences：可以是一个list,每一段文本list中的一个集合，每个集合又按照词顺序组成list，对于大语料集，建议使用BrownCorpus,Text8Corpus或lineSentence构建。
 #size表示词嵌入的特征维度.大的size需要更多的训练数据,但是效果会更好. 推荐值为几十到几百。
 #window表示词的窗口，指当前词与预测词的最大距离
 #min_count表示忽视词出现次数低于此值的词
 #默认sg=0，为CBOW，否则sg=1，为skip-gram
 #seed为函数的随机化设置种子，确保每次随机结果一样。
-#sentences：可以是一个list，对于大语料集，建议使用BrownCorpus,Text8Corpus或lineSentence构建。
 #alpha: 是学习速率
 #min_count: 可以对字典做截断. 词频少于min_count次数的单词会被丢弃掉, 默认值为5
 #max_vocab_size: 设置词向量构建期间的RAM限制。如果所有独立单词个数超过这个，则就消除掉其中最不频繁的一个。每一千万个单词需要大约1GB的RAM。设置成None则没有限制。
