@@ -20,8 +20,37 @@ model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4,sg=0，se
 #trim_rule： 用于设置词汇表的整理规则，指定那些单词要留下，哪些要被删除。可以设置为None（min_count会被使用）或者一个接受()并返回RU·E_DISCARD,uti·s.RU·E_KEEP或者uti·s.RU·E_DEFAU·T的函数。
 #sorted_vocab： 如果为1（defau·t），则在分配word index 的时候会先对单词基于频率降序排序。
 #batch_words：每一批的传递给线程的单词的数量，默认为10000
+
+#得到最相似的词向量
+model.most_similar("再见")
+#保存模型
+model.save('/home/weblogic/DATA/private/shangguanxf/cc_txt2/word2vec.bin')
+#加载模型
+model=gensim.models.Word2Vec.load("/home/weblogic/DATA/private/shangguanxf/cc_txt2/word2vec.bin")
+
 ```
-2. lda（隐狄利克雷分布），得到文档的主题分布
+2. 文档向量模型
+
+```python
+import gensim
+from gensim.models.doc2vec import TaggedLineDocument,LabeledSentence 
+model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4,sg=0，seed=0)
+#sentence为list，list内一列为文档词的list，另一列为tag。可以通过TaggedLineDocument直接从txt中生成sentences，txt的格式为一个文档一行，每个词之间以空格隔开
+#dm定义训练算法。默认dm=1,使用PV-DM。dm=0,使用PV-DBOW
+
+inferred_vector = model.infer_vector(['解除','核实','张女士','军民','状况','权益','签收','工号','服务满意','损失','投保','保险期限','无条件'])
+#得到最相似的文档index和相似度
+sims = model.docvecs.most_similar([inferred_vector], topn=3)  
+print(sims) 
+#保存模型
+model.save('/home/weblogic/DATA/private/shangguanxf/cc_txt2/doc2vec.bin')
+#加载模型
+model=m = gensim.models.Doc2Vec.load("/home/weblogic/DATA/private/shangguanxf/cc_txt2/doc2vec.bin")
+```
+
+   ​
+
+3. lda（隐狄利克雷分布），得到文档的主题分布
 
 ```python
 import gensim
@@ -41,6 +70,9 @@ ldamodel=lda(corpus,num_topics=5,id2word=doc_dict,passes=30,random_state=1)
 #corpus语料集
 #num_topics划分的主题数
 #id2word表示词id到每个文档的映射，用于决定词汇表的规模以及调试和主题打印
+query= doc_dict.doc2bow('北京市/保额/交费/明白/无条件/核对/损失/几号/工作/健康/如实'.split('/'))
+ldamodel[query]
+#得到该查询分类到每个主题的概率
 ```
 
-   ​
+   
