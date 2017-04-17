@@ -22,6 +22,20 @@ for root,dirs,files in os.walk('/home/weblogic/DATA/public/cc热点大数据/工
         df1.to_csv(os.path.join('/home/weblogic/DATA/private/shangguanxf/cc_bigdata/create/工单机构分布/标准化',filespath),encoding='gb18030')
 ```
 
+### 使用sample对数据进行重采样
+
+```python
+DataFrame.sample(n=None, frac=None, replace=False, weights=None, random_state=None, axis=None)
+#n 返回的采样数据
+#frac 返回的采样比例
+#replace 采样是否替换原有数据
+#weights 采样权重，需与原df列同样长。缺失值被视为0。
+
+#通过设置采样比例为1，对数据进行重新排序。
+df=df.sample(frac=1)
+df.reset_index(inplace=True, drop=True)
+```
+
 
 
 ## DataFrame常用操作
@@ -268,6 +282,25 @@ df.isnull()
 ```python
 df=pd.read_csv(os.path.join(root,filespath),encoding="gb18030",header=None,names=['机构名称','工单客户比'])
 #注意，设置列名时需header=None
+```
+
+### 生成训练集和测试集
+
+```python
+#取70%为训练集，得到再采样的70%的index
+train_list=list(all_.sample(frac=0.7).index)
+#通过set得到全量的index和训练集的index的差集作为测试集
+test_list=list(set(list(range(len(all_))))-set(train_list))
+#通过index取得训练集
+train=all_.iloc[train_list,:]
+train.reset_index(inplace=True, drop=True)
+#训练集中目标分类数量（分类为1）
+print(sum(train.标签))
+#通过index取得测试集
+test=all_.iloc[test_list,:]
+test.reset_index(inplace=True, drop=True)
+#测试集中目标分类数量（分类为1）
+print(sum(test.标签))
 ```
 
 
