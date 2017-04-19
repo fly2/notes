@@ -91,6 +91,15 @@ df.drop([df.columns[0]], axis=1,inplace=True)
 #df.column[0]得到第0列的列名
 ```
 
+### 按照条件更改列的值
+
+```python
+#使用.loc来按照条件更改列的值
+df.loc[df['A'] > 2, 'B'] = new_val
+```
+
+
+
 ### 数据合并
 
 数据合并有两种，一种是行数不变，合并列。一种是列不变，合并行
@@ -130,13 +139,16 @@ df1.index.name='key'
 df1=df1.reset_index()
 ```
 
-### DataFrame直接进行字符替换
+### df中str函数使用
 
-python str本身自带了很多函数。在pandas中使用需要在str类型的series后加str。
+python str本身自带了很多函数。在pandas中使用需要在str类型的series后加str。**不加.str将无法有效进行替换。**
 
  ```python
    infor['日期']=infor['日期'].str.replace('-','')#字符替换
+    
    df1.通话文本.str.count('。')#字符计数
+   
+   df1.通话文本.str.len()#得到每一行的字符长度
  ```
 
 ### 连接数据库
