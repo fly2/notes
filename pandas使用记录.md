@@ -40,6 +40,23 @@ df.reset_index(inplace=True, drop=True)
 
 ## DataFrame常用操作
 
+###建表
+
+```python
+#先建立表，再逐步赋值
+df1=pd.DataFrame(columns=('机构名称','minmax变换乘100','工单/客户数','该机构工单量','有效客户数'))
+#用loc为表赋值
+df1.loc[n]=[df.机构名称[i],m3,df.工单机构分布[i],df.该机构工单量[i],df.有效客户数[i]]
+
+#通过直接赋值的方法建立表
+df2 = pd.DataFrame({ 'A' : 1.,
+                     'B' : pd.Timestamp('20130102'),
+                     'C' : pd.Series(1,index=list(range(4)),dtype='float32'),
+                     'D' : np.array([3] * 4,dtype='int32'),
+                     'E' : pd.Categorical(["test","train","test","train"]),
+                     'F' : 'foo' })
+```
+
 ### 得到列名
 
 ```python
@@ -91,14 +108,53 @@ df.drop([df.columns[0]], axis=1,inplace=True)
 #df.column[0]得到第0列的列名
 ```
 
+### 去除重复值
+
+```python
+infor2.drop_duplicates(subset,keep,inplace)
+#subset 为所需的列标签或行标签，可以一个，也可以是标签的列表
+#keep的值有三种{‘first’, ‘last’, False},默认为‘first’
+#first : 保留重复值中的第一个
+#last : 保留重复值中的最后一个
+#False : 删除所有重复值
+#inplace=True代替原df，默认为False
+infor2.drop_duplicates(['工作所在地','性别'],False,inplace=True)
+#删除所有性别，工作所在地重复行
+```
+
+### 统计各列的值的数目
+
+```python
+#利用series.value_counts()计算列中每个值的数目
+Series.value_counts(normalize=False, sort=True, ascending=False, bins=None, dropna=True)
+#normalize 是否转换成频率，normalize=True则频数除以总频数作归一化处理
+#sort 是否排序
+#ascending 是否升序 默认ascending=False降序排列
+#bins=int 将连续变量分成离散变量
+#dropna=True删除空值
+
+#对test列统计值的词数
+a=['一','二','一']
+df=pd.DataFrame({'test':a})
+df.test.value_counts()
+#用bins将其分组
+a=[1,2,3,4,5,6,1,2,3]
+df=pd.DataFrame({'test':a})
+df.test.value_counts(bins=2)
+#结果
+0.995    6
+3.500    3
+#即将列a分成两个离散变量，(0.995,3.5] 频数为6, (3.5,6]频数为3
+```
+
+
+
 ### 按照条件更改列的值
 
 ```python
 #使用.loc来按照条件更改列的值
 df.loc[df['A'] > 2, 'B'] = new_val
 ```
-
-
 
 ### 数据合并
 
@@ -117,6 +173,19 @@ df4=pd.merge(df3,df1,how='inner',on=None,left_on=['投保人姓名','保单号']
 main=pd.merge(infor4,infor2,how='left',on='姓名')
 #用名字去关联，左边保持不变，右边和左边相同时匹配过去
 ```
+
+### 重置index
+
+在使用pd.concat之后需要重置索引，否则df.iloc[0,1]返回合并前每个表的[0,1]
+
+```python
+#重置索引
+df.reset_index(inplace=True, drop=True)
+#inplece=True 代替原df
+#drop=True 删除原索引
+```
+
+
 
 ### dict转DataFrame
 
@@ -151,6 +220,17 @@ python str本身自带了很多函数。在pandas中使用需要在str类型的s
    df1.通话文本.str.len()#得到每一行的字符长度
  ```
 
+### str类型的series转int类型
+
+将str的series转换为int的方法。
+
+```python
+#使用pandas自带函数
+df1.录音编号=pd.to_numeric(df1.录音编号)
+#使用numpy类型转换
+df1.录音编号=np.int64(df1.录音编号)
+```
+
 ### 连接数据库
 
 使用python连接数据库，可以使用sqlalchemy包，通过这个包连接数据库，对里面的数据进行操作。也可以通过pandas内部的函数直接读取数据库中的表。针对oracle，可以使用cx_Oracle包来读取oracle数据。读取oracle数据库出现中文乱码，是由于编码不匹配，需在前面设置编码格式。
@@ -181,16 +261,6 @@ res = cur.fetchall()[][].read()
 data = eval(res)
 df = pd.DataFrame(res, columns = ['保单号', '录音编号', '问答文本'])
 print(df)
-```
-### str类型的series转int类型
-
-将str的series转换为int的方法。
-
-```python
-#使用pandas自带函数
-df1.录音编号=pd.to_numeric(df1.录音编号)
-#使用numpy类型转换
-df1.录音编号=np.int64(df1.录音编号)
 ```
 ## 时间类型处理
 
