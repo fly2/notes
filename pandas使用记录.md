@@ -218,6 +218,8 @@ python str本身自带了很多函数。在pandas中使用需要在str类型的s
    df1.通话文本.str.count('。')#字符计数
    
    df1.通话文本.str.len()#得到每一行的字符长度
+
+   ja.time.str.split(' ').apply(lambda x: x[0])#得到切分后的第一个字符串
  ```
 
 ### str类型的series转int类型
