@@ -36,7 +36,9 @@ df=df.sample(frac=1)
 df.reset_index(inplace=True, drop=True)
 ```
 
+### iloc和loc
 
+pandas中iloc是用来对位置索引进行操作，loc是用行索引进行操作。
 
 ## DataFrame常用操作
 
@@ -55,6 +57,42 @@ df2 = pd.DataFrame({ 'A' : 1.,
                      'D' : np.array([3] * 4,dtype='int32'),
                      'E' : pd.Categorical(["test","train","test","train"]),
                      'F' : 'foo' })
+```
+
+### 行索引及多重行索引
+
+```python
+import pandas as pd
+#单列索引
+df=pd.DataFrame(columns=['age','gender','name'])
+#利用索引新添数据，1,2,3为当前行索引
+df.loc[1]=[18,'female','July']
+df.loc[2]=[19,'male','Jeo']
+df.loc[3]=[12,'female','Lily']
+df.loc[4]=[18,'male','Jack']
+#设置索引
+df.set_index('age',inplace=True)
+#选择数据
+df.loc[19]
+>>
+gender    male
+name       Jeo
+Name: 19.0, dtype: object
+
+#多列索引
+df.set_index(['age','gender'],inplace=True)
+#选择数据
+df.loc[(18,'female')]
+>>
+name    July
+Name: (18.0, female), dtype: object
+#利用查询来筛选数据
+df.query('age==18')
+>>
+		        name
+age	    gender	
+18.0	female	July
+        male	Jack
 ```
 
 ### 得到列名
@@ -101,12 +139,28 @@ del df['列']
 #返回一个删除列的新的DataFrame
 DataFrame.drop(labels, axis=0, level=None, inplace=False, errors='raise')
 #labels标签名或标签名的列表
-#axis轴，当label为1时，axis=1
+#axis轴，当label为列名时，axis=1
 #implace是否代替原Dataframe，默认为False
 
 df.drop([df.columns[0]], axis=1,inplace=True)
 #df.column[0]得到第0列的列名
 ```
+
+### 排序列
+
+```python
+pandas.DataFrame.sort_values(by, axis=0, ascending=True, inplace=False, kind='quicksort', na_position='last')
+
+import numpy as np
+import pandas as pd
+df = pd.DataFrame({'A' : ['foo', 'bar', 'foo', 'bar', 'foo', 'bar', 'foo', 'foo'],
+'B' : ['one', 'one', 'two', 'three','two', 'two', 'one', 'three'],
+'C' : np.random.randn(8),'D' : np.random.randn(8)})
+#按照C列排序，递增为关
+df.sort_values('C',ascending=False)
+```
+
+
 
 ### 去除重复值
 
@@ -218,8 +272,6 @@ python str本身自带了很多函数。在pandas中使用需要在str类型的s
    df1.通话文本.str.count('。')#字符计数
    
    df1.通话文本.str.len()#得到每一行的字符长度
-
-   ja.time.str.split(' ').apply(lambda x: x[0])#得到切分后的第一个字符串
  ```
 
 ### str类型的series转int类型
@@ -337,6 +389,28 @@ pd.date_range('2011-01-02','2016-11-30',freq='W')
 #按周生成时间。起始时间为'2011-01-02'，截止时间为'2016-11-30'
 ```
 
+## 分组计算
+
+### groupby分组
+
+```python
+import numpy as np
+import pandas as pd
+df = pd.DataFrame({'A' : ['foo', 'bar', 'foo', 'bar', 'foo', 'bar', 'foo', 'foo'],
+'B' : ['one', 'one', 'two', 'three','two', 'two', 'one', 'three'],
+'C' : np.random.randn(8),'D' : np.random.randn(8)})
+#按A列进行分组
+df1=df.groupby('A')
+#按A、B列进行分组
+df2=df.groupby(['A','B'])
+#按索引进行分组
+df3=df.groupby(level=0)
+```
+
+
+
+
+
 ## 问题解决记录
 
 ### pandas读取csv，前面有\ufeff
@@ -385,6 +459,27 @@ test=all_.iloc[test_list,:]
 test.reset_index(inplace=True, drop=True)
 #测试集中目标分类数量（分类为1）
 print(sum(test.标签))
+```
+
+### 文本特征中错误分行
+
+数据中的文本在转换过程中空格被转换成换行符。
+
+```python
+#将语音文本数据中的错误分开的文本合并
+pathname='/home/weblogic/DATA/private/shangguanxf/cc_txt2/大数据语音文本信息.txt'
+#二进制读取文件
+f = open(pathname, 'rb')  
+line=f.readlines()
+for i in range(2,len(line)):
+    #解码文本
+    s=line[i].decode()
+    #只保留数字行前面的换行符。正常一行应有6列，由于空格被转换成换行符，导致最后一列文本被错分多行。删除非6列的行的换行符，合并文本数据。
+    if s.count(',')<6:
+        line[i-1]=line[i-1][:-2]
+with open ('/home/weblogic/DATA/private/shangguanxf/cc_txt2/大数据语音文本信息.csv','wb') as file2:
+    file2.writelines(line)    
+print('end')
 ```
 
 
