@@ -52,14 +52,30 @@ $$
 
 ### **其它常用命令**
 
-> | 命令               | 显示               |      | 命令            | 显示            |
-> | ---------------- | ---------------- | ---- | ------------- | ------------- |
-> | `\sqrt[3]{2}`    | $\sqrt[3]{2}$    |      | `\sqrt{2}`    | $\sqrt{2}$    |
-> | `x^{3}`          | $x^3$            |      | `x_{3}`       | $x_{3}$       |
-> | `\lim_{x \to 0}` | $\lim_{x \to 0}$ |      | `\frac{1}{2}` | $\frac{1}{2}$ |
+> | 命令                 | 显示                 |      | 命令            | 显示             |
+> | ------------------ | ------------------ | ---- | ------------- | -------------- |
+> | `\sqrt[3]{2}`      | $\sqrt[3]{2}$      |      | `\sqrt{2}`    | $\sqrt{2}$     |
+> | `x^{3}`            | $x^3$              |      | `x_{3}`       | $x_{3}$        |
+> | `\lim_{x \to 0}`   | $\lim_{x \to 0}$   |      | `\frac{1}{2}` | $\frac{1}{2}$  |
+> | `\alpha\cdot\beta` | $\alpha\cdot\beta$ |      | `2\times 3`   | $2\times 3$    |
+> | `\overline`        | $\overline y$      |      | `\underline`  | $\underline x$ |
 
 > **注意**：上标和下标在只有一个字符时，可以不用中括号: `x^2`和`x^{2}`的结果都是 $x^2$
+>
+### 调整公式大小
+
+
+> | 命令       | 显示         | 命令            | 显示              |
+> | -------- | ---------- | ------------- | --------------- |
+> | `\tiny`  | $\tiny D$  | `\scriptsize` | $\scriptsize D$ |
+> | `\small` | $\small D$ | `\normalsize` | $\normalsize D$ |
+> | `\large` | $\large D$ | `\Large`      | $\Large D$      |
+> | `\LARGE` | $\LARGE D$ | `\huge`       | $\huge D$       |
+> | `\Huge`  | $\Huge D$  |               |                 |
+>
+> **注意**：从左到右，从上到下依次变大
 
 ------
 
-[更多详见](http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference)
+>
+>[更多详见](http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference)
