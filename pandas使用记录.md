@@ -51,12 +51,15 @@ df1=pd.DataFrame(columns=('机构名称','minmax变换乘100','工单/客户数'
 df1.loc[n]=[df.机构名称[i],m3,df.工单机构分布[i],df.该机构工单量[i],df.有效客户数[i]]
 
 #通过直接赋值的方法建立表
-df2 = pd.DataFrame({ 'A' : 1.,
+df2 = pd.DataFrame({ 'A' : 1,
                      'B' : pd.Timestamp('20130102'),
                      'C' : pd.Series(1,index=list(range(4)),dtype='float32'),
                      'D' : np.array([3] * 4,dtype='int32'),
                      'E' : pd.Categorical(["test","train","test","train"]),
                      'F' : 'foo' })
+#生成离散值列
+df3 = pd.DataFrame({ 'A' : 1,
+                     'G' : pd.np.random.choice(['lol','dota','cf'],10)})
 ```
 
 ### 行索引及多重行索引
@@ -150,6 +153,12 @@ df.drop([df.columns[0]], axis=1,inplace=True)
 
 ```python
 pandas.DataFrame.sort_values(by, axis=0, ascending=True, inplace=False, kind='quicksort', na_position='last')
+#by 排序所依赖的轴的名称或名称列表
+#axis=0 按什么轴进行排序，0为行，1为列。默认为0
+#ascending 是否升序，应为bool或bool列表。默认为True升序
+#inplace 是否替换原表。默认为否
+#kind 排序方法，有{‘quicksort’, ‘mergesort’, ‘heapsort’}，默认为'quicksort'
+#na_position NaN的位置,有{‘first’, ‘last’}，放在开始还是结尾，默认放结尾
 
 import numpy as np
 import pandas as pd
@@ -158,6 +167,42 @@ df = pd.DataFrame({'A' : ['foo', 'bar', 'foo', 'bar', 'foo', 'bar', 'foo', 'foo'
 'C' : np.random.randn(8),'D' : np.random.randn(8)})
 #按照C列排序，递增为关
 df.sort_values('C',ascending=False)
+#按照b，c列排序
+df.sort_values(['B','C'])
+```
+
+### 更改列类型
+
+更改类型需要使用astype()函数，有三种使用方法。astype()里可以用numpy的数据类型，也可以直接用'int8'类型的字符串形式。
+
+**注意：**用第二种方法更改部分列时，即使只有一列也需要用`dft[['a']]`，因为`dft.a`和`dft['a']`都得到的是array形式，`dft[['a']]`得到的是df格式。只有df格式才能用astype。
+
+```python
+
+dft = pd.DataFrame({'a': [1,2,3], 'b': [4,5,6], 'c': [7, 8, 9]})
+#全表更改类型
+#不会直接更改原表，需要赋值回去
+dft=dft.astype(np.int16)
+dft=dft.astype('int16')
+
+#更改部分列
+#不会直接更改原表，需要赋值回去
+dft[['a','b']] = dft[['a','b']].astype(np.uint8)
+
+#用loc更改部分列，容易出现异常，导致列格式无法传递回去,要避免使用第三种方法
+dft.loc[:, ['a', 'b']].astype(np.int16).dtypes
+>
+a    int16
+b    int16
+dtype: object
+    
+dft.loc[:, ['a', 'b']] = dft.loc[:, ['a', 'b']].astype(np.int16)
+dft.dtypes
+>    
+a    int64
+b    int64
+c    int64
+dtype: object
 ```
 
 
@@ -405,6 +450,20 @@ df1=df.groupby('A')
 df2=df.groupby(['A','B'])
 #按索引进行分组
 df3=df.groupby(level=0)
+```
+
+### apply使用
+
+apply对整行或整列的进行操作，类似matlab中cellfun对单个cell进行操作。
+
+```python
+DataFrame.apply(func, axis=0, broadcast=False, raw=False, reduce=None, args=(), **kwds)
+#func 对行/列进行操作的函数，可以自定义函数，多使用匿名函数
+#axis=0 0为行，1为列即操作一列的所有行
+#broadcast=False 是否和输入dataframe的尺寸保持一致
+#raw=False 是否转换为Series格式，False为转换为Series格式，True则使用ndarray代替。如果只使用apply numpy函数，使用ndarray将得到更高的性能。
+#reduce
+#args 传递给函数的位置参数
 ```
 
 
