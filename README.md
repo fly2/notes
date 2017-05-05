@@ -10,3 +10,4 @@
 ### [flow示例](https://github.com/fly2/notes/blob/master/flow%E7%A4%BA%E4%BE%8B.md)
 
 ### [省市对应列表](https://github.com/fly2/notes)
+### [常用模型性能度量方法](https://github.com/fly2/notes/blob/master/%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9E%8B%E6%80%A7%E8%83%BD%E5%BA%A6%E9%87%8F%E6%96%B9%E6%B3%95.md)
