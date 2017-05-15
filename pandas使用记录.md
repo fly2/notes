@@ -17,9 +17,11 @@ for root,dirs,files in os.walk('/home/weblogic/DATA/public/cc热点大数据/工
     for filespath in files:
         #root为路径，files为文件列表
         print(os.path.join(root,filespath))
-        df=pd.read_csv(os.path.join(root,filespath),encoding="gb18030")
-        #用os.path.join合成路径
-        df1.to_csv(os.path.join('/home/weblogic/DATA/private/shangguanxf/cc_bigdata/create/工单机构分布/标准化',filespath),encoding='gb18030')
+        #没有找到.csv会返回-1，否则返回位置
+        if filespath.find('.csv')>-1:
+            df=pd.read_csv(os.path.join(root,filespath),encoding="gb18030")
+            #用os.path.join合成路径
+            df1.to_csv(os.path.join('/home/weblogic/DATA/private/shangguanxf/cc_bigdata/create/工单机构分布/标准化',filespath),encoding='gb18030')
 ```
 
 ### 使用sample对数据进行重采样
@@ -133,20 +135,28 @@ DataFrame.insert(loc, column, value, allow_duplicates=False)
 df.insert(9,'班次',d)
 ```
 
-### 删除列
+### 删除行列
 
 ```python
-#永久删除列
-del df['列']
-
-#返回一个删除列的新的DataFrame
+#返回一个删除行/列的新的DataFrame
 DataFrame.drop(labels, axis=0, level=None, inplace=False, errors='raise')
 #labels标签名或标签名的列表
 #axis轴，当label为列名时，axis=1
 #implace是否代替原Dataframe，默认为False
 
+#删除列
+
+del df['列名']
+
 df.drop([df.columns[0]], axis=1,inplace=True)
 #df.column[0]得到第0列的列名
+
+#删除行
+df.drop(0)
+#删除标签为0的行
+
+df.drop(0,inplace=True)
+#删除行标签为0的行，并代替原表
 ```
 
 ### 排序列
@@ -220,6 +230,8 @@ infor2.drop_duplicates(subset,keep,inplace)
 infor2.drop_duplicates(['工作所在地','性别'],False,inplace=True)
 #删除所有性别，工作所在地重复行
 ```
+
+
 
 ### 统计各列的值的数目
 
@@ -317,6 +329,8 @@ python str本身自带了很多函数。在pandas中使用需要在str类型的s
    df1.通话文本.str.count('。')#字符计数
    
    df1.通话文本.str.len()#得到每一行的字符长度
+
+   df1.通话文本.str.find('中')#得到第一个‘中’（查询的字符串）出现的位置
  ```
 
 ### str类型的series转int类型
