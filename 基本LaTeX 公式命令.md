@@ -52,16 +52,17 @@ $$
 
 ### **其它常用命令**
 
-> | 命令                 | 显示                 |      | 命令            | 显示             |
-> | ------------------ | ------------------ | ---- | ------------- | -------------- |
-> | `\sqrt[3]{2}`      | $\sqrt[3]{2}$      |      | `\sqrt{2}`    | $\sqrt{2}$     |
-> | `x^{3}`            | $x^3$              |      | `x_{3}`       | $x_{3}$        |
-> | `\lim_{x \to 0}`   | $\lim_{x \to 0}$   |      | `\frac{1}{2}` | $\frac{1}{2}$  |
-> | `\alpha\cdot\beta` | $\alpha\cdot\beta$ |      | `2\times 3`   | $2\times 3$    |
-> | `\overline`        | $\overline y$      |      | `\underline`  | $\underline x$ |
-> | `\neq`             | $ \neq$            |      | `\geq`        | $\geq$         |
-> | `\leq`             | $\leq$             |      | `\in`         | $\in$          |
-> | `\notin`           | $\notin$           |      |               |                |
+> | 命令                 | 显示                 |      | 命令                       | 显示                     |
+> | ------------------ | ------------------ | ---- | ------------------------ | ---------------------- |
+> | `\sqrt[3]{2}`      | $\sqrt[3]{2}$      |      | `\sqrt{2}`               | $\sqrt{2}$             |
+> | `x^{3}`            | $x^3$              |      | `x_{3}`                  | $x_{3}$                |
+> | `\lim_{x \to 0}`   | $\lim_{x \to 0}$   |      | `\frac{1}{2}`            | $\frac{1}{2}$          |
+> | `\alpha\cdot\beta` | $\alpha\cdot\beta$ |      | `2\times 3`              | $2\times 3$            |
+> | `\overline`        | $\overline y$      |      | `\underline`             | $\underline x$         |
+> | `\neq`             | $ \neq$            |      | `\geq`                   | $\geq$                 |
+> | `\leq`             | $\leq$             |      | `\in`                    | $\in$                  |
+> | `\notin`           | $\notin$           |      | `$\max \limits_{a<x<b}$` | $\max \limits_{a<x<b}$ |
+> | `\infty`           | $\infty$           |      |                          |                        |
 
 > **注意**：上标和下标在只有一个字符时，可以不用中括号: `x^2`和`x^{2}`的结果都是 $x^2$
 >
