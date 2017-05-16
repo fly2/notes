@@ -11,3 +11,4 @@
 
 ### [省市对应列表](https://github.com/fly2/notes)
 ### [常用模型性能度量方法](https://github.com/fly2/notes/blob/master/%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9E%8B%E6%80%A7%E8%83%BD%E5%BA%A6%E9%87%8F%E6%96%B9%E6%B3%95.md)
+###[常见距离度量方式](https://github.com/fly2/notes/blob/master/%E5%B8%B8%E8%A7%81%E8%B7%9D%E7%A6%BB%E5%BA%A6%E9%87%8F%E6%96%B9%E5%BC%8F.md)
