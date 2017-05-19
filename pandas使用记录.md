@@ -114,7 +114,7 @@ df.column[0]
    df=pd.DataFrame({'A':[1,2,3], 'B':[4,5,6], 'C':[7,8,9]})
 
    #方法一，需要一次更改全部列名
-   df.columns('a','b','c')
+   df.columns=['a','b','c']
    #方法二,更改指定列名
    df.rename(columns={'a':'A'},inplace=True)
    ```
@@ -229,6 +229,16 @@ infor2.drop_duplicates(subset,keep,inplace)
 #inplace=True代替原df，默认为False
 infor2.drop_duplicates(['工作所在地','性别'],False,inplace=True)
 #删除所有性别，工作所在地重复行
+```
+
+### 去除nan
+
+```python
+dropna(axis=0, how='any', thresh=None, subset=None, inplace=False)
+#axis 按行还是按列去除，axis=0，按行删，axis=1按列删
+#how{'any','all'} 删除条件，'any'删除所有存在空值的行/列，'all'当该列或行全为空时删除
+#subset 沿其他轴需要考虑的标签
+#inplece 是否代替原数据
 ```
 
 
@@ -553,6 +563,27 @@ for i in range(2,len(line)):
 with open ('/home/weblogic/DATA/private/shangguanxf/cc_txt2/大数据语音文本信息.csv','wb') as file2:
     file2.writelines(line)    
 print('end')
+```
+
+### DataFrame相加值全为nan
+
+dataframe相加需要列名一致，否则会导致结果全为nan。将一个dataframe的列名与另一个dataframe改一致。
+
+```python
+df1=pd.DataFrame({'A':[1,2,3], 'B':[4,5,6], 'C':[7,8,9]})
+df2=pd.DataFrame({'a':[1,2,3], 'b':[4,5,6], 'c':[7,8,9]})
+df1+df2
+-->A	B	C	a	b	c
+0	NaN	NaN	NaN	NaN	NaN	NaN
+1	NaN	NaN	NaN	NaN	NaN	NaN
+2	NaN	NaN	NaN	NaN	NaN	NaN
+#更改列名
+df1.columns=df2.columns
+df1+df2
+-->a	b	c
+0	2	8	14
+1	4	10	16
+2	6	12	18
 ```
 
 
