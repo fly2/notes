@@ -100,6 +100,19 @@ age	    gender
         male	Jack
 ```
 
+### 索引操作
+
+```python
+#取交集
+df.index.intersection(df1.index)
+#取并集
+df.index.union(df1.index)
+#取差集
+df.index.diff(df1.index)
+```
+
+
+
 ### 得到列名
 
 ```python
