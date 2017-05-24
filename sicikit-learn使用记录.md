@@ -55,7 +55,7 @@ kmeans.cluster_centers_-->array([[ 1.,  2.],[ 4.,  2.]])
 
 ##### MiniBatchKMeans聚类
 
-MinibatchKmeans聚类相比正常的kmeans聚类，每次只使用部分数据去更新聚类簇心。相对于使用全部数据去更新聚类簇心，会损失一些精度，但会提高速度。适用于数据量很大时使用。
+MinibatchKmeans聚类相比正常的kmeans聚类，每次只使用部分数据去更新聚类簇心。相对于使用全部数据去更新聚类簇心，会损失一些精度，但会提高速度。适用于数据量很大时使用。使用fit_predict可能后缺少部分分类的数据点。
 
 平滑惯性（ewa_inertia）定义为：
 
