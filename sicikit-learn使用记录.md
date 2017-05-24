@@ -4,10 +4,11 @@
 
 ### Nearest Neighbors 
 
-  最近邻有两种方法，一种是根据最近的邻居表现做分类（回归），一种是根据一定范围半径r内的邻居的表现做分类(回归)。  
-  在用KNeighborsRegressor或RadiusNeighborsRegressor做回归，即对近邻的值做平均`weights = 'uniform'`,也可以按照距离加权平均`weights = 'distance'`。**在scikit-learn中distance加权是按照距离倒数作加权**
+ 最近邻算法可以用来做无监督的聚类，也可以做有监督的分类和回归。
 
+聚类即kmeans算法，计算点到点的距离，找出最近的聚类中心点。
 
+分类/回归则是考虑邻居的情况，根据最近的n个邻居（或在一定范围内的所有邻居）的类别（数值）来得到自己的类别（数值）。
 
 #### 聚类
 
@@ -19,7 +20,10 @@ elkan K-Means算法：
 
 利用三角形性质（两边之和大于第三边，两边之差小于第三边）来减少计算量。不适用于稀疏矩阵，由于数值缺失导致某些距离无法计算。
 
+##### kmeans聚类
+
 ```python
+#kmeans聚类
 KMeans(n_clusters=8, init='k-means++', n_init=10, max_iter=300, tol=0.0001, precompute_distances='auto', verbose=0, random_state=None, copy_x=True, n_jobs=1, algorithm='auto')
 #n_clusters 生成的簇的数目
 #init 初始化质心，可以是方法，可以是质心矩阵。如果是矩阵，则尺寸应为[n_clusters, n_features]
@@ -49,11 +53,42 @@ kmeans.predict([[0, 0], [4, 4]])-->array([0, 1], dtype=int32)
 kmeans.cluster_centers_-->array([[ 1.,  2.],[ 4.,  2.]])
 ```
 
-#### 分类回归
+##### MiniBatchKMeans聚类
 
-#### balltree
+MinibatchKmeans聚类相比正常的kmeans聚类，每次只使用部分数据去更新聚类簇心。相对于使用全部数据去更新聚类簇心，会损失一些精度，但会提高速度。适用于数据量很大时使用。
+
+平滑惯性（ewa_inertia）定义为：
+
+alpha=batch_size*2/(n_samples+1)
+
+ ewa_inertia = ewa_inertia * (1 - alpha) + batch_inertia * alpha
+
+batch_size为批次的大小。n_samples为样本点数目，+1为了防止除数为0导致无效。batch_inertia为样本距离最近的聚类中心的总和。第一次ewa_inertia = batch_inertia，之后的平滑惯性由上面的式子计算得出。
+
+```python
+MiniBatchKMeans(n_clusters=8, init='k-means++', max_iter=100, batch_size=100, verbose=0, compute_labels=True, random_state=None, tol=0.0, max_no_improvement=10, init_size=None, n_init=3, reassignment_ratio=0.01)
+#n_clusters 初始化的质心数目
+#init 初始化质心，可以是方法，可以是质心矩阵。如果是矩阵，则尺寸应为[n_clusters, n_features]
+#k-means++:初始的聚类中心之间的相互距离要尽可能的远。
+#random:从数据中随机选取初始聚类中心
+#max_iter 最大迭代次数
+#batch_size 批次大小，每次更新质心所用的数据量
+#verbose 是否输出详细信息
+#compute_labels 在minibatch收敛后为整个数据集的数据加上标签，默认为True
+#random_state 为随机数生成器设置种子
+#tol 通过聚类中心的相对位移变化来提前停止聚类，默认为0。中心相对位移变化通过平滑，方差归一化后计算中心距离平方均值测量。
+#max_no_improvement 最大连续未降低平滑惯性的次数，当达到最大次数，则停止算法。默认为10.如果要禁止此提前停止条件，设置max_no_improvement=None
+#init_size 初始化中心点时所需要的随机采样数量。默认为3倍的batch_size。
+#n_init 尝试的随机初始化次数。
+#reassignment_ratio 控制要重新分配的中心的最大计数数量的分数。 较高的值意味着低计数中心更容易重新分配，这意味着模型将需要更长的时间来收敛，可能产生更好的聚类效果。
+```
 
 
+
+#### 分类/回归
+
+最近邻有两种方法，一种是根据最近的邻居表现做分类（回归），一种是根据一定范围半径r内的邻居的表现做分类(回归)。  
+  在用KNeighborsRegressor或RadiusNeighborsRegressor做回归，即对近邻的值做平均`weights = 'uniform'`,也可以按照距离加权平均`weights = 'distance'`。**在scikit-learn中distance加权是按照距离倒数作加权**
 
 ```python
 #找到最近的邻居
@@ -79,7 +114,46 @@ distances
        [ 0.        ,  1.        ],
        [ 0.        ,  1.41421356]])
 
+#knn分类
+KNeighborsClassifier(n_neighbors=5, weights='uniform', algorithm='auto', leaf_size=30, p=2, metric='minkowski', metric_params=None, n_jobs=1, **kwargs)
+#n_neighbors 考虑的最近邻个数
+#weights 预测时的权重函数{'uniform','distance'}.'uniform'为均值平均，'distance'加权平均，权重为距离的倒数。我们也可以自定义权重，即自定义一个函数，输入是距离值，输出是权重值。这样我们可以自己控制不同的距离所对应的权重。
+#algorithm 计算最近邻时使用的算法{‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}。当输入是稀疏矩阵时，会无视此参数使用暴力计算{'brute'}的方法。
+#'brute':暴力计算，无任何优化
+#'ball_tree':适用于高维数据，在kd-tree能够处理的数据范围内要慢于kd-tree。
+#'kd_tree':适用于低维数据，维数小于20时效率最高
+#leaf_size 叶的尺寸，停止建子树的叶子节点数量的阈值，不影响结果。只影响内存大小和查询结果的速度。leaf_size一般leaf_size<n_samples<2*leaf_size,除非n_samples<leaf_size。leaf_size越大速度越快。
+#p 闵可夫斯基距离的p值，1时为曼哈顿距离，2时为欧式距离，无穷时为切比雪夫距离。
+#metric 字符串或距离矩阵对象。默认为闵可夫斯基距离（'minkowski'）
+#metric_params 度量函数的附加关键字参数。主要是用于带权重闵可夫斯基距离的权重，以及其他一些比较复杂的距离度量的参数。
+#n_joibs 并行线程数。如果为-1，则设置为cpu的核心数。
+
+#rnn分类
+RadiusNeighborsClassifier(radius=1.0, weights='uniform', algorithm='auto', leaf_size=30, p=2, metric='minkowski', outlier_label=None, metric_params=None, **kwargs)
+#radius 使用的参数空间范围，即近邻判定的半径。在半径内的即为近邻。
+#weights 预测时的权重函数{'uniform','distance'}.'uniform'为均值平均，'distance'加权平均，权重为距离的倒数。我们也可以自定义权重，即自定义一个函数，输入是距离值，输出是权重值。这样我们可以自己控制不同的距离所对应的权重。
+#algorithm 计算最近邻时使用的算法{‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}。当输入是稀疏矩阵时，会无视此参数使用暴力计算{'brute'}的方法。
+#'brute':暴力计算，无任何优化
+#'ball_tree':适用于高维数据，在kd-tree能够处理的数据范围内要慢于kd-tree。
+#'kd_tree':适用于低维数据，维数小于20时效率最高
+#leaf_size 叶的尺寸，停止建子树的叶子节点数量的阈值，不影响结果。只影响内存大小和查询结果的速度。leaf_size一般leaf_size<n_samples<2*leaf_size,除非n_samples<leaf_size。leaf_size越大速度越快。
+#p 闵可夫斯基距离的p值，1时为曼哈顿距离，2时为欧式距离，无穷时为切比雪夫距离。
+#metric 字符串或距离矩阵对象。默认为闵可夫斯基距离（'minkowski'）
+#metric_params 度量函数的附加关键字参数。主要是用于带权重闵可夫斯基距离的权重，以及其他一些比较复杂的距离度量的参数。
+#outlier_label 主要用于预测时，如果目标点半径内没有任何训练集的样本点时，应该标记的类别，不建议选择默认值 none,因为这样遇到异常点会报错。可设置为训练集没有的类别以表明异常。
 ```
+
+### Logistic Model
+
+#### 分类
+
+```python
+LogisticRegression(penalty='l2', dual=False, tol=0.0001, C=1.0, fit_intercept=True, intercept_scaling=1, class_weight=None, random_state=None, solver='liblinear', max_iter=100, multi_class='ovr', verbose=0, warm_start=False, n_jobs=1)
+#penalty{'l1','l2'} 指定的用于优化算法的范数。‘newton-cg’,‘sag’和‘lbfgs’只支持'l2'范数
+#dual
+```
+
+
 
 ### gbdt
 
