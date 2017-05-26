@@ -1,4 +1,4 @@
-# 学习心得
+# 学习笔记
 
 ### [pandas使用记录](https://github.com/fly2/notes/blob/master/pandas%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95.md)
 ### [sicikit-learn使用记录](https://github.com/fly2/notes/blob/master/sicikit-learn%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95.md#sicikit-learn使用记录)
