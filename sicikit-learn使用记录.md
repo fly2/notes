@@ -149,8 +149,24 @@ RadiusNeighborsClassifier(radius=1.0, weights='uniform', algorithm='auto', leaf_
 
 ```python
 LogisticRegression(penalty='l2', dual=False, tol=0.0001, C=1.0, fit_intercept=True, intercept_scaling=1, class_weight=None, random_state=None, solver='liblinear', max_iter=100, multi_class='ovr', verbose=0, warm_start=False, n_jobs=1)
-#penalty{'l1','l2'} 指定的用于优化算法的范数。‘newton-cg’,‘sag’和‘lbfgs’只支持'l2'范数
-#dual
+#penalty{'l1','l2'} 指定的用于惩罚过拟合的范数。‘newton-cg’,‘sag’和‘lbfgs’只支持'l2'范数
+#dual 是否计算其对偶形式。（svm中用到对偶问题）如果计算对偶形式，只能使用l2范数惩罚。当n_sample>n_feature时，建议dual=False
+#tol 停止的标准，当优化器（newton-cg and lbfgs）的提升小于tol则停止
+#C 正则化力量的倒数。必须是一个正的浮点型数字。像支持向量机一样，更小的值表示更强的正则化。
+#fit_intercept 指定是否将一个常量（偏差或截距）添加到决策函数中
+#intercept_scaling 只当使用'liblinear'求解，且fit_intercept=True时有用。在这种情况下，x变为[x,self.intercept_scaling]，即将等于intercept_scaling的常量作为“合成”特征附加到实例向量。 截距成为intercept_scaling * synthetic_feature_weight。 注意!合成特征和其他所有特征一样需要进行l1/l2正则。为了减少正则化对合成特征权重的影响（在截距上），必须增大intercept_scaling。
+#class_weight 可输入字典或者'balanced'。字典格式为{class_label:weight},如果不提供，所有的分类权重为1.如果设置为'balanced'模式，则会自动根据输入的数据集中各类别出现的频数的反比作为权重，具体公式为weight_i=n_samples / (n_classes * n_class_i) n_classes为类别数,n_class_i为输入数据集中分类为i类别的数目。请注意，如果指定了sample_weight，这些权重将乘以sample_weight（通过fit方法传递）。
+#random_state 随机数生成器种子，仅用于'sag'和'liblinear'求解。
+#solver {‘newton-cg’, ‘lbfgs’, ‘liblinear’, ‘sag’}用来优化问题的算法。
+对于小数据集，用'liblinear'是一个好的选择，当数据集更大时，使用'sag'会得到更快的速度。
+对于多类问题，只有'newton-cg', 'sag' 和 'lbfgs'可以处理多项损失，'liblinear'只能用来处理'one-vs-rest'的情况
+'newton-cg'，'lbfgs'和'sag'只处理L2惩罚。
+请注意，'sag'快速收敛仅在具有大致相同尺度的特征上得到保证。可以使用sklearn.preprocessing中的缩放器预处理数据。
+#max_iter solver的最大迭代次数，只对'newton-cg', 'sag' and 'lbfgs'有用
+#multi_class {'ovr', 'multinomial'},多分类选项。如果选择'ovr'（one-vs-rest），则将演变成n个二分类问题，每个分类将自己作为正例，其他分类作为负例进行分类训练。选择'multinomial'，则是最小化多分类损失函数，此选项只适用于'newton-cg'，'sag'和'lbfgs'。
+#verbose 对于'liblinear' 和 'lbfgs' 求解器(solver)，可以设置为任意正数来输出详细信息。
+#warm_start 当设置为True时，重新使用上一次调用的解决方案作为初始化，否则，擦除以前的解决方案。 对于liblinear求解器无用。
+#n_jobs 交叉验证循环期间使用的CPU内核数。 如果值为-1，则使用所有核心。
 ```
 
 
