@@ -35,6 +35,80 @@ line=[line.strip() for line in open('/home/weblogic/DATA/private/shangguanxf/cc_
 #line.strip()为去除每行后面的'\n'
 ```
 
+### 文件保存
+
+```python
+#保存为txt
+with open ('/home/weblogic/DATA/private/shangguanxf/txt_anaysis/create/product_p.txt','wt') as file2:
+    for key in product_p:
+        file2.writelines('%s,%s\n' % (key, product_p[key]))    
+        
+#保存为csv
+with codecs.open(os.path.join("/home/weblogic/DATA/private/shangguanxf/cc_bigdata/create/工单机构分布/画图/",filespath),"w",'gb18030') as datacsv:
+            #读取csv文件，返回的是迭代类型
+            c1 = csv.writer(datacsv,dialect = ("excel"))
+            for one in out.items():
+                c1.writerow([one[0],one[1]])
+            for two in tmp.items():
+                c1.writerow([two[0],two[1]])
+```
+
+## os
+
+### 得到当前路径
+
+```python
+os.getcwd()
+->'E:\\code\\python'
+```
+
+### 获取指定目录下的所有文件和目录名
+
+```python
+os.listdir('dirname')
+#返回一个列表
+```
+
+### 检测文件/文件夹是否存在
+
+```python
+os.path.exists(path)
+#path可以为当前路径下的文件，也可以是绝对路径
+os.path.exists('gensim使用记录.md')
+->True
+os.path.exists('d:/1111.txt')
+->True
+```
+
+### 生成文件夹
+
+```python
+os.mkdir('d:/tmp1')
+#生成文件夹
+
+os.makedirs('d:/tmp2/tmp1')
+#生成多层文件夹（即生成tmp2，tmp1）
+```
+
+### 删除文件夹
+
+```python
+os.rmdir(path)
+#只能删除空文件夹
+os.rmdir('d:/tmp1')
+
+os.removedirs(path)
+#删除子目录后如果子目录为空则会同时删除父目录
+```
+
+### 删除文件
+
+```python
+os.remove(path)
+#删除指定文件
+os.remove('d:/1111.txt')
+```
+
 
 
 ## numpy
