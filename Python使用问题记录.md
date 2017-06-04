@@ -141,3 +141,28 @@ np.bincount(x)
 #输出结果为：array([0, 1, 1, 0, 1, 0, 1, 1])
 ```
 
+## time
+
+### 计算时间
+
+可以通过`time.time()`来得到当前的时间戳（1970年起始），两个时间戳相减，便得到运行时间
+
+```python
+import time
+
+time1=time.time()
+print(time.time()-time1)
+```
+
+### 暂停程序
+
+可以通过`time.sleep()`来使程序暂停。
+
+```python
+import time
+time.sleep(1)
+#程序暂停1s，实际暂停时间可能比1s短
+```
+
+
+
