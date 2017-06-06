@@ -599,5 +599,20 @@ df1+df2
 2	6	12	18
 ```
 
+### 查看df中索引是否存在
+
+```python
+import pandas as pd
+df1=pd.DataFrame({'A':[1,2,3], 'B':[4,5,6], 'C':[7,8,9]})
+#isin(list),list为需要确认是否存在的索引
+df.index.isin([3])
+->array([False, False,  True, False], dtype=bool)
+#使用逻辑词直接判断
+3 in df.index
+->True
+#可以结合if进行使用
+if 3 in df.index:print('ok')
+```
+
 
 
