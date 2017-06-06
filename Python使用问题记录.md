@@ -109,6 +109,14 @@ os.remove(path)
 os.remove('d:/1111.txt')
 ```
 
+## shutil
+
+### 删除目录以及目录内的所有内容
+
+```python
+shutil.rmtree('d:/test')
+```
+
 
 
 ## numpy
