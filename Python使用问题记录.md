@@ -76,6 +76,12 @@ with open('data.json', 'r') as f:
     data = json.load(f)
 ```
 
+## xml读写
+
+```python
+
+```
+
 
 
 ## os
