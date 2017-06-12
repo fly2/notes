@@ -53,6 +53,31 @@ with codecs.open(os.path.join("/home/weblogic/DATA/private/shangguanxf/cc_bigdat
                 c1.writerow([two[0],two[1]])
 ```
 
+## json读写
+
+```python
+import json
+#生成json数据
+data = {
+'name' : 'ACME',
+'shares' : 100,
+'price' : 542.23
+}
+ 
+json_str = json.dumps(data)
+#将字符串转回python数据结构
+data1=json.loads(json_str)
+
+#写json文件
+with open('data.json', 'w') as f:
+    json.dump(data,f)
+#读json文件
+with open('data.json', 'r') as f:
+    data = json.load(f)
+```
+
+
+
 ## os
 
 ### 得到当前路径
