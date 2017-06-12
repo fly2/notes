@@ -384,10 +384,13 @@ import os
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
 #直接读取数据库中的表
 df=pd.read_sql_table('id_infor','oracle+cx_oracle://shangguan:shangguan_test123@sandbox')
+#通过schema参数设置表所在空间（即name.table的name）
+#df=pd.read_sql_table('tb_cc_record_analysis','oracle+cx_oracle://shangguan:shangguan_test123@sandbox',schema='sandbox_fixed')
 
 #设置编码格式
 import os
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
+#用cx_Oracle读取数据库中的表
 import cx_Oracle as ora
 import pandas as pd
 con = ora.connect('shangguan/shangguan_test123@sandbox')
