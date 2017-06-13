@@ -15,6 +15,21 @@ print('a is %.3f,b is %.3f'%(0.2,0.5))
 -->a is 0.200,b is 0.500
 ```
 
+### 空值
+
+```python
+None==None
+-->True
+#在df的列中得到空值得真值表
+df.col1==None
+#无法得到该列为空的真值表，需要使用isnull()
+df.col1.isnull()
+
+from numpy import NaN
+NaN==NaN
+-->False
+```
+
 ## 文件存取
 
 ### 文件读取
@@ -78,11 +93,81 @@ with open('data.json', 'r') as f:
 
 ## xml读写
 
+<<<<<<< HEAD
 ```python
 
 ```
 
+=======
+xml格式简单介绍
 
+```xml
+<?xml version="1.0" ?> 
+- <data>
+- <country name="Singapore">#name为country的属性，country为标签(tag)
+  <rank>4</rank> #4为'rank'标签的text
+  <year>2011</year> 
+  <gdppc>59900</gdppc> 
+  <neighbor name="Malaysia" direction="N" /> 
+  </country>
+- <country name="Panama">
+  <rank>68</rank> 
+  <year>2011</year> 
+  <gdppc>13600</gdppc> 
+  <neighbor name="Costa Rica" direction="W" /> 
+  <neighbor name="Colombia" direction="E" /> 
+  </country>
+  </data>
+```
+
+
+
+xml读取有三种方法SAX，DOM，以及ElementTree。因DOM需要将XML数据映射到内存中的树，一是比较慢，二是比较耗内存，而SAX流式读取XML文件，比较快，占用内存少，但需要用户实现回调函数（handler）。ElementTree相对DOM速度要快，api接口也相对友善，因此这里只介绍ElementTree。
+>>>>>>> origin/master
+
+**注意：**
+
+xml.etree.ElementTree模块不能防止恶意构造的数据。 如果您需要解析不受信任或未经身份验证的数据，请参阅[XML漏洞](https://docs.python.org/3.5/library/xml.html#xml-vulnerabilities)。
+
+```python
+import xml.etree.ElementTree as ET
+#读取xml文件
+tree = ET.parse('country_data.xml')
+root = tree.getroot()
+#读取xml格式的文本
+root = ET.fromstring(country_data_as_string)
+#使用下标访问
+root[0][1].text
+-->'2011'
+#一级下标为country,二级下标为country中包含的标签。此例中[0][1]指第一个country,中的year，text为该标签的内容
+
+#for循环遍历输出
+for child in root: 
+    #到country一级
+    print(child.tag, "---", child.attrib) 
+    for i in child:
+        #到rank，year...这一级
+        print(i.text)
+        #输出文本，由于neighbor没有text会输出None
+
+#使用iter直接遍历二级标签
+for neighbor in root.iter('neighbor'):
+...     print(neighbor.attrib)
+#for neighbor in root.iter('yaer'):
+#...     print(neighbor.text)
+
+#通过搜索标签来输出，当为一级标签时直接搜索标签，当为二级标签时，搜索为路径'country/year'
+for i in root.findall('country/year'):
+    #find为搜索到的第一个元素，findall为全部元素
+    print(i.text)
+
+#写出xml文件
+tree.write(out_path, encoding="utf-8",xml_declaration=True,method="xml")
+#out_path 输出地址
+#encoding 编码，默认为"us-ascii"
+#xml_declaration 是否将xml声明添加到文件中，默认为None。True为始终添加，False为从添加，None为不是这三种编码时添加（US-ASCII or UTF-8 or Unicode）
+#method设置输出格式，可选'xml','html','txt',默认为'xml'
+```
 
 ## os
 
@@ -201,6 +286,13 @@ print(time.time()-time1)
 import time
 time.sleep(1)
 #程序暂停1s，实际暂停时间可能比1s短
+```
+
+### 当前时间
+
+```python
+t=time.strftime('%Y%m%d',time.localtime(time.time()))
+#得到当前时间，以年月日格式返回。
 ```
 
 
