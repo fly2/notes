@@ -93,12 +93,6 @@ with open('data.json', 'r') as f:
 
 ## xml读写
 
-<<<<<<< HEAD
-```python
-
-```
-
-=======
 xml格式简单介绍
 
 ```xml
@@ -123,7 +117,6 @@ xml格式简单介绍
 
 
 xml读取有三种方法SAX，DOM，以及ElementTree。因DOM需要将XML数据映射到内存中的树，一是比较慢，二是比较耗内存，而SAX流式读取XML文件，比较快，占用内存少，但需要用户实现回调函数（handler）。ElementTree相对DOM速度要快，api接口也相对友善，因此这里只介绍ElementTree。
->>>>>>> origin/master
 
 **注意：**
 

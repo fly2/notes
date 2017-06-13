@@ -62,6 +62,13 @@ df2 = pd.DataFrame({ 'A' : 1,
 #生成离散值列
 df3 = pd.DataFrame({ 'A' : 1,
                      'G' : pd.np.random.choice(['lol','dota','cf'],10)})
+
+#通过列直接建表
+#此法只可建一列，第二列为index，当有多列值时和上面一样，需要用字典去赋值。
+a=[1,2,3]
+b=['n','n','m']
+df4=pd.DataFrame(a,b)
+#pandas.DataFrame(data=None, index=None, columns=None, dtype=None, copy=False)[source],故df4中a为列，b为索引。
 ```
 
 ### 行索引及多重行索引
