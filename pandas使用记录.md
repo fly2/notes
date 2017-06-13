@@ -100,6 +100,22 @@ age	    gender
         male	Jack
 ```
 
+### 重置索引
+
+在使用pd.concat之后需要重置索引，否则df.iloc[0,1]返回合并前每个表的[0,1]
+
+```python
+#重置索引
+df.reset_index(inplace=True, drop=True)
+#inplece=True 代替原df
+#drop=True 删除原索引
+
+#重新排列索引
+df.reindex(new_index)
+#将原来的索引按照新索引进行排列，如果新索引在原索引中不存在，返回NaN。如果想要生成新的索引，使用reset_index()
+
+```
+
 ### 索引操作
 
 ```python
@@ -306,17 +322,6 @@ df4=pd.merge(df3,df1,how='inner',on=None,left_on=['投保人姓名','保单号']
 #on为关联时匹配的列，当只有一列时用on，多列时on=None，用left_on和right_on来关联
 main=pd.merge(infor4,infor2,how='left',on='姓名')
 #用名字去关联，左边保持不变，右边和左边相同时匹配过去
-```
-
-### 重置index
-
-在使用pd.concat之后需要重置索引，否则df.iloc[0,1]返回合并前每个表的[0,1]
-
-```python
-#重置索引
-df.reset_index(inplace=True, drop=True)
-#inplece=True 代替原df
-#drop=True 删除原索引
 ```
 
 
