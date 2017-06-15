@@ -413,6 +413,69 @@ data = eval(res)
 df = pd.DataFrame(res, columns = ['保单号', '录音编号', '问答文本'])
 print(df)
 ```
+## 文件读存
+
+### csv
+
+```python
+#csv读取
+pd.read_csv(filepath_or_buffer, sep=', ', delimiter=None, header='infer', names=None, index_col=None, usecols=None, squeeze=False, prefix=None, mangle_dupe_cols=True, dtype=None, engine=None, converters=None, true_values=None, false_values=None, skipinitialspace=False, skiprows=None, nrows=None, na_values=None, keep_default_na=True, na_filter=True, verbose=False, skip_blank_lines=True, parse_dates=False, infer_datetime_format=False, keep_date_col=False, date_parser=None, dayfirst=False, iterator=False, chunksize=None, compression='infer', thousands=None, decimal=b'.', lineterminator=None, quotechar='”', quoting=0, escapechar=None, comment=None, encoding=None, dialect=None, tupleize_cols=False, error_bad_lines=True, warn_bad_lines=True, skipfooter=0, skip_footer=0, doublequote=True, delim_whitespace=False, as_recarray=False, compact_ints=False, use_unsigned=False, low_memory=True, buffer_lines=None, memory_map=False, float_precision=None)
+只列出常用参数，其余用时查询。
+#filepath_or_buffer 文件地址
+#sep设置分隔符
+#engine : {‘c’, ‘python’}, 选用引擎，c速度快，python功能更丰富。 
+#encoding 编码格式，默认为utf-8
+
+
+#常用写法
+df=pd.read_csv('/home/weblogic/DATA/public/cc热点大数据/太寿工单/太寿工单.csv',encoding='gb18030')
+
+#csv写出
+df.to_csv(path_or_buf=None, sep=', ', na_rep='', float_format=None, columns=None, header=True, index=True, index_label=None, mode='w', encoding=None, compression=None, quoting=None, quotechar='”', line_terminator='\n', chunksize=None, tupleize_cols=False, date_format=None, doublequote=True, escapechar=None, decimal='.')
+只列出常用参数，其余用时查询
+#path_or_buf 保存文件位置
+#sep 设置分割符
+#header 是否保留列名，默认header=True保留列名
+#index 是否保留索引，默认index=True保留索引
+#encoding 编码格式
+
+#常用写法.因为read_csv读取时会自动生成索引，所以生成时关闭索引
+df.to_csv('/home/weblogic/DATA/private/shangguanxf/cc_copy/create/10-3/寿险投诉机构工单.csv',index=False)
+```
+
+#### 读取的csv没有列名
+
+```python
+df=pd.read_csv(os.path.join(root,filespath),encoding="gb18030",header=None,names=['机构名称','工单客户比'])
+#注意，设置列名时需header=None
+```
+
+### excel
+
+```python
+#读取excel
+pd.read_excel(io, sheetname=0, header=0, skiprows=None, skip_footer=0, index_col=None, names=None, parse_cols=None, parse_dates=False, date_parser=None, na_values=None, thousands=None, convert_float=True, has_index_names=None, converters=None, dtype=None, true_values=None, false_values=None, engine=None, squeeze=False, **kwds)
+只列出常用参数，余下用时查询
+#io 文件位置
+#sheetname 选择所用的sheet，可用string或int。string则应为所取sheet名。int则是sheet位置，0为第一个sheet。当取多个sheet时，使用列表[]。如果为None，则取所有的sheet
+#header 列名位置，默认为0
+#names 要使用的列名列表。 如果文件不包含标题行，应设置header = None
+
+#常用写法
+df1=pd.read_excel('/home/weblogic/DATA/private/shangguanxf/cc_copy/1-3/寿险预约与咨询工单1_3.xls','Sheet1')
+
+#保存excel
+df.to_excel(excel_writer, sheet_name='Sheet1', na_rep='', float_format=None, columns=None, header=True, index=True, index_label=None, startrow=0, startcol=0, engine=None, merge_cells=True, encoding=None, inf_rep='inf', verbose=True, freeze_panes=None)
+#excel_writer 保存文件位置
+#sheet_name 表格名称
+#encoding 编码格式
+
+#常用写法
+df.to_excel(os.path.join('/home/weblogic/DATA/private/shangguanxf/cc_copy/create/',res_path,filespath1),sheet_name='sheet1')
+```
+
+
+
 ## 时间类型处理
 
 参考链接:
@@ -544,13 +607,6 @@ df4=df4[df4.坐席原始意见.isnull()==False]
 
 df.isnull()
 #将返回一个真值矩阵，空为真，非空为假
-```
-
-### 读取的csv没有列名
-
-```python
-df=pd.read_csv(os.path.join(root,filespath),encoding="gb18030",header=None,names=['机构名称','工单客户比'])
-#注意，设置列名时需header=None
 ```
 
 ### 生成训练集和测试集
