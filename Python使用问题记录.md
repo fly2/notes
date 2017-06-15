@@ -287,6 +287,17 @@ np.bincount(x)
 #输出结果为：array([0, 1, 1, 0, 1, 0, 1, 1])
 ```
 
+### 生成随机整数
+
+```python
+import numpy as np
+np.random.randint(a, b, size=(c, d))
+#生成范围在[a,b)的整数
+#size为生成数组行列
+```
+
+
+
 ## time
 
 ### 计算时间
