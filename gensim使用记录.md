@@ -1,6 +1,9 @@
-1.词向量模型，对词的表示进行降维
+## 词向量模型
+
+### 参数说明及使用
+
 ```python
-model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4,sg=0，seed=0)
+model = Word2Vec(sentences=None, size=100, alpha=0.025, window=5, min_count=5, max_vocab_size=None, sample=0.001, seed=1, workers=3, min_alpha=0.0001, sg=0, hs=0, negative=5, cbow_mean=1, hashfxn=<built-in function hash>, iter=5, null_word=0, trim_rule=None, sorted_vocab=1, batch_words=10000)
 #sentences：可以是一个list,每一段文本list中的一个集合，每个集合又按照词顺序组成list，对于大语料集，建议使用BrownCorpus,Text8Corpus或lineSentence构建。
 #size表示词嵌入的特征维度.大的size需要更多的训练数据,但是效果会更好. 推荐值为几十到几百。
 #window表示词的窗口，指当前词与预测词的最大距离
@@ -21,23 +24,101 @@ model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4,sg=0，se
 #sorted_vocab： 如果为1（defau·t），则在分配word index 的时候会先对单词基于频率降序排序。
 #batch_words：每一批的传递给线程的单词的数量，默认为10000
 
-#得到最相似的词向量
-model.most_similar("再见")
-#保存模型
+#导入词向量模块
+from gensim.models import Word2Vec
+
+#语料生成
+#BrownCorpus是迭代来自Brown语料库（NLTK数据的一部分）的句子。
+#Text8Corpus从“text8”语料库迭代句子，从http://mattmahoney.net/dc/text8.zip中解压缩。
+from gensim.models.word2vec import LineSentence
+#LineSentence返回的是两重列表，每行为一个列表，行列表由词列表组成
+sentences = LineSentence('myfile.txt')#txt格式为分好词的句子，词以空格隔开。一行一句话。
+sentences = LineSentence('compressed_text.txt.bz2')
+sentences = LineSentence('compressed_text.txt.gz')
+
+#训练模型
+import multiprocessing
+model = Word2Vec(doc_list,size=400, window=5, min_count=5,workers=multiprocessing.cpu_count())
+#更新模型参数
+model.train(sentences, total_words=None, word_count=0, total_examples=None, queue_factor=2, report_delay=1.0)
+#从句子序列更新模型的神经权重（可以是一次性的生成器流）。 对于Word2Vec，每个句子必须是unicode字符串的列表。 （子类可以接受其他示例。）为了支持从（初始）α到min_alpha的线性学习率衰减，应提供total_examples（句子数/行数）或total_words（句子中的原始单词数），除非句子与用于初始构建的句子相同 词汇。
+
+#删除中间参数
+model.delete_temporary_training_data(replace_word_vectors_with_normalized=False)
+#丢弃在训练和得分中使用的参数。 如果您确定已完成模型训练。 如果replace_word_vectors_with_normalized被设置，忘记原始向量，只保留归一化的向量=节约大量的内存！
+
+#得到词向量内容
+model['再见']
+
+#找出前N个最相似的词。积极的词有助于积极的相似性，消极的词则相反。加法运算
+most_similar(positive=[], negative=[], topn=10, restrict_vocab=None, indexer=None)
+#该方法计算给定单词投影权重向量的简单平均值(正例权重为1，负例为-1。即正例-负例)与模型中每个单词的向量之间的余弦相似性。该方法对应于原始word2vec实现中的word-analogy和distance 脚本。如果topn为False，most_similar返回相似度分数的向量。
+#restrict_vocab 是一个可选的整数，它限制了搜索最相似值的向量的范围。例如，restrict_vocab = 10000将只检查词汇顺序中前10000个单词向量。（如果您按频率降序排序词汇表，这将很有意义。）
+例：
+>>> trained_model.most_similar(positive=['woman','king'], negative=['man'])
+[('queen', 0.50882536), ...]
+
+#使用Omer Levy和Yoav Goldberg在[4]中提出的乘法组合目标寻找前N个最相似的词。积极的词对于相似性仍然是积极地，而消极词是负面地，但对一个大距离支配计算有较小的易感性。
+most_similar_cosmul(positive=[], negative=[], topn=10)
+#附加的正或负例子分别对分子或分母做出贡献。具体见https://github.com/RaRe-Technologies/gensim/blob/686e97579a61edf20908afd4aba90bfaf0fce340/gensim/models/keyedvectors.py
+例：
+>>> trained_model.most_similar_cosmul(positive=['baghdad','england'], negative=['london'])
+[(u'iraq', 0.8488819003105164), ...]
+
+
+#根据词得到最相似的词
+similar_by_word(word, topn=10, restrict_vocab=None)
+#如果topn为False，similar_by_word返回相似性分数的向量。restrict_vocab是一个可选整数，它限制了搜索最相似值的向量的范围。例如，restrict_vocab = 10000将只检查词汇顺序中前10000个单词向量。（如果您按频率降序排序词汇表，这将很有意义。）
+例：
+>>> trained_model.similar_by_word('graph')
+[('user', 0.9999163150787354), ...]
+
+#通过向量找出前N个最相似的词。
+similar_by_vector(vector, topn=10, restrict_vocab=None)
+#如果topn为False，similar_by_vector返回相似性分数的向量。restrict_vocab是一个可选整数，它限制了搜索最相似值的向量的范围。例如，restrict_vocab = 10000将只检查词汇顺序中前10000个单词向量。（如果您按频率降序排序词汇表，这将很有意义。）
+例：
+>>> trained_model.similar_by_vector([1,2])
+[('survey', 0.9942699074745178), ...]
+
+similarity(w1, w2)
+#计算两个词之间的余弦相似度。
+例：
+>>> trained_model.similarity('woman','man')
+0.73723527
+>>> trained_model.similarity('woman','woman')
+1.0
+
+#找出最不匹配的词
+model.doesnt_match("breakfast cereal dinner lunch".split())
+-->'cereal'
+
+#保存模型,后缀对保存加载没有影响，可以任意命名后缀
 model.save('/home/weblogic/DATA/private/shangguanxf/cc_txt2/word2vec.bin')
 #加载模型
 model=gensim.models.Word2Vec.load("/home/weblogic/DATA/private/shangguanxf/cc_txt2/word2vec.bin")
-
 ```
-2. 文档向量模型
+### 文档
+
+[使用示例](https://github.com/RaRe-Technologies/gensim/blob/develop/docs/notebooks/word2vec.ipynb)
+
+[在线更新模型示例](https://github.com/RaRe-Technologies/gensim/blob/develop/docs/notebooks/online_w2v_tutorial.ipynb)
+
+## 文档向量模型
+
+### 参数说明及使用
 
 ```python
 import gensim
 from gensim.models.doc2vec import TaggedLineDocument,LabeledSentence 
-model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4,sg=0，seed=0)
-#sentence为list，list内一列为文档词的list，另一列为tag。可以通过TaggedLineDocument直接从txt中生成sentences，txt的格式为一个文档一行，每个词之间以空格隔开
+Doc2Vec(documents=None, dm_mean=None, dm=1, dbow_words=0, dm_concat=0, dm_tag_count=1, docvecs=None, docvecs_mapfile=None, comment=None, trim_rule=None, **kwargs)
+#documents为list，list内一列为文档词的list，另一列为tag。可以通过TaggedLineDocument直接从txt中生成sentences，txt的格式为一个文档一行，每个词之间以空格隔开
+#dm_mean 默认为0，使用文档内词向量的和，dm_mean=1时使用向量的平均值。（仅在dm被用在非拼接模型时使用）
 #dm定义训练算法。默认dm=1,使用PV-DM。dm=0,使用PV-DBOW
+#dbow_words 如果设为1，训练word-vectors (用skip-gram方式) 的同时训练 DBOW doc-vector。默认是0 (仅训练doc-vectors时更快)。
+#dm_concat 如果为1，使用上下文词向量的拼接，默认是0。注意，拼接的结果是一个更大的模型，输入的大小不再是一个词向量（采样或算术结合），而是标签和上下文中所有词结合在一起的大小
+#dm_tag_count 每个文件期望的文本标签数，在使用dm_concat模式时默认为1。
 
+#先生成新文本的文本向量
 inferred_vector = model.infer_vector(['解除','核实','张女士','军民','状况','权益','签收','工号','服务满意','损失','投保','保险期限','无条件'])
 #得到最相似的文档index和相似度
 sims = model.docvecs.most_similar([inferred_vector], topn=3)  
@@ -50,7 +131,9 @@ model=m = gensim.models.Doc2Vec.load("/home/weblogic/DATA/private/shangguanxf/cc
 
    ​
 
-3. lda（隐狄利克雷分布），得到文档的主题分布
+## lda（隐狄利克雷分布）
+
+得到文档主题分布。
 
 ```python
 import gensim
