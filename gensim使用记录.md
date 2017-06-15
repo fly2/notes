@@ -118,6 +118,13 @@ Doc2Vec(documents=None, dm_mean=None, dm=1, dbow_words=0, dm_concat=0, dm_tag_co
 #dm_concat 如果为1，使用上下文词向量的拼接，默认是0。注意，拼接的结果是一个更大的模型，输入的大小不再是一个词向量（采样或算术结合），而是标签和上下文中所有词结合在一起的大小
 #dm_tag_count 每个文件期望的文本标签数，在使用dm_concat模式时默认为1。
 
+#语料生成
+documents=TaggedLineDocument('/home/weblogic/DATA/private/shangguanxf/cc_txt2/语音文本分词.txt')
+#语音文本分词为一个文档一行，内部分词以空格分开
+
+#训练模型
+model = Doc2Vec(documents, size=400, window=5, min_count=5,iter=5,workers=multiprocessing.cpu_count())
+
 #先生成新文本的文本向量
 inferred_vector = model.infer_vector(['解除','核实','张女士','军民','状况','权益','签收','工号','服务满意','损失','投保','保险期限','无条件'])
 #得到最相似的文档index和相似度
@@ -126,7 +133,7 @@ print(sims)
 #保存模型
 model.save('/home/weblogic/DATA/private/shangguanxf/cc_txt2/doc2vec.bin')
 #加载模型
-model=m = gensim.models.Doc2Vec.load("/home/weblogic/DATA/private/shangguanxf/cc_txt2/doc2vec.bin")
+model= gensim.models.Doc2Vec.load("/home/weblogic/DATA/private/shangguanxf/cc_txt2/doc2vec.bin")
 ```
 
    ​
