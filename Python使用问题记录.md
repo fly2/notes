@@ -30,6 +30,28 @@ NaN==NaN
 -->False
 ```
 
+### isinstance
+
+```python
+#通过内置函数isinstance进行判断变量是否为某个类型，是则返回True
+isinstance(val,type)
+a = 4
+isinstance (a,int)
+-->True
+```
+
+### if  not  列表
+
+是判断列表是否为空，如果为空，则返回True，否则返回False
+
+```python
+if  not ['a','b','c']:
+    print(1)
+else:
+    print(2)
+-->2
+```
+
 ## 文件存取
 
 ### 文件读取
@@ -53,7 +75,7 @@ line=[line.strip() for line in open('/home/weblogic/DATA/private/shangguanxf/cc_
 ### 文件保存
 
 ```python
-#保存为txt
+#保存为txt,在win显示需加\r
 with open ('/home/weblogic/DATA/private/shangguanxf/txt_anaysis/create/product_p.txt','wt') as file2:
     for key in product_p:
         file2.writelines('%s,%s\n' % (key, product_p[key]))    
@@ -226,7 +248,14 @@ os.remove('d:/1111.txt')
 shutil.rmtree('d:/test')
 ```
 
+## multiprocessing
 
+得到电脑的cpu核心数
+
+```python
+import multiprocessing
+workers=multiprocessing.cpu_count()
+```
 
 ## numpy
 
