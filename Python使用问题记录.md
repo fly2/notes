@@ -90,6 +90,17 @@ with codecs.open(os.path.join("/home/weblogic/DATA/private/shangguanxf/cc_bigdat
                 c1.writerow([two[0],two[1]])
 ```
 
+### 文件追加
+
+```python
+#在原有文件后面追加，即需要设置模式为'a'
+with open('D:/Program Files (x86)/Tencent/WeChat/WeChat Files/s_g_x_f/Files/data2007.csv','a') as f:
+        for i in city:
+            f.writelines('%s,%s,%s,%s\n' % (i,data[i][0],data[i][1],data[i][2]))
+```
+
+
+
 ## json读写
 
 ```python
