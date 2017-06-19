@@ -195,6 +195,217 @@ tree.write(out_path, encoding="utf-8",xml_declaration=True,method="xml")
 #method设置输出格式，可选'xml','html','txt',默认为'xml'
 ```
 
+## str
+
+在字符串前面加u，`u'中国'`表示unicode编码，可以直接使用encode进行编码转换。字符串前面加b，`b'\xe4\xb8\xad\xe5\x9b\xbd'`表示byte字符串，可直接根据编码格式进行解码。
+
+### 转义字符
+
+| 转义字符    | 描述            | 转义字符   | 描述                        |
+| ------- | ------------- | ------ | ------------------------- |
+| \(在行尾时) | 续行符           | \other | 其它的字符以普通格式输出              |
+| \\      | 反斜杠符号         | \xyy   | 十六进制数，yy代表的字符，例如：\x0a代表换行 |
+| \'      | 单引号           | \oyy   | 八进制数，yy代表的字符，例如：\o12代表换行  |
+| \"      | 双引号           | \f     | 换页                        |
+| \a      | 响铃            | \r     | 回车                        |
+| \b      | 退格(Backspace) | \t     | 横向制表符                     |
+| \e      | 转义            | \v     | 纵向制表符                     |
+| \000    | 空             | \n     | 换行                        |
+
+### 字符串运算
+
+下列实例中a='Hello',b='Python'
+
+| 操作符    | 描述                                       | 实例                   |
+| ------ | ---------------------------------------- | :------------------- |
+| +      | 字符串连接                                    | a+b>>>'HelloPython'  |
+| *      | 重复输出字符串                                  | a * 2>>>'HelloHello' |
+| []     | 通过索引获取字符串中字符                             | a[1]>>>'e'           |
+| [ : ]  | 截取字符串中的一部分                               | a[1:4]>>>'ell'       |
+| in     | 成员运算符 - 如果字符串中包含给定的字符返回 True             | "H" in a>>>True      |
+| not in | 成员运算符 - 如果字符串中不包含给定的字符返回 True            | "M" not in a>>>True  |
+| r/R    | 原始字符串 - 原始字符串：所有的字符串都是直接按照字面的意思来使用，不会进行转义字符操作。 原始字符串除在字符串的第一个引号前加上字母"r"（可以大小写）以外，与普通字符串有着几乎完全相同的语法。 | print(r'\n')>>>  \n  |
+
+```python
+#r操作符实例
+print('a\nb')
+-->
+a
+b
+print(r'a\nb')
+-->
+a\nb
+```
+
+### 字符串格式化
+
+**注意：**格式化操作符辅助指令写在字符串格式化符号前面。
+
+```python
+#示例
+#保留两位小数的浮点数
+print("My name is %s and weight is %.2f kg!" % ('Zara', 98.2) )
+-->My name is Zara and weight is 98.20 kg!
+```
+
+字符串格式化符号。
+
+| 符   号 | 描述                 |
+| ----- | ------------------ |
+| %c    | 格式化字符及其ASCII码      |
+| %s    | 格式化字符串             |
+| %d    | 格式化整数              |
+| %u    | 格式化无符号整型           |
+| %o    | 格式化无符号八进制数         |
+| %x    | 格式化无符号十六进制数        |
+| %X    | 格式化无符号十六进制数（大写）    |
+| %f    | 格式化浮点数字，可指定小数点后的精度 |
+| %e    | 用科学计数法格式化浮点数       |
+| %E    | 作用同%e，用科学计数法格式化浮点数 |
+| %g    | %f和%e的简写           |
+| %G    | %f 和 %E 的简写        |
+| %p    | 用十六进制数格式化变量的地址     |
+
+格式化操作符辅助指令：
+
+| 符号    | 功能                                       |
+| ----- | ---------------------------------------- |
+| *     | 定义宽度或者小数点精度                              |
+| -     | 用做左对齐                                    |
+| +     | 在正数前面显示加号( + )                           |
+| <sp>  | 在正数前面显示空格                                |
+| #     | 在八进制数前面显示零('0')，在十六进制前面显示'0x'或者'0X'(取决于用的是'x'还是'X') |
+| 0     | 显示的数字前面填充'0'而不是默认的空格                     |
+| %     | '%%'输出一个单一的'%'                           |
+| (var) | 映射变量(字典参数)                               |
+| m.n.  | m 是显示的最小总宽度,n 是小数点后的位数(如果可用的话)           |
+
+### 内置函数
+
+#### str.split()
+
+字符串分割
+
+```python
+#以 str 为分隔符切片 string，如果 num有指定值，则仅分隔 num 个子字符串
+string.split(str,num)
+#string为字符串
+#str为分割的字符串
+#num为分割次数，默认为全部分割
+
+string='君不见，黄河之水天上来，奔流到海不复回。君不见，高堂明镜悲白发，朝如青丝暮成雪'
+string.split('，')
+-->['君不见', '黄河之水天上来', '奔流到海不复回。君不见', '高堂明镜悲白发', '朝如青丝暮成雪']
+```
+
+#### str.join()
+
+字符串合并
+
+```python
+#以 string 作为分隔符，将 seq 中所有的元素(的字符串表示)合并为一个新的字符串
+string.join(seq)
+#seq为待合并的字符串list
+
+s=['君不见', '黄河之水天上来', '奔流到海不复回。君不见', '高堂明镜悲白发', '朝如青丝暮成雪']
+'/'.join(s)
+-->'君不见/黄河之水天上来/奔流到海不复回。君不见/高堂明镜悲白发/朝如青丝暮成雪'
+```
+
+#### str.replace()
+
+```python
+#把 string 中的 str1 替换成 str2,如果 num 指定，则替换不超过 num 次.
+string.replace(str1,str2,num)
+#str1为匹配的字符串
+#str2为替换后的字符串
+#num为替换次数，默认为全部
+
+string='君不见，黄河之水天上来，奔流到海不复回。君不见，高堂明镜悲白发，朝如青丝暮成雪'
+string.replace('君','你')
+-->'你不见，黄河之水天上来，奔流到海不复回。你不见，高堂明镜悲白发，朝如青丝暮成雪'
+```
+
+#### str.strip()
+
+```python
+#删除字符串前后的空格
+string.strip()
+
+string='                hello world!          '
+string.strip()
+-->'hello world!'
+
+string.lstrip()#删除字符串左边的空格
+string.rstrip()#删除字符串右边的空格
+```
+
+#### str.count()
+
+```python
+#返回 str 在 string 里面出现的次数，如果 beg 或者 end 指定则返回指定范围内 str 出现的次数
+string.count(str,beg,end)
+#str 需要统计出现次数的字符串
+#beg 统计的开始位置
+#end 统计的结束位置
+
+string='君不见，黄河之水天上来，奔流到海不复回。君不见，高堂明镜悲白发，朝如青丝暮成雪'
+string.count('见',0,3)
+-->1 
+#因为只统计string[0:3]中'见'的次数，故为1次
+```
+
+#### string.encode()和string.decode()
+
+```python
+#以 encoding 指定的编码格式解码 string，如果出错默认报一个 ValueError 的 异 常 ， 除 非 errors 指 定 的 是 'ignore' 或 者'replace'
+string.decode(encoding='UTF-8', errors='strict')
+
+#以 encoding 指定的编码格式编码 string，如果出错默认报一个ValueError 的异常，除非 errors 指定的是'ignore'或者'replace'
+string.encode(encoding='UTF-8', errors='strict')
+#encoding 编码格式
+#errors 错误处理方式
+常见编码格式'gb18030','gb2312','utf-8','gbk'
+
+```
+
+#### str.find
+
+**注意：** str.find只会返回找到的第一个匹配的字符的开始的位置，后面匹配到的将没有任何返回
+
+```python
+#检测 str 是否包含在 string 中，如果 beg 和 end 指定范围，则检查是否包含在指定范围内，如果是返回开始的索引值，否则返回-1
+string.find(str, beg=0, end=len(string))
+#str 要寻找的字符串
+#beg 开始搜索位置，默认为0
+#end 结束搜索位置，默认为len(string)
+
+string='君不见，黄河之水天上来，奔流到海不复回。君不见，高堂明镜悲白发，朝如青丝暮成雪'
+string.find('见')
+-->2 #只返回了第一个匹配的'见'的其实位置
+
+```
+
+#### str.maketrans和str.translate
+
+```python
+#根据 str 给出的表(包含 256 个字符)转换 string 的字符,要过滤掉的字符放到 del 参数中
+string.translate(str, del="")
+#str为由maketrans生成的替换表
+#del为要过滤掉的字符
+
+#maketrans() 方法用于创建字符映射的转换表，对于接受两个参数的最简单的调用方式，第一个参数是字符串，表示需要转换的字符，第二个参数也是字符串表示转换的目标。
+string.maketrans(intab, outtab)
+#intab 需要转换的字符
+#outtab 映射后的字符
+
+
+string = "this is string example....wow!!!"
+trantab=str.maketrans('aeiou', "12345")
+string.translate(trantab)
+-->'th3s 3s str3ng 2x1mpl2....w4w!!!'
+```
+
 ## os
 
 ### 得到当前路径
