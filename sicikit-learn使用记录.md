@@ -55,7 +55,7 @@ kmeans.cluster_centers_-->array([[ 1.,  2.],[ 4.,  2.]])
 
 ##### MiniBatchKMeans聚类
 
-MinibatchKmeans聚类相比正常的kmeans聚类，每次只使用部分数据去更新聚类簇心。相对于使用全部数据去更新聚类簇心，会损失一些精度，但会提高速度。适用于数据量很大时使用。使用fit_predict可能后缺少部分分类的数据点。
+MinibatchKmeans聚类相比正常的kmeans聚类，每次只使用部分数据去更新聚类簇心。相对于使用全部数据去更新聚类簇心，会损失一些精度，但会提高速度。适用于数据量很大时使用。
 
 平滑惯性（ewa_inertia）定义为：
 
@@ -181,7 +181,7 @@ LogisticRegression(penalty='l2', dual=False, tol=0.0001, C=1.0, fit_intercept=Tr
 
   scikit中自带有对文本处理的函数。
 
-  `HashingVectorizer`输入为列表格式的文本，输出为onehot词矩阵，出现为1，未出现为0
+  `HashingVectorizer`输入为列表格式的文本(支持'/'分词的文本)，输出为onehot词矩阵，出现为1，未出现为0
   `CountVectorizer`输入为列表格式的文本，输出为词出现次数onehot矩阵
 
   `sklearn.feature_extraction.text.``CountVectorizer`(*input=u'content'*, *encoding=u'utf-8'*, *decode_error=u'strict'*, *strip_accents=None*, *lowercase=True*, *preprocessor=None*, *tokenizer=None*, *stop_words=None*, *token_pattern=u'(?u)\b\w\w+\b'*, *ngram_range=(1*, *1)*, *analyzer=u'word'*, *max_df=1.0*, *min_df=1*, *max_features=None*, *vocabulary=None*, *binary=False*, *dtype=<type 'numpy.int64'>*)
