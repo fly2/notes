@@ -52,6 +52,29 @@ else:
 -->2
 ```
 
+### @的用法
+
+'@'符号用作函数修饰符，即将被修饰的函数作为参数，返回修饰后的同名函数或其他可调用的东西。修饰符必须出现在函数定义前一行，不允许和函数定义在同一行。也就是说@A def f(): 是非法的。 只可以在模块或类定义层内对函数进行修饰，不允许修修饰一个类。
+
+```python
+#在addspam中先定义了new(*args)函数，在return中调用new函数，在new中调用fn函数
+def addspam(fn):
+    def new(*args):
+        print("spam,spam,spam")
+        return fn(*args)
+    return new
+@addspam
+def useful(a,b):
+    print(a**2+b**2)
+#调用useful(4,3)时会将useful当作参数调用addspam(useful(4,3))
+useful(4,3)
+-->
+spam,spam,spam
+25
+```
+
+
+
 ## 文件存取
 
 ### 文件读取
