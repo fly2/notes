@@ -2,6 +2,12 @@
 
 画图使用matplotlib和seaborn
 
+### 直接展示图像
+
+matplotlib是最著名的Python图表绘制扩展库，它支持输出多种格式的图形图像，并且可以使用多种GUI界面库交互式地显示图表。使用`%matplotlib`命令可以将matplotlib的图表直接嵌入到Notebook之中，或者使用指定的界面库显示图表，它有一个参数指定matplotlib图表的显示方式。
+
+`inline`表示将图表嵌入到Notebook中。plt.plot()`所创建的图表将直接显示在该单元之下，无需plt.show()。
+
 ### 折线图
 
 #### 2d折线图
