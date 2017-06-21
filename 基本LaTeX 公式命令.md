@@ -86,8 +86,34 @@ $$
 | `()`   | $()$   |      | `\sqrt{2}`         | $[]$              |
 | `\{\}` | $\{\}$ |      | `\langle  \rangle` | $\langle \rangle$ |
 | `||`   | $\|\|$ |      | `||a+b||_1`        | $ \|\|a+b\|\|_1$  |
+|        |        |      |                    |                   |
+大括号
+$$
+F^{HLLC}=\left\{
+\begin{array}{rcl}
+F_L       &      & {0      <      S_L}\\
+F^*_L     &      & {S_L \leq 0 < S_M}\\
+F^*_R     &      & {S_M \leq 0 < S_R}\\
+F_R       &      & {S_R \leq 0}
+\end{array} \right.
+$$
+```latex
+$$
+F^{HLLC}=\left\{
+\begin{array}{rcl}
+F_L       &      & {0      <      S_L}\\
+F^*_L     &      & {S_L \leq 0 < S_M}\\
+F^*_R     &      & {S_M \leq 0 < S_R}\\
+F_R       &      & {S_R \leq 0}
+\end{array} \right.
+$$
+```
+
+
 
 ------
 
 >
 >[更多详见](http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference)
+
+
