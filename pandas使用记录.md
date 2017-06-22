@@ -68,7 +68,64 @@ df3 = pd.DataFrame({ 'A' : 1,
 a=[1,2,3]
 b=['n','n','m']
 df4=pd.DataFrame(a,b)
-#pandas.DataFrame(data=None, index=None, columns=None, dtype=None, copy=False)[source],故df4中a为列，b为索引。
+#pandas.DataFrame(data=None, index=None, columns=None, dtype=None, copy=False),故df4中a为列，b为索引。如果想a,b均为列，需要加{}，如df2那般
+```
+
+### 数据选择
+
+通过标签（df.loc）选择时行[1:3]表示[1,2,3],通过位置(df.iloc)进行选择时行[1:3]表示[1,2]
+
+```python
+import pandas as pd
+import numpy as np
+df=pd.DataFrame({ 'A' : 1,
+                     'B' : pd.Timestamp('20130102'),
+                     'C' : pd.Series(1,index=list(range(4)),dtype='float32'),
+                     'D' : np.array([3] * 4,dtype='int32'),
+                     'E' : pd.Categorical(["test","train","test","train"]),
+                     'F' : 'foo' })
+#按列选择,选择多列时需用括号
+df[['A','B']]
+
+#按行选择,0:3表示[0,1,2]
+df[0:3]
+
+#通过布尔值选择
+df[df.E=='test']
+#用isin进行筛选
+df[df.E.isin(['test','train'])]
+
+#通过标签获得行列,0:3为行标签即index，['A','B']为列名
+注意：此时0:3得到的是[0,1,2,3]
+df.loc[0:3,['A','B']]
+df.loc[0]<==>df.loc[0,:]#两者结果相同
+#loc行可以为bool值
+df.loc[df.E=='test',['A','B']]
+
+
+#通过位置获得行列,0:4为行位置，0:2为列位置
+注意：行列都是从0开始计数
+注意：此时0:4=[0,1,2,3],0:2=[0,1]
+df.iloc[0:4,0:2]
+#单独取一列时可直接使用该列位置.直接取C列的值
+df.iloc[0:4,2]
+
+```
+
+### 数据赋值
+
+建议使用loc和iloc进行赋值
+
+```python
+#通过索引进行数据赋值
+df.loc[0,['A','B']=[2,3]
+#at和loc等价
+df.at[0,['A','B']=[2,3]
+      
+#通过位置进行数据赋值
+df.iloc[0:3,2]=3
+#iat和iloc类似，但行列只能单选
+df.iat[0:3,2]=3
 ```
 
 ### 行索引及多重行索引
@@ -120,7 +177,6 @@ df.reset_index(inplace=True, drop=True)
 #重新排列索引
 df.reindex(new_index)
 #将原来的索引按照新索引进行排列，如果新索引在原索引中不存在，返回NaN。如果想要生成新的索引，使用reset_index()
-
 ```
 
 ### 索引操作
@@ -251,7 +307,16 @@ c    int64
 dtype: object
 ```
 
+### 得到重复值
 
+```python
+df.duplicated(cols=None, take_last=False)
+#cols 为考虑是否重复的列，None则考虑全表
+#take_last为重复值标签方式{'first','last',False}
+#first:重复值中第一个为false，即不视为重复值
+#last：重复值中最后一个为false，即不视为重复值
+#False：所有重复值均为True。
+```
 
 ### 去除重复值
 
@@ -267,17 +332,49 @@ infor2.drop_duplicates(['工作所在地','性别'],False,inplace=True)
 #删除所有性别，工作所在地重复行
 ```
 
+### 得到nan
+
+pandas 提供isnull和notnull两种方法。isnull是为nan返回True，notnull是nan返回False。
+
+```python
+df1=pd.DataFrame({'A':range(5),'B':[np.nan,np.nan,np.nan,3,1],'C':np.random.rand(5)})
+#使用pd函数
+pd.isnull(df1.B)
+pd.notnull(df1.B)
+
+#使用df的函数
+df1.B.isnull
+df1.B.notnull
+```
+
 ### 去除nan
 
 ```python
 dropna(axis=0, how='any', thresh=None, subset=None, inplace=False)
 #axis 按行还是按列去除，axis=0，按行删，axis=1按列删
 #how{'any','all'} 删除条件，'any'删除所有存在空值的行/列，'all'当该列或行全为空时删除
-#subset 沿其他轴需要考虑的标签
+#thresh 不被去除需要的最少非空值数
+#subset 只根据subset参数里的列进行操作
 #inplece 是否代替原数据
+
+df1=pd.DataFrame({'A':range(5),'B':[np.nan,np.nan,np.nan,3,1],'C':np.random.rand(5),'D':[1,2,3,4,np.nan]})
+df1
+	A	B	       C	D
+0	0	NaN	0.494810	1.0
+1	1	NaN	0.001969	2.0
+2	2	NaN	0.774776	3.0
+3	3	3.0	0.073526	4.0
+4	4	1.0	0.532342	NaN
+df1.dropna(axis=0,subset=['D'])#只根据列表中的列的空值来决定是否保留，保留方式按how的参数执行
+    A	 B	       C	D
+0	0	NaN	0.494810	1.0
+1	1	NaN	0.001969	2.0
+2	2	NaN	0.774776	3.0
+3	3	3.0	0.073526	4.0
+df1.dropna(axis=0,thresh=4)#只保留非空值大于等于4的行
+    A	B	       C	D
+3	3	3.0	0.073526	4.0
 ```
-
-
 
 ### 统计各列的值的数目
 
