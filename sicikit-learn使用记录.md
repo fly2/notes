@@ -229,3 +229,14 @@ sklearn.model_selection.cross_val_score(estimator, X, y=None, groups=None, scori
 
 ```
 
+## 模型保存
+
+```python
+from sklearn.externals import joblib
+#lr是一个LogisticRegression模型
+#保存模型
+joblib.dump(lr, 'lr.model')
+#加载模型
+lr = joblib.load('lr.model')
+```
+
