@@ -99,7 +99,7 @@ line=[line.strip() for line in open('/home/weblogic/DATA/private/shangguanxf/cc_
 
 ```python
 #保存为txt,在win显示需加\r
-with open ('/home/weblogic/DATA/private/shangguanxf/txt_anaysis/create/product_p.txt','wt') as file2:
+with open('/home/weblogic/DATA/private/shangguanxf/txt_anaysis/create/product_p.txt','wt') as file2:
     for key in product_p:
         file2.writelines('%s,%s\n' % (key, product_p[key]))    
         
@@ -504,6 +504,8 @@ workers=multiprocessing.cpu_count()
 
 ## numpy
 
+numpy生成向量时，不要使用[1,n]/(1,n)这种形式，直接用单个n进行赋值，否则会生成矩阵，不能直接取值，需要array[0]才能取到值
+
 ### np的bool索引赋值
 
 在对np生成的数组以bool索引赋值时，bool需要为np.array类型。
@@ -539,6 +541,15 @@ import numpy as np
 np.random.randint(a, b, size=(c, d))
 #生成范围在[a,b)的整数
 #size为生成数组行列
+```
+
+### 生成0
+
+```python
+#生成5维的0向量
+np.zeros((5))
+#生成(3,5)的0矩阵
+np.zeros((3,5))
 ```
 
 
