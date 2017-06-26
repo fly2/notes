@@ -173,7 +173,7 @@ LogisticRegression(penalty='l2', dual=False, tol=0.0001, C=1.0, fit_intercept=Tr
 
 > 为什么用xgboost/gbdt在在调参的时候把树的最大深度调成6就有很高的精度了，但是用DecisionTree/RandomForest的时候需要把树的深度调到15或更高？
 
->一句话的解释，来自周志华老师的机器学习教科书（[ 机器学习-周志华**](https://link.zhihu.com/?target=https%3A//www.amazon.cn/%25E6%259C%25BA%25E5%2599%25A8%25E5%25AD%25A6%25E4%25B9%25A0-%25E5%2591%25A8%25E5%25BF%2597%25E5%258D%258E/dp/B01ARKEV1G/ref%3Dsr_1_1%3Fie%3DUTF8%26qid%3D1462535564%26sr%3D8-1%26keywords%3D%25E6%259C%25BA%25E5%2599%25A8%25E5%25AD%25A6%25E4%25B9%25A0)）：Boosting主要关注降低偏差，因此Boosting能基于泛化性能相当弱的学习器构建出很强的集成；Bagging主要关注降低方差，因此它在不剪枝的决策树、神经网络等学习器上效用更为明显。
+>一句话的解释，来自周志华老师的机器学习教科书（[ 机器学习-周志华](https://link.zhihu.com/?target=https%3A//www.amazon.cn/%25E6%259C%25BA%25E5%2599%25A8%25E5%25AD%25A6%25E4%25B9%25A0-%25E5%2591%25A8%25E5%25BF%2597%25E5%258D%258E/dp/B01ARKEV1G/ref%3Dsr_1_1%3Fie%3DUTF8%26qid%3D1462535564%26sr%3D8-1%26keywords%3D%25E6%259C%25BA%25E5%2599%25A8%25E5%25AD%25A6%25E4%25B9%25A0)）：Boosting主要关注降低偏差，因此Boosting能基于泛化性能相当弱的学习器构建出很强的集成；Bagging主要关注降低方差，因此它在不剪枝的决策树、神经网络等学习器上效用更为明显。
 >
 >随机森林(random forest)和GBDT都是属于集成学习（ensemble learning)的范畴。集成学习下有两个重要的策略Bagging和Boosting。
 >
@@ -193,6 +193,20 @@ LogisticRegression(penalty='l2', dual=False, tol=0.0001, C=1.0, fit_intercept=Tr
 ### gbdt
 
   GradientBoostingClassifier和GradientBoostingRegressor进行训练时，x需要为array-like格式(数组)，不能使用稀疏矩阵。当为稀疏矩阵时，可以考虑RandomForest或adaboost。
+
+### IsolationForest
+
+孤立森林，用于发现异常值的集成算法。
+
+```python
+IsolationForest(n_estimators=100, max_samples='auto', contamination=0.1, max_features=1.0, bootstrap=False, n_jobs=1, random_state=None, verbose=0)
+#n_estimators 孤立森林所用树的数目
+#max_samples 每个基决策树所需要的样本数。如果输入整数，则为需要分配的样本数，如果为浮点数，则为需要分配的比例(max_samples * X.shape[0])。如果为'auto'则设置为min(256,n_estimators)
+#contamination 数据集中离群值的比例
+#max_features
+```
+
+
 
 ## 文本处理
 
