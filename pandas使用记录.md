@@ -782,5 +782,26 @@ df.index.isin([3])
 if 3 in df.index:print('ok')
 ```
 
+### np数组无法用df真值赋值
+
+将df真值转为np真值即可成功使用
+
+```python
+a=np.array([1,2,3,4,5,6,7,8])
+df=pd.DataFrame({'A':[1,2,3,4,5,6,7,8]})
+#直接用df的真值去操作
+a[df.A>3]
+-->array([1, 1, 1, 2, 2, 2, 2, 2])
+a[df.A>3]=1
+a
+-->array([1, 1, 3, 4, 5, 6, 7, 8])
+#将df的真值转为np数组
+a[np.array(df.A>3)]
+-->array([4, 5, 6, 7, 8])
+a[np.array(df.A>3)]=1
+a
+-->array([1, 2, 3, 1, 1, 1, 1, 1])
+```
+
 
 
