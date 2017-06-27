@@ -194,6 +194,18 @@ LogisticRegression(penalty='l2', dual=False, tol=0.0001, C=1.0, fit_intercept=Tr
 
   GradientBoostingClassifier和GradientBoostingRegressor进行训练时，x需要为array-like格式(数组)，不能使用稀疏矩阵。当为稀疏矩阵时，可以考虑RandomForest或adaboost。
 
+#### 分类
+
+```python
+GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, criterion='friedman_mse', min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, min_impurity_split=1e-07, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')
+#loss {‘deviance’, ‘exponential’}需要优化的损失函数。'deviance'指用概率（logistic回归）产出进行分类的偏差,'exponential'即等于adaboost算法
+#learning_rate 通过该参数来缩小每棵树对学习率的贡献。learning_rate和n_estimators之间存在权衡。
+#n_estimators 基决策树数目
+#subsample
+```
+
+
+
 ### IsolationForest
 
 孤立森林，用于发现异常值的集成算法。
@@ -203,7 +215,20 @@ IsolationForest(n_estimators=100, max_samples='auto', contamination=0.1, max_fea
 #n_estimators 孤立森林所用树的数目
 #max_samples 每个基决策树所需要的样本数。如果输入整数，则为需要分配的样本数，如果为浮点数，则为需要分配的比例(max_samples * X.shape[0])。如果为'auto'则设置为min(256,n_estimators)
 #contamination 数据集中离群值的比例
-#max_features
+#max_features 每个基学习器的特征数，可输入整数或浮点数，整数为特征数，浮点数为特征比例（max_features * X.shape[1]）。
+#bootstrap 如果为True，则单个树使用随机替换的训练数据。 如果为False，则不进行替换的采样。
+#n_jobs 算法训练，预测时的并行数，-1表示使用全部核心
+#random_state 随机数生成器使用的种子
+#verbose 控制建树长度的冗长度。
+
+#孤立森林示例
+from sklearn.ensemble import IsolationForest
+n=100
+If=IsolationForest(n_estimators=n,  contamination=0.0001, n_jobs=24, random_state=None, verbose=0)
+If=If.fit(doc2vec1)
+py=If.predict(doc2vec2)
+precision=sum(test_y[py==1])/sum(py==1)
+recall=sum(py[np.array(test_y==1)])/sum(test_y==1)
 ```
 
 
