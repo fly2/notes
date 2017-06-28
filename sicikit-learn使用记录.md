@@ -199,9 +199,10 @@ LogisticRegression(penalty='l2', dual=False, tol=0.0001, C=1.0, fit_intercept=Tr
 ```python
 GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, criterion='friedman_mse', min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, min_impurity_split=1e-07, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')
 #loss {‘deviance’, ‘exponential’}需要优化的损失函数。'deviance'指用概率（logistic回归）产出进行分类的偏差,'exponential'即等于adaboost算法
-#learning_rate 通过该参数来缩小每棵树对学习率的贡献。learning_rate和n_estimators之间存在权衡。
-#n_estimators 基决策树数目
-#subsample
+#learning_rate 通过该参数来缩小每棵树对学习率的贡献。较小的learning_rate意味着我们需要更多的弱学习器的n_estimators。通常我们用步长(learning_rate)和迭代最大次数(n_estimators)一起来决定算法的拟合效果。
+#n_estimators 基决策树数目,即模型迭代次数
+#subsample 子采样比例（subsample）。取值为(0,1]。注意这里的子采样和随机森林不一样，随机森林使用的是放回抽样，而这里是不放回抽样。如果取值为1，则全部样本都使用，等于没有使用子采样。如果取值小于1，则只有一部分样本会去做GBDT的决策树拟合。选择小于1的比例可以减少方差，即防止过拟合，但是会增加样本拟合的偏差，因此取值不能太低。推荐在[0.5, 0.8]之间。
+#criterion 检测分割质量的函数。有'mse','mae','friedman_mse'。默认的“friedman_mse”通常是最好的，因为在某些情况下可以提供更好的近似。
 ```
 
 
