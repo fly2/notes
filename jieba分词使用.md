@@ -190,6 +190,17 @@ print(jieba.lcut(i))
 ['司机', '，', '秋', '名山', '怎么', '走']
 ```
 
+**使用实例：**
+
+```python
+#stopword为停用词表，每行为一个停用词
+stopkey=[line.strip() for line in open('/home/weblogic/DATA/private/shangguanxf/cc_txt1/stopword.txt').readlines()] 
+for sk in stopkey:
+    jieba.del_word(sk)
+```
+
+
+
 **注意：**
 
 除了使用`del_word`方法外，还可以使用列表集合取差集进行去除无效词，但此法会打乱分词顺序，如果后续需要进行语义分析，会产生较大影响。可以用在tfidf生成**关键词抽取**或以**tfidf向量分类**中。
