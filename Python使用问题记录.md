@@ -80,6 +80,7 @@ spam,spam,spam
 ### 文件读取
 
 ```python
+读取txt
 #方法一
 f=open('test.txt')        
 #返回文件对象
@@ -95,11 +96,21 @@ line=[line.strip() for line in open('/home/weblogic/DATA/private/shangguanxf/cc_
 #line.strip()为去除每行后面的'\n'
 ```
 
+```python
+读取csv
+#按行读取
+f=open('/home/weblogic/DATA/private/shangguanxf/cc_txt1/product.txt',encoding="gb18030").readlines()
+#按照分隔符进行分割
+line=[line.split(',') for line in f]
+```
+
+
+
 ### 文件保存
 
 ```python
 #保存为txt,在win显示需加\r
-with open('/home/weblogic/DATA/private/shangguanxf/txt_anaysis/create/product_p.txt','wt') as file2:
+with open ('/home/weblogic/DATA/private/shangguanxf/txt_anaysis/create/product_p.txt','wt') as file2:
     for key in product_p:
         file2.writelines('%s,%s\n' % (key, product_p[key]))    
         
@@ -500,6 +511,18 @@ shutil.rmtree('d:/test')
 ```python
 import multiprocessing
 workers=multiprocessing.cpu_count()
+```
+
+## io
+
+### 代替文件进行操作（io.StringIO）
+
+使用StringIO可以省去建立文件的步骤，直接模拟读取数据
+
+```python
+from io import StringIO
+data = 'a,b,c\n1,2,3\n4,5,6,7\n8,9,10'
+pd.read_csv(StringIO(data), error_bad_lines=False)
 ```
 
 ## numpy
