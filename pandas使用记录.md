@@ -547,6 +547,21 @@ df=pd.read_csv(os.path.join(root,filespath),encoding="gb18030",header=None,names
 #注意，设置列名时需header=None
 ```
 
+#### 读取csv有不规范数据，有的行中列和其他行不统一
+
+通过设置 error_bad_lines=True, warn_bad_lines=True来决定是否遇到不合规范的行数进行报错和警告。
+
+**注意：**如果error_bad_lines=False,虽然不会报错，但会跳过不合规范的数据
+
+```python
+CParserError: Error tokenizing data. C error: Expected 10 fields in line 45, saw 11
+报错：数据期待为10列，但是在45行见到了11列
+
+df=pd.read_csv('/home/weblogic/DATA/private/shangguanxf/cc_txt1/warning.txt',encoding='gb18030',error_bad_lines=False)
+#遇到数据格式错误会不进行报错，但仍会跳出警告
+#报错的数据会被跳过
+```
+
 ### excel
 
 ```python
