@@ -73,6 +73,26 @@ spam,spam,spam
 25
 ```
 
+### assert
+
+断言，Python的assert是用来检查一个条件，如果它为真，就不做任何事。如果它为假，则会抛出AssertError并且包含错误信息。
+
+```python
+x=5
+assert x > 0, "x is not zero or negative" 
+assert x%2 == 0, "x is not an even number"
+
+
+AssertionError                            Traceback (most recent call last)
+<ipython-input-10-394dd573a39e> in <module>()
+      1 x=5
+      2 assert x > 0, "x is not zero or negative"
+----> 3 assert x%2 == 0, "x is not an even number"
+
+AssertionError: x is not an even number
+
+```
+
 
 
 ## 文件存取

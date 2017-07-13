@@ -2,12 +2,6 @@
 
 画图使用matplotlib和seaborn
 
-### 直接展示图像
-
-matplotlib是最著名的Python图表绘制扩展库，它支持输出多种格式的图形图像，并且可以使用多种GUI界面库交互式地显示图表。使用`%matplotlib`命令可以将matplotlib的图表直接嵌入到Notebook之中，或者使用指定的界面库显示图表，它有一个参数指定matplotlib图表的显示方式。
-
-`inline`表示将图表嵌入到Notebook中。plt.plot()`所创建的图表将直接显示在该单元之下，无需plt.show()。
-
 ### 折线图
 
 #### 2d折线图
@@ -56,4 +50,39 @@ for i in xrange(5):
     plt.plot(x,np.cos(i*x))  
 plt.show()  
 ```
+
+### 图片保存
+
+plt图片保存有两种方法。
+
+#### plt.savefig(path)
+
+用来保存生成的figure()图像
+
+```python
+plt.figure()
+lw = 2
+plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic example')
+plt.legend(loc="lower right")
+#savefig(path)
+plt.savefig('/home/weblogic/DATA/private/shangguanxf/cc_txt2/roc.png')
+plt.show()
+```
+
+#### plt.imsave(path,arr)
+
+用来保存矩阵图像
+
+```python
+plt.imsave(path,arr)
+#path 保存图像的地址
+#arr An MxN (luminance), MxNx3 (RGB) or MxNx4 (RGBA) array.
+```
+
+
 

@@ -251,6 +251,111 @@ recall=sum(py[np.array(test_y==1)])/sum(test_y==1)
 
   `TfidfVectorizer`输入为列表格式的文档，输出为tf-idf
 
+## 特征选择
+
+### Univariate feature selection
+
+通过选择基于单变量统计测试的最佳特征来进行单变量特征选择。 它可以被看作是模型的预处理步骤。 Scikit-learn中进行特征选择的方法有：
+
+- [`SelectKBest`](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectKBest.html#sklearn.feature_selection.SelectKBest) 只保留得分最高的k个特征
+
+- [`SelectPercentile`](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectPercentile.html#sklearn.feature_selection.SelectPercentile)只保留得分最高的指定百分比的特征
+
+- 对每个特征使用常见的单变量统计检验：假阳性率（false positive rate）用SelectFpr，错误发现率（false discovery rate）用SelectFdr或家族误差（family wise error）用SelectFwe。
+
+- [`GenericUnivariateSelect`](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.GenericUnivariateSelect.html#sklearn.feature_selection.GenericUnivariateSelect) 允许使用可配置策略执行单变量特征选择。 这允许使用超参数搜索模型来选择最佳的单变量选择策略。
+
+这些对象将输入一个评分函数，返回单变量分数和p值（分数仅用于SelectKBest和SelectPercentile的特征选择）：
+
+- 对于回归：f_regression，mutual_info_regression
+
+- 对于分类：chi2，f_classif，mutual_info_classif
+
+#### SelectKBest
+
+
+```python
+SelectKBest(score_func=<function f_classif>, k=10)
+#score_func 评价单变量特征得分的函数
+#k 保留的特征数目
+
+from sklearn.datasets import load_iris
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2
+iris = load_iris()
+X, y = iris.data, iris.target
+X.shape
+
+X_new = SelectKBest(chi2, k=2).fit_transform(X, y)
+X_new.shape
+```
+
+#### SelectPercentile
+
+```python
+SelectPercentile(score_func=<function f_classif>, percentile=10)
+#score_func 函数采用两个数组X和Y，并返回一对数组（分数，p值）或单个数组与分数。 默认值为f_classif（参见下文“另见”）。 默认功能仅适用于分类任务。
+#percentile 保留的特征百分比
+
+from sklearn.datasets import load_iris
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2
+iris = load_iris()
+X, y = iris.data, iris.target
+X.shape
+
+X_new = SelectKBest(chi2, k=2).fit_transform(X, y)
+X_new.shape
+```
+
+#### 评分函数
+
+| 函数名称                   | 描述            | 适用范围 |
+| ---------------------- | ------------- | ---- |
+| chi2                   | 卡方检验          | 分类   |
+| f_classif              | 方差分析          | 分类   |
+| mutual_info_classif    | 估计离散目标变量的互信息。 | 分类   |
+| f_regression           | 单变量线性回归测试。    | 回归   |
+| mutual_info_regression | 估计连续目标变量的互信息。 | 回归   |
+
+#### GenericUnivariateSelect
+
+```python
+GenericUnivariateSelect(score_func=<function f_classif>, mode='percentile', param=1e-05)
+#score_func 函数采用两个数组X和Y，并返回一对数组（分数，p值）或单个数组与分数。 默认值为f_classif（参见下文“另见”）。 默认功能仅适用于分类任务。
+#mode 特征选择模式，有{'percentile', 'k_best', 'fpr', 'fdr', 'fwe'}
+#param 对应模式的参数，参数类型依赖于模式的选择，可以为浮点或整数型。
+```
+
+
+
+### SelectFromModel
+
+SelectFromModel是一个基于模型的特征选择器，可以与任何在拟合后具有coef_或feature_importances_属性的模型一起使用。 如果相应的coef_或feature_importances_值低于提供的阈值参数，则这些特征被认为是不重要的并被移除。 除了在数值上指定阈值之外，还有内置的启发式方法用于使用字符串参数来查找阈值。 可用的启发式是'mean'，'mdian'和浮点数，例如“0.1 * mean”。
+
+```python
+SelectFromModel(estimator, threshold=None, prefit=False)
+#estimator 构建特征选择器的的基准模型。 这可以是一个已经fit过的模型（如果是，则prefit设置为True）或一个没有fit过的模型。
+#threshold 用于特征选择的阈值,可以使用字符串{'mean','median'}和浮点数。 保留重要性大于或等于阈值的特征，丢弃其他的特征。 如果'median'（或'mean'），则阈值是特征的median（或mean）。 还可以使用缩放因子（例如，“1.25 * mean”）。 如果None，而且基模型的参数惩罚设置为l1，无论显式还是隐式（例如Lasso），则所使用的阈值为1e-5。 否则，默认使用“mean”。
+#prefit 基模型是否进行过预训练。 如果为True，则必须直接调用transform，并且SelectFromModel不能与cross_val_score，GridSearchCV等类似的模型函数一起使用。 如果为False，使用fit训练模型，然后转换以进行特征选择。
+
+from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.datasets import load_iris
+from sklearn.feature_selection import SelectFromModel
+iris = load_iris()
+X, y = iris.data, iris.target
+X.shape
+->(150, 4)
+clf = ExtraTreesClassifier()
+clf = clf.fit(X, y)
+clf.feature_importances_  
+->array([ 0.04...,  0.05...,  0.4...,  0.4...])
+model = SelectFromModel(clf, '0.2*mean',prefit=True)
+X_new = model.transform(X)
+X_new.shape
+->(150, 2)
+```
+
 ## 模型验证
 
 ### cross-validation
