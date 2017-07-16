@@ -62,7 +62,9 @@ $$
 > | `\neq`             | $ \neq$            |      | `\geq`                   | $\geq$                 |
 > | `\leq`             | $\leq$             |      | `\in`                    | $\in$                  |
 > | `\notin`           | $\notin$           |      | `$\max \limits_{a<x<b}$` | $\max \limits_{a<x<b}$ |
-> | `\infty`           | $\infty$           |      |                          |                        |
+> | `\infty`           | $\infty$           |      | `\partial`               | $\partial$             |
+> | `\nabla`           | $\nabla$           |      | `\Delta`                 | $\Delta$               |
+> | `\hat x`           | $\hat x$           |      |                          |                        |
 
 > **注意**：上标和下标在只有一个字符时，可以不用中括号: `x^2`和`x^{2}`的结果都是 $x^2$
 >

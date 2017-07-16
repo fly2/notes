@@ -310,13 +310,13 @@ X_new.shape
 
 #### 评分函数
 
-| 函数名称                   | 描述            | 适用范围 |
-| ---------------------- | ------------- | ---- |
-| chi2                   | 卡方检验          | 分类   |
-| f_classif              | 方差分析          | 分类   |
-| mutual_info_classif    | 估计离散目标变量的互信息。 | 分类   |
-| f_regression           | 单变量线性回归测试。    | 回归   |
-| mutual_info_regression | 估计连续目标变量的互信息。 | 回归   |
+| 函数名称                   | 描述                 | 适用范围 |
+| ---------------------- | ------------------ | ---- |
+| chi2                   | 卡方检验               | 分类   |
+| f_classif              | 方差分析               | 分类   |
+| mutual_info_classif    | 估计离散目标变量的互信息。      | 分类   |
+| f_regression           | 单变量线性回归测试(皮尔森相关系数) | 回归   |
+| mutual_info_regression | 估计连续目标变量的互信息。      | 回归   |
 
 #### GenericUnivariateSelect
 
