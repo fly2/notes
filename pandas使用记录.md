@@ -179,6 +179,19 @@ df.reindex(new_index)
 #将原来的索引按照新索引进行排列，如果新索引在原索引中不存在，返回NaN。如果想要生成新的索引，使用reset_index()
 ```
 
+### 索引排序
+
+```python
+df.sort_index(axis=0, level=None, ascending=True, inplace=False, kind='quicksort', na_position='last', sort_remaining=True, by=None)
+#axis=0 按列排序
+#level 排序等级，可以为索引等级（int）或索引名称（level name）或者为list格式
+#ascending 是否正序排列
+#inplace 是否替代原数据
+#kind 排列方式{‘quicksort’, ‘mergesort’, ‘heapsort’}
+#na_position {'first', 'last'}Nan的数据摆放位置，first为放在数据前面，last为放在末尾
+#sort_remaining 如果为真，并按级别和索引排序为多级，则按照指定级别排序后，按其他级别排序（按顺序排列）
+```
+
 ### 索引操作
 
 ```python
@@ -189,8 +202,6 @@ df.index.union(df1.index)
 #取差集
 df.index.diff(df1.index)
 ```
-
-
 
 ### 得到列名
 
