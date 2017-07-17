@@ -93,6 +93,83 @@ AssertionError: x is not an even number
 
 ```
 
+### 多变量命名
+
+使用locals()或者globals()，这两个函数提供了基于字典的访问局部和全局变量的方式。key为变量名，value为对应的变量值。
+
+```python
+for i in range(10):
+    locals()['name%s' % i],c = i,10 
+    #通过字典的方式生成命名为name1，name2，。。。，name9的变量
+```
+
+### 函数的参数
+
+python函数参数定义有四种方法：位置参数，默认参数，可变参数，关键字参数，四种如果要同时使用多种参数，需要按照（位置参数，默认参数，可变参数，关键字参数）顺序定义。
+
+```python
+#位置参数
+def fun(a,b):
+    print(a)
+    print(b)
+fun(20,30)
+->20
+->30
+
+#默认参数
+def fun(a=10,b=20):
+    print(a)
+    print(b)
+fun()
+->10
+->20
+
+#可变参数定义需加一个*
+#可变参数会将多的参数转变为list，放入的可变参数中
+def fun(a,b,*c):
+    print(a)
+    print(b)
+    for i in c:
+        print(i)
+    print(c)
+#c取到的为a，b多余的元素，如果为列表[3,4]，则c中只有一个元素，即列表[3,4]，而不是当前这样，c为一个列表，里面有3,4两个元素
+fun(10,20,3,4)
+->10
+->20
+->3
+->4
+->(3, 4, 5, 6, 7)
+
+#关键字参数，定义需加**
+#关键字参数会将参数形成dict对
+def fun(a,**kw):
+    print(a)
+    print(type(kw))
+    for i in kw.keys():
+        print(i,'  ',kw[i])
+fun(10,s=2,c=3)
+->10
+-><class 'dict'>
+->c    3
+->s    2
+```
+
+### 多函数使用
+
+对于多函数直接用字典或列表循环调用即可。
+
+```python
+def a():
+    print('a')
+def b():
+    print('b')
+c=[a,b]
+for i in c:
+    i()
+->a
+->b
+```
+
 
 
 ## 文件存取
