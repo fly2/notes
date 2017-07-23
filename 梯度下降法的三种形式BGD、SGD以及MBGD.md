@@ -64,9 +64,9 @@ $\LARGE  cost(\theta,(x^i,y^i))=\frac{1}{2}(y^i-h_\theta(x^i))^2$
 
 　　具体的伪代码形式为：
 
-　　1. Randomly shuffle dataset；
+  　　1. Randomly shuffle dataset；
 
-　　2. **repeat**{
+  　　2. **repeat**{
 
 　　　　for i=1, ... , mm{
 
@@ -100,7 +100,7 @@ $\LARGE  cost(\theta,(x^i,y^i))=\frac{1}{2}(y^i-h_\theta(x^i))^2$
 
 　　　　for i=1, 11, 21, 31, ... , 991{
 
-​               $\large \theta_j:=\theta_j-\alpha\frac{1}{10}\sum_{k=1}^{i+9}(h_{\theta}(x^k)-y^k)x_j^k$ 
+​               $\large \theta_j:=\theta_j-\alpha\frac{1}{10}\sum_{k=i}^{i+9}(h_{\theta}(x^k)-y^k)x_j^k$ 
 
 　　　　(for every j=0, ... , nn)
 
@@ -108,7 +108,21 @@ $\LARGE  cost(\theta,(x^i,y^i))=\frac{1}{2}(y^i-h_\theta(x^i))^2$
 
 　　}
 
-### 4. 总结
+### 4. 批量岁提梯度下降法MSGD
+
+批量随机梯度下降法（Mini-batch  Stochastic gradient descent）可以视为sgd一种改进，每次训练选择n个样本进行迭代，用这n个样本进行n次迭代，在对着n个结果加权平均，作为这一次的下降梯度。之后迭代直到收敛。
+
+（1）选择n个训练样本（n<m，m为总训练集样本数）
+
+（2）在这n个样本中进行n次迭代，每次使用1个样本
+
+（3）对n次迭代得出的n个gradient进行加权平均再并求和，作为这一次mini-batch下降梯度
+
+（4）不断在训练集中重复以上步骤，直到收敛。
+
+
+
+### 5. 总结
 
 　　**Batch gradient descent:** Use all examples in each iteration；
 

@@ -195,7 +195,20 @@ for i in c:
 4.0
 ```
 
+### yield使用
 
+用于函数中，将函数变成生成器。保存的是函数的状态，每次在当前状态上迭代。
+
+```python
+def feb(max):
+    n, a, b = 0, 0, 1
+    while n<max:
+        yield b
+        a, b = b, a + b
+        n = n + 1
+for i in feb(10):
+    print(i)
+```
 
 ## 文件存取
 

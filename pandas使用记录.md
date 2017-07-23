@@ -387,6 +387,44 @@ df1.dropna(axis=0,thresh=4)#只保留非空值大于等于4的行
 3	3	3.0	0.073526	4.0
 ```
 
+### 填充nan
+
+在使用fillna时，注意value和method为冲突的参数，设置了value则mothod只能用None，使用设置的value去填充所有的空值。设置了模式，就按模式去做填充，而不会使用value。
+
+fillna内部的limit参数应该是针对每个value所能使用的次数，当指定模式时，有多个值（每个空值前/后的有效值），而无指定模式时，实际上是指定模式填充的特例，只用一个值value去填充。
+
+```python
+DataFrame.fillna(value=None, method=None, axis=None, inplace=False, limit=None, downcast=None, **kwargs)
+#value 用于填充空值的值
+#填充时的模式{'backfill', 'bfill', 'pad', 'ffill', None} backfill/bfill:使用后一个有效值对空值进行填充	pad/ffill:使用前一个有效值进行填充
+#axis 按行还是列进行填充{0 or 'index', 1 or 'columns'}
+#inplace 是否代替原有数据
+#limit	当为指定填充模式时，limit为使用前一个/后一个有效数字可以填充的空值最大数目。当没有指定模式时，此值为可以填充的空值的最大数目，当空值多于此值时，只填充从前面开始的limit个空值。limit如果存在，则应为大于0的整数。
+#downcast 用于转换列的格式，说明中表示可以用字典和'infer'两种用法，但在0.20中仍然无法使用字典，只能使用'infer'（推断）。好像pandas中自动后调整输入的数据格式，不太需要用到这个。
+```
+
+### 插值nan
+
+其中有封装scipy程序，可参考[scipy documentation](http://docs.scipy.org/doc/scipy/reference/interpolate.html#univariate-interpolation) and [tutorial documentation](http://docs.scipy.org/doc/scipy/reference/tutorial/interpolate.html)
+
+```python
+DataFrame.interpolate(method='linear', axis=0, limit=None, inplace=False, limit_direction='forward', downcast=None, **kwargs)
+#method 插值的方式{'linear', 'time', 'index', 'values', 'nearest', 'zero','slinear', 'quadratic', 'cubic', 'barycentric', 'krogh', 'polynomial', 'spline', 'piecewise_polynomial', 'from_derivatives', 'pchip', 'akima'}
+'linear'：忽视索引并将值视为等距间隔。这是支持多重索引的唯一方法。是method默认的参数
+'time'：需要索引为时间索引，按照时间进行插值，具体插值函数会根据情况自行选择。通常为linear，按照时间的先后进行等距填充
+'index','value':使用索引的实际数值
+'nearest','nearest', 'zero', 'slinear', 'quadratic', 'cubic', 'barycentric', 'polynomial'传递给scipy.interpolate.interp1d。 'polynormal'(多项式)和'spline'(样条)都要求您也指定一个顺序（int），例如。 df.interpolate（method ='polynomial'，order = 4）。 这些使用索引的实际数值。
+'krogh', 'piecewise_polynomial', 'spline', 'pchip' and 'akima'都是相似名称的scipy插值方法的包装。 这些使用索引的实际数值。 有关其行为的更多信息，请参阅scipy文档和教程文档 
+'from_derivatives'是指用于替代scify中'piecewise_polynomial'插值法的'BPoly.from_derivatives'
+增加了对'akima'方法的支持添加了插入方法'from_derivatives'，它替代了scipy中的“piecewise_polynomial”0.18; 向后兼容scipy <0.18
+#axis 填充方式 0为逐列填充，1为逐行填充
+#limit 去填充连续NaN的最大数量，必须大于0
+#inpalce 是否替代原有df
+#limit_direction  {'forward', 'backward', 'both'}指定连续NaN填充的方向
+```
+
+
+
 ### 统计各列的值的数目
 
 ```python
