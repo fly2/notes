@@ -73,6 +73,37 @@ spam,spam,spam
 25
 ```
 
+@lazy_property
+
+在方法前加@property可以将方法直接当成属性访问。但会在每次执行c.area时都会调用一次，现在可以使用@lazy_property，使只在初始化时调用一次。
+
+```python
+class Circle(object): 
+  def __init__(self, radius): 
+    self.radius = radius 
+  
+  @property
+  def area(self): 
+    return 3.14 * self.radius ** 2
+  
+c = Circle(4) 
+print(c.radius) 
+print(c.area) 
+
+def lazy_property(func):
+    attr_name = "_lazy_" + func.__name__
+ 
+    @property
+    def _lazy_property(self):
+        if not hasattr(self, attr_name):
+            setattr(self, attr_name, func(self))
+        return getattr(self, attr_name)
+ 
+    return _lazy_property
+```
+
+
+
 ### assert
 
 断言，Python的assert是用来检查一个条件，如果它为真，就不做任何事。如果它为假，则会抛出AssertError并且包含错误信息。
@@ -647,6 +678,70 @@ shutil.rmtree('d:/test')
 import multiprocessing
 workers=multiprocessing.cpu_count()
 ```
+
+## collections
+
+### deque
+
+deque是为了高效实现插入和删除操作的双向列表，适合用于队列和栈。`deque`除了实现list的`append()`和`pop()`外，还支持`appendleft()`和`popleft()`，这样就可以非常高效地往头部添加或删除元素。deque还可以定义最大长度，当有超过最大长度的元素插入时，会根据插入方向append，appendleft反向删除元素。
+
+```python
+from collections import deque
+q = deque(['a', 'b', 'c'])
+q.append('x')
+q.appendleft('y')
+q
+deque(['y', 'a', 'b', 'c', 'x'])
+
+q=deque(maxlen=5)
+for i in range(10):
+    q.appendleft(i)
+print(q)
+->deque([9, 8, 7, 6, 5], maxlen=5)
+
+q=deque(maxlen=5)
+for i in range(10):
+    q.append(i)
+print(q)
+->deque([5, 6, 7, 8, 9], maxlen=5)
+```
+
+### Counter
+
+计数器的更新包括增加和减少两种。其中，增加使用update()方法，减少则使用subtract()方法。Counter()内可以使用list
+
+```python
+from collections import Counter
+c = Counter()
+for ch in 'programming':
+	c[ch] = c[ch] + 1
+
+c
+->Counter({'g': 2, 'm': 2, 'r': 2, 'a': 1, 'i': 1, 'o': 1, 'n': 1, 'p': 1})
+s='门特挂号;糖尿病,糖尿病合并微循环病变,糖尿病合并冠心病;门特挂号;偏瘫,脑梗死 高血压病'
+c = Counter(re.split(':|,|、| |;',s))
+
+c = Counter('which')
+c.update('witch')  # 使用另一个iterable对象更新
+c['h']
+->3
+d = Counter('watch')
+c.update(d)  # 使用另一个Counter对象更新
+c['h']
+->4
+
+
+c = Counter('which')
+c.subtract('witch')  # 使用另一个iterable对象更新
+c['h']
+->1
+d = Counter('watch')
+c.subtract(d)  # 使用另一个Counter对象更新
+c['a']
+->-1
+```
+
+
 
 ## io
 

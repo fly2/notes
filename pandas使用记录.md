@@ -653,6 +653,33 @@ from pandas.tseries.offsets import *
 from datetime import datetime,timedelta
 ```
 
+### 时间格式字符串
+
+`%a `星期的简写。如 星期三为Web
+`%A `星期的全写。如 星期三为Wednesday
+`%b `月份的简写。如4月份为Apr
+`%B 月份的全写。如4月份为April `
+`%c:  `日期时间的字符串表示。（如： 04/07/10 10:43:39）
+`%d:  `日在这个月中的天数（是这个月的第几天）
+`%f:  `微秒（范围[0,999999]）
+`%H:  `小时（24小时制，[0, 23]）
+`%I:  `小时（12小时制，[0, 11]）
+`%j:  `日在年中的天数 [001,366]（是当年的第几天）
+`%m:  `月份（[01,12]）
+`%M:  `分钟（[00,59]）
+`%p:  `AM或者PM
+`%S:  `秒（范围为[00,61]，为什么不是[00, 59]，参考python手册~_~）
+`%U:  `周在当年的周数当年的第几周），星期天作为周的第一天
+`%w:  `今天在这周的天数，范围为[0, 6]，6表示星期天
+`%W:  `周在当年的周数（是当年的第几周），星期一作为周的第一天
+`%x:  `日期字符串（如：04/07/10）
+`%X:  `时间字符串（如：10:43:39）
+`%y:  `2个数字表示的年份
+`%Y:  `4个数字表示的年份
+`%z:  `与utc时间的间隔 （如果是本地时间，返回空字符串）
+`%Z:  `时区名称（如果是本地时间，返回空字符串）
+`%%:  `%% => %
+
 ### str转换为时间格式
 
 ```python
@@ -678,7 +705,6 @@ DateOffset(months=3,days=10)
 datetime.now()==>datetime.datetime(2017, 4, 15, 16, 2, 24, 663820)
 #加3月10天
 datetime.now()+DateOffset(months=3,days=10)==>Timestamp('2017-07-25 16:03:17.801300')
-
 ```
 
 ### 转换到月初
@@ -696,7 +722,7 @@ datetime.now()+DateOffset(months=3,days=10)+MonthBegin()==>Timestamp('2017-08-01
 ### 生成时间范围的列表
 
 ```python
-pandas.date_range(start=None, end=None, periods=None, freq='D', tz=None, normalize=False, name=None, closed=None, **kwargs)[source]
+pandas.date_range(start=None, end=None, periods=None, freq='D', tz=None, normalize=False, name=None, closed=None, **kwargs)
 #start：string或datetime-like，默认值是None，表示日期的起点。
 #end：string或datetime-like，默认值是None，表示日期的终点。
 #periods：integer或None，默认值是None，表示你要从这个函数产生多少个日期索引值；如果是None的话，那么start和end必须不能为None。
@@ -874,6 +900,30 @@ df is None
 #为空返回真
 df is not None
 #不为空返回真
+```
+
+### df读取数据过慢
+
+在对数据重采样时，使用df进行数据重采样。发现速度过慢，在使用numpy.array测试时发现速度差距，怀疑df不是索引获取数据。为提高重采样速度，使用numpy.array()代替df。
+
+```python
+test=np.ones((10000,1))
+prob=numpy.ones(10000)/10000
+t0=time.time()
+for i in range(100):
+    for j in range(10000):
+        #使用numpy.array数值进行取数
+        p=prob[j]
+print(time.time()-t0)
+t1=time.time()
+df=pd.DataFrame({'b':prob})
+for i in range(10):
+    for j in range(10000):
+        #使用df的函数进行取数
+        p=df.loc[j,'b']
+print(time.time()-t1)
+->0.3686678409576416
+->36.97714591026306
 ```
 
 
