@@ -708,19 +708,34 @@ print(q)
 
 ### Counter
 
-计数器的更新包括增加和减少两种。其中，增加使用update()方法，减少则使用subtract()方法。Counter()内可以使用list
+Counter()内可以使用（list、tuple、dict、字符串等）创建
+
+计数器的更新包括增加和减少两种。其中，增加使用update()方法，减少则使用subtract()方法。
+
+当计数值为0时，并不意味着元素被删除，删除元素应当使用`del`。
+
+most_common(n)返回一个topn列表，多个值相同时为无顺序排列。n为空则返回全部
 
 ```python
 from collections import Counter
+
+#Counter创建的四种方法
+>>> c = Counter()  # 创建一个空的Counter类
+>>> c = Counter('gallahad')  # 从一个可iterable对象（list、tuple、dict、字符串等）创建
+>>> c = Counter({'a': 4, 'b': 2})  # 从一个字典对象创建
+>>> c = Counter(a=4, b=2)  # 从一组键值对创建
+
+#直接赋值创建
 c = Counter()
 for ch in 'programming':
 	c[ch] = c[ch] + 1
-
 c
 ->Counter({'g': 2, 'm': 2, 'r': 2, 'a': 1, 'i': 1, 'o': 1, 'n': 1, 'p': 1})
+#从列表中创建
 s='门特挂号;糖尿病,糖尿病合并微循环病变,糖尿病合并冠心病;门特挂号;偏瘫,脑梗死 高血压病'
 c = Counter(re.split(':|,|、| |;',s))
 
+#计数器增加计数
 c = Counter('which')
 c.update('witch')  # 使用另一个iterable对象更新
 c['h']
@@ -730,7 +745,7 @@ c.update(d)  # 使用另一个Counter对象更新
 c['h']
 ->4
 
-
+#计数器减小计数
 c = Counter('which')
 c.subtract('witch')  # 使用另一个iterable对象更新
 c['h']
@@ -739,6 +754,18 @@ d = Counter('watch')
 c.subtract(d)  # 使用另一个Counter对象更新
 c['a']
 ->-1
+
+#得到topn列表
+from collections import Counter
+c=Counter()
+c.update('witchasxcsacx')
+c.most_common()
+->[('c', 3),('x', 2),('a', 2),('s', 2), ('t', 1),('w', 1),('h', 1),('i', 1)]
+c.most_common(5)
+->[('c', 3), ('x', 2), ('a', 2), ('s', 2), ('t', 1)]
+
+#删除a元素
+del c["a"]
 ```
 
 
