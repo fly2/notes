@@ -120,7 +120,7 @@ TensorFlow 将图形定义转换成分布式执行的操作, 以充分利用可�
 
 | 操作                                       | 描述                                       |
 | ---------------------------------------- | ---------------------------------------- |
-| tf.reduce_sum(input_tensor, reduction_indices=None, keep_dims=False, name=None) | 计算输入tensor元素的和，或者安照reduction_indices指定的轴进行求和# ‘x’ is [[1, 1, 1]# [1, 1, 1]]tf.reduce_sum(x) ==> 6tf.reduce_sum(x, 0) ==> [2, 2, 2]tf.reduce_sum(x, 1) ==> [3, 3]tf.reduce_sum(x, 1, keep_dims=True) ==> [[3], [3]]tf.reduce_sum(x, [0, 1]) ==> 6 |
+| tf.reduce_sum(input_tensor, reduction_indices=None, keep_dims=False, name=None) | 计算输入tensor元素的和，或者按照reduction_indices指定的轴进行求和，不指定则按行列求和# ‘x’ is [[1, 1, 1]# [1, 1, 1]]tf.reduce_sum(x) ==> 6tf.reduce_sum(x, 0) ==> [2, 2, 2]tf.reduce_sum(x, 1) ==> [3, 3]tf.reduce_sum(x, 1, keep_dims=True) ==> [[3], [3]]tf.reduce_sum(x, [0, 1]) ==> 6 |
 | tf.reduce_prod(input_tensor, reduction_indices=None, keep_dims=False, name=None) | 计算输入tensor元素的乘积，或者安照reduction_indices指定的轴进行求乘积 |
 | tf.reduce_min(input_tensor, reduction_indices=None, keep_dims=False, name=None) | 求tensor中最小值                              |
 | tf.reduce_max(input_tensor, reduction_indices=None, keep_dims=False, name=None) | 求tensor中最大值                              |
@@ -151,7 +151,7 @@ TensorFlow 将图形定义转换成分布式执行的操作, 以充分利用可�
 
 | 操作                                     | 描述                                       |
 | -------------------------------------- | ---------------------------------------- |
-| tf.argmin(input, dimension, name=None) | 返回input最小值的索引index                       |
+| tf.argmin(input, dimension, name=None) | 返回input最小值的索引index         a=np.array([[1,2],[3,4],[5,6]])  sess.run(tf.arg_max(a,0))->array([2, 2], dtype=int64) sess.run(tf.arg_max(a,1))-->array([1, 1, 1], dtype=int64) |
 | tf.argmax(input, dimension, name=None) | 返回input最大值的索引index                       |
 | tf.listdiff(x, y, name=None)           | 返回x，y中不同值的索引                             |
 | tf.where(input, name=None)             | 返回bool型tensor中为True的位置# ‘input’ tensor is #[[True, False]#[True, False]]# ‘input’ 有两个’True’,那么输出两个坐标值.# ‘input’的rank为2, 所以每个坐标为具有两个维度.where(input) ==>[[0, 0],[1, 0]] |
