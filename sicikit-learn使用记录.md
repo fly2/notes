@@ -1,5 +1,23 @@
 # sicikit-learn使用记录
 
+## 常用距离
+
+### 余弦相似度
+
+$$\Large  Cos_\theta=\frac{\sum_1^n(x_i y_i)}{\sqrt{\sum_1^n x_i^2}\sqrt{\sum_1^n y_i^2}}$$
+
+```python
+cosine_similarity(X, Y=None, dense_output=True)
+```
+
+### 余弦距离
+
+$$\Large  1-Cos_\theta=1-\frac{\sum_1^n(x_i y_i)}{\sqrt{\sum_1^n x_i^2}\sqrt{\sum_1^n y_i^2}}$$
+
+```python
+cosine_distances(X, Y=None)
+```
+
 ## 常用算法
 
 ### Nearest Neighbors 
@@ -51,6 +69,8 @@ kmeans.labels_=array([0, 0, 0, 1, 1, 1], dtype=int32)
 kmeans.predict([[0, 0], [4, 4]])-->array([0, 1], dtype=int32)
 #聚类中心点
 kmeans.cluster_centers_-->array([[ 1.,  2.],[ 4.,  2.]])
+#返回到每个中心的距离矩阵
+kmeans.transform([[0, 0], [4, 4]])-->array([[ 2.23606798,  4.47213595],[ 3.60555128,  2.        ]])
 ```
 
 ##### MiniBatchKMeans聚类
@@ -169,6 +189,77 @@ LogisticRegression(penalty='l2', dual=False, tol=0.0001, C=1.0, fit_intercept=Tr
 #n_jobs 交叉验证循环期间使用的CPU内核数。 如果值为-1，则使用所有核心。
 ```
 
+### DBSCAN
+
+是一个比较有代表性的基于密度的[聚类算法](https://baike.baidu.com/item/%E8%81%9A%E7%B1%BB%E7%AE%97%E6%B3%95)。与划分和层次聚类方法不同，它将簇定义为密度相连的点的最大集合，能够把具有足够高密度的区域划分为簇，并可在噪声的[空间数据库](https://baike.baidu.com/item/%E7%A9%BA%E9%97%B4%E6%95%B0%E6%8D%AE%E5%BA%93)中发现任意形状的聚类。
+
+#### 聚类算法
+
+```python
+DBSCAN(eps=0.5, min_samples=5, metric='euclidean', metric_params=None, algorithm='auto', leaf_size=30, p=None, n_jobs=1)
+#eps 两个样本被认为在同一个社区的最大距离。
+#min_samples 作为核心点的点的邻域中的样本数（或总权重）。 包括核心点本身。
+#metric 计算特征数组中实例之间的距离时使用的度量。 如果度量标准是字符串或可调用，则它必须是其度量参数由metrics.pairwise.calculate_distance允许的选项之一。 如果度量是“预先计算的”，则假设X是距离矩阵，并且必须是平方。 X可以是稀疏矩阵，在这种情况下，只有“非零”元素可以被认为是DBSCAN的邻居。
+#metric_params 为距离度量添加关键字参数
+#algorithm  {'auto', 'ball_tree', 'kd_tree', 'brute'}由NearestNeighbors模块用于计算点距离并找到最近邻居的算法。 有关详细信息，请参阅NearestNeighbors模块文档。
+#leaf_size 叶子尺寸传递给BallTree或KDTree。 这可能会影响构建和查询的速度，以及存储树所需的内存。 最优值取决于问题的性质。
+#p 用于计算点之间的距离的闵可夫斯基度量的权力。
+#n_jobs 并行运行数目。
+```
+
+[距离划分度量](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.distance_metrics.html#sklearn.metrics.pairwise.distance_metrics)
+
+### EllipticEnvelope
+
+#### 异常值检测
+
+```python
+EllipticEnvelope(store_precision=True, assume_centered=False, support_fraction=None, contamination=0.1, random_state=None)
+#store_precision 指定是否存储估计精度。
+#assume_centered 如果为True，则计算鲁棒位置和协方差估计的支持，并且从其重新计算协方差估计，而不用数据中心。 用于处理平均值大大等于零但不完全为零的数据。 如果False，鲁棒的位置和协方差直接用FastMCD算法计算，无需额外的处理。
+#support_fraction 要支持原始MCD估计的要点的比例。 默认值为None，这意味着在算法中将使用support_fraction的最小值：[n_sample + n_features + 1] / 2。
+#contamination 数据集的污染量，即数据集中异常值的比例。
+#random_state 随机种子
+
+from sklearn.covariance import EllipticEnvelope
+#EllipticEnvelope
+ee=EllipticEnvelope(store_precision=True, assume_centered=False, support_fraction=None, contamination=0.003, random_state=0)
+ee=ee.fit(vec1)
+py=ee.predict(vec2)
+precision=sum(test_y[py==1])/sum(py==1)
+recall=sum(py[np.array(test_y==1)])/sum(test_y==1)
+f1=f1_score(py,test_y)
+res.loc[r,:]=[100,precision,recall,f1]
+r=r+1
+```
+
+## 降维算法
+
+### t-sne
+
+t分布随机相邻嵌入。
+t-SNE [1]是可视化高维数据的工具。 它将数据点之间的相似性转换为联合概率，并尝试最小化低维嵌入与高维数据的联合概率之间的Kullback-Leibler分歧。 t-SNE具有不是凸的成本函数，即不同的初始化，我们可以得到不同的结果。
+强烈建议使用另外的维数降低方法（例如密度数据的PCA或稀疏数据的TruncatedSVD），如果特征数量非常多，则将维数减少到合理的数量（例如50）。 这将抑制一些噪音，并加快样品之间成对距离的计算。 有关更多提示，请参阅Laurens van der Maaten的常见问题[2]。
+
+```python
+TSNE(n_components=2, perplexity=30.0, early_exaggeration=12.0, learning_rate=200.0, n_iter=1000, n_iter_without_progress=300, min_grad_norm=1e-07, metric='euclidean', init='random', verbose=0, random_state=None, method='barnes_hut', angle=0.5)
+#n_components 嵌入的空间维数，为int类型
+#perplexity 这种perplexity和其他流形学习算法中使用的最近邻数有关。更大的数据集通常需要更大的perplexity。考虑在5到50之间选择一个值。选择不是非常重要因为T-SNE对这个参数非常不敏感。
+#early_exaggeration 控制原始空间中的自然簇在嵌入空间中的紧密程度，以及它们之间有多少空间。对于较大的值，在嵌入空间中自然簇之间的空间将更大。同样，这个参数的选择不是很关键。如果成本函数在初始优化期间增加，则早期夸张因子或学习率可能太高
+#learning_rate 对于T-SNE学习速度通常在范围[ 10，1000 ]。如果学习率太高，数据看起来像一个“球”，其点与最近的邻居大致相等。如果学习率太低，大多数点看起来像是在稠密的云中压缩，而离群值很少。如果成本函数陷入一个糟糕的局部极小值，增加学习率可能会有所帮助。
+#n_iter 优化的最大迭代次数，应不小于250次
+#n_iter_without_progress 在我们中止优化之前没有进展的最大迭代次数，在早期夸张的250次初始迭代之后使用。 请注意，只有每50次迭代检查进度，因此该值将四舍五入为50的下一个倍数。
+#min_grad_norm 如果梯度范数低于该阈值，则优化将被停止。
+#metric 计算特征数组中实例之间的距离时使用的度量。 如果度量标准是一个字符串，则它必须是其度量参数的scipy.spatial.distance.pdist允许的选项之一，或成对的.PAIRWISE_DISTANCE_FUNCTIONS中列出的度量标准。 如果度量是“预先计算的”，则X被假定为距离矩阵。 或者，如果度量是可调用函数，则在每对实例（行）上调用它，并记录结果值。 可调用应从X中取两个数组作为输入，并返回一个表示它们之间距离的值。 默认为“欧几里德”，它被解释为平方欧几里得距离。
+#init 初始化嵌入。 可能的选项是'random'，'pca'和一个numpy数组（n_samples，n_components）。 PCA初始化不能与预计算距离一起使用，并且通常比随机初始化更全局稳定。
+#verbose 详细程度。
+#random_state 如果int，random_state是随机数生成器使用的种子; 如果RandomState的实例，random_state是随机数生成器; 如果None，则随机数生成器是由np.random使用的RandomState实例。 注意，不同的初始化可能导致成本函数的不同局部最小值。
+#method 默认情况下，梯度计算算法使用在O（NlogN）时间运行的Barnes-Hut近似（method='barnes_hut'）。 method='exact'将运行较慢但精确的算法在O（N ^ 2）时间。 当最近邻错误需要优于3％时，应使用'exact'的算法。 然而，'exact'的方法不能扩展到数百万的例子。
+#angle 只用于method ='barnes_hut'这是Barnes-Hut T-SNE的速度和精度之间的权衡。 “角度”是从一个点测量的远距离节点的角度大小（在[3]中称为θ）。 如果这个大小低于'angle'，那么它将被用作其中包含的所有点的汇总节点。 该方法对0.2〜0.8范围内的参数变化不敏感。 小于0.2的角具有很快的计算时间而大于0.8的角误差增大很快。
+```
+
+
+
 ## 集成算法
 
 > 为什么用xgboost/gbdt在在调参的时候把树的最大深度调成6就有很高的精度了，但是用DecisionTree/RandomForest的时候需要把树的深度调到15或更高？
@@ -204,8 +295,6 @@ GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100,
 #subsample 子采样比例（subsample）。取值为(0,1]。注意这里的子采样和随机森林不一样，随机森林使用的是放回抽样，而这里是不放回抽样。如果取值为1，则全部样本都使用，等于没有使用子采样。如果取值小于1，则只有一部分样本会去做GBDT的决策树拟合。选择小于1的比例可以减少方差，即防止过拟合，但是会增加样本拟合的偏差，因此取值不能太低。推荐在[0.5, 0.8]之间。
 #criterion 检测分割质量的函数。有'mse','mae','friedman_mse'。默认的“friedman_mse”通常是最好的，因为在某些情况下可以提供更好的近似。
 ```
-
-
 
 ### IsolationForest
 

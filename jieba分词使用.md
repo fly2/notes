@@ -199,8 +199,6 @@ for sk in stopkey:
     jieba.del_word(sk)
 ```
 
-
-
 **注意：**
 
 除了使用`del_word`方法外，还可以使用列表集合取差集进行去除无效词，但此法会打乱分词顺序，如果后续需要进行语义分析，会产生较大影响。可以用在tfidf生成**关键词抽取**或以**tfidf向量分类**中。
@@ -214,7 +212,52 @@ words=list(jieba.cut(str1,HMM=False))
 line='/'.join(list(set(words1)-set(stopkey)))
 ```
 
+### 词性标注
 
+jieba支持分词时进行词性标注。
+
+```python
+import jieba.posseg as pseg
+words = pseg.cut("我爱北京天安门")
+#words是一个generator object，需要用for循环导出
+for word,flag in words:
+    print(word,flag)
+>>
+我 r
+爱 v
+北京 ns
+天安门 ns
+
+#使用lcut可以直接得到list，但list为pair格式
+words=pseg.lcut("我爱北京天安门")
+words
+>>
+[pair('我', 'r'), pair('爱', 'v'), pair('北京', 'ns'), pair('天安门', 'ns')]
+
+words[0]
+>>
+pair('我', 'r')
+```
+
+[词性标注解释](http://fhqllt.iteye.com/blog/947917)
+
+| 符号   | 标注   | 符号   | 标注   |
+| ---- | ---- | ---- | ---- |
+| a    | 形容词  | b    | 区别词  |
+| c    | 连词   | d    | 副词   |
+| e    | 叹词   | g    | 语素词  |
+| h    | 前接成分 | i    | 习用语  |
+| j    | 简称   | k    | 后接成分 |
+| m    | 数次   | n    | 普通名词 |
+| nd   | 方位名词 | nh   | 人名   |
+| ni   | 机构名  | nl   | 处所名词 |
+| ns   | 地名   | nt   | 时间词  |
+| nz   | 其他专名 | o    | 拟声词  |
+| p    | 介词   | q    | 量词   |
+| r    | 代词   | u    | 助词   |
+| v    | 动词   | wp   | 标点符号 |
+| ws   | 字符串  | x    | 非语素词 |
+|      |      |      |      |
 
 ### 分词示例
 

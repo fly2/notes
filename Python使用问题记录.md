@@ -102,8 +102,6 @@ def lazy_property(func):
     return _lazy_property
 ```
 
-
-
 ### assert
 
 断言，Python的assert是用来检查一个条件，如果它为真，就不做任何事。如果它为假，则会抛出AssertError并且包含错误信息。
@@ -185,6 +183,48 @@ fun(10,s=2,c=3)
 ->s    2
 ```
 
+### 类的继承
+
+面向对象的编程带来的主要好处之一是代码的**重用**，实现这种重用的方法之一是通过继承机制。继承完全可以理解成类之间的类型和子类型关系。
+
+需要注意的地方：**继承语法**   class 派生类名（**基类名**）：//...   基类名写作括号里，基本类是在类定义的时候，**在元组之中指明的**。这与c#是有区别的。
+
+何时使用继承：假如我需要定义几个类，而类与类之间有一些公共的属性和方法，这时我就可以把相同的属性和方法作为基类的成员，而特殊的方法及属性则在本类中定义，这样只需要继承基类这个动作，就可以访问到基类的属性和方法了，它提高了代码的可扩展性。
+
+任何事情都有利有弊：继承的一个弱点就是，可能特殊的本类又有其他特殊的地方，又会定义一个类，其下也可能再定义类，这样就会造成继承的那条线越来越长，使用继承的话,任何一点小的变化也需要重新定义一个类,很容易引起类的爆炸式增长,产生一大堆有着细微不同的子类. 所以有个“多用组合少用继承”的原则，（我觉得两者一起使用才是最佳吧*^◎^*）
+
+**在python中继承中的一些特点：**
+
+**1：在继承中基类的构造`__init__()`方法不会被自动调用，它需要在其派生类的构造中亲自专门调用。有别于C#**
+
+**2：在调用基类的方法时，需要加上基类的类名前缀，且需要带上self参数变量。区别于在类中调用普通函数时并不需要带上self参数**
+
+**3：Python总是首先查找对应类型的方法，如果它不能在派生类中找到对应的方法，它才开始到基类中逐个查找。（先在本类中查找调用的方法，找不到才去基类中找）。**
+
+如果在继承元组中列了一个以上的类，那么它就被称作“多重继承” 。
+
+实例：定义一个模块，模块里定义了一个基类：
+
+![img](./picture/python_1.png)
+
+子类：
+
+![img](./picture/python_2.png)
+
+输出：
+
+![img](./picture/python_3.png)
+
+ 假如在子类中不用__init__()初始化函数，那么子类会继承基类的属性，如：
+
+![img](./picture/python_4.png)
+
+ 输出：
+
+![img](./picture/python_5.png)
+
+ 
+
 ### 多函数使用
 
 对于多函数直接用字典或列表循环调用即可。
@@ -226,6 +266,31 @@ for i in c:
 4.0
 ```
 
+### map
+
+`map()`函数接收两个参数，一个是函数，一个是`Iterable`，`map`将传入的函数依次作用到序列的每个元素，并把结果作为新的`Iterator`返回。在python3中map需要list(map(fun,iter))。
+
+举例说明，比如我们有一个函数`f(x)=x^2`，要把这个函数作用在一个list `[1, 2, 3, 4, 5, 6, 7, 8, 9]`上，就可以用`map()`实现如下：
+
+```python
+def f(x):
+     return x * x
+r = map(f, [1, 2, 3, 4, 5, 6, 7, 8, 9])
+list(r)
+[1, 4, 9, 16, 25, 36, 49, 64, 81]
+```
+
+### reduce
+
+`reduce`在python3中已被封装到`functools`中，如果在python3中使用需要从`functools`中导入。
+
+`reduce`把一个函数作用在一个序列`[x1, x2, x3, ...]`上，这个函数必须接收两个参数，`reduce`把结果继续和序列的下一个元素做累积计算，其效果就是：
+
+```python
+from functools import reduce
+reduce(f, [x1, x2, x3, x4]) = f(f(f(x1, x2), x3), x4)
+```
+
 ### yield使用
 
 用于函数中，将函数变成生成器。保存的是函数的状态，每次在当前状态上迭代。
@@ -241,7 +306,134 @@ for i in feb(10):
     print(i)
 ```
 
+### 错误处理
+
+当代码出错时，为了不影响代码运行。可以使用`try...except...finally...`的处理机制。当我们认为某些代码可能会出错时，就可以用`try`来运行这段代码，如果执行出错，则后续代码不会继续执行，而是直接跳转至错误处理代码，即`except`语句块，执行完`except`后，如果有`finally`语句块，则执行`finally`语句块，至此，执行完毕。
+
+```python
+try:
+    print('try...')
+    r = 10 / 0
+    print('result:', r)
+except ZeroDivisionError as e:
+    print('except:', e)
+finally:
+    print('finally...')
+print('END')
+
+try...
+except: division by zero
+finally...
+END
+```
+
+从输出可以看到，当错误发生时，后续语句`print('result:', r)`不会被执行，`except`由于捕获到`ZeroDivisionError`，因此被执行。最后，`finally`语句被执行。然后，程序继续按照流程往下走。
+
+**注意：**
+
+1. `except` 后接的是错误代码，只有当出现和`except`后面错误代码一致的错误，才会执行`except`下的语句块，如果没有对应错误编码的`except`则会在执行完`finally`后报错。
+2. 当`except`后没有错误编码，则所有错误都会捕获，执行`except`下的语句块。不建议使用此方法，会导致未知的错误不被发现，积累到后面使得问题难以追踪。仅可作为权宜之计。
+3. 在使用`except`时需要注意的是，它不但捕获该类型的错误，还把其子类也“一网打尽”。比如：当`ValueErroe`在第一个`except`,`UnicodeError`在第二个`except`时，第二个`except`永远也捕获不到`UnicodeError`，因为`UnicodeError`是`ValueError`的子类，如果有，也被第一个`except`给捕获了。
+
+## 数据类型
+
+### dict(字典)
+
+字典是一种以key-value键值对的方式存贮，在提取值是只用使用key即可取得对应value，适用于查询操作，查询复杂度为O(n)。但由于其内部为无序结构，如果需要顺序之类的信息则无能为力。
+
+**注意：**在python3.6中dict已经变为有序字典
+
+#### 创建字典
+
+```python
+#方法一，通过大括号进行创建
+d1={}
+d1={'a':1,'b':2}
+
+
+#方法二，通过包含键值的元组(tuple/pair)创建
+L = [('Jonh',18), ('Nancy',19)]  
+T = tuple(L)  
+T->(('Jonh', 18), ('Nancy', 19))  
+d = dict(T) 
+
+words=[pair('我', 'r'), pair('爱', 'v'), pair('北京', 'ns'), pair('天安门', 'ns')]
+dict(words)->{'北京': 'ns', '天安门': 'ns', '我': 'r', '爱': 'v'}
+
+
+#方法三，通过包含键值的列表创建
+L = [('Jonh',18), ('Nancy',19)]  
+d = dict(L)  #通过包含键值的列表创建  
+d->{'Jonh': 18, 'Nancy': 19}   
+
+
+#方法四，使用fromkeys创建字典，使用不便，仅供参考。对多个键只能赋同一个value，且无法直接在原字典上增加键值，如果要使其增加，只能通过赋值的方式覆盖原字典
+d={3: 'z', 'y': 3}  
+L1 = [1,2,3]
+d.fromkeys(L1,[['a'],['b'],['c']])
+->{1: [['a'], ['b'], ['c']], 2: [['a'], ['b'], ['c']], 3: [['a'], ['b'], ['c']]}
+```
+
+#### 添加键值
+
+```python
+d={}
+#如果对应key存在，则将value替换为新的value。如果key不存在，则添加对应key_value
+d['a']=1
+```
+
+#### 键值是否存在
+
+```python
+d=['a':1,'b':2,'c':3]
+'c' in d
+
+'c' in d.keys()
+```
+
+#### d.keys()
+
+返回key
+
+#### d.values()
+
+返回value
+
+#### d.copy() 
+
+对字典 d 进行浅复制，返回一个和d有相同键值对的新字典
+
+#### d.items()
+
+将字典 d 中所有键值对以dict_items的形式返回
+
+#### d.clear()
+
+清空字典d
+
+#### del d[x]
+
+删除字典 d 中键为 x 的键值对，若 x 不存在会出现 KeyError
+
+#### d.pop( x )
+
+返回给定键 x 对应的值，并将该键值对从字典中删除
+
+#### d.popitem( )
+
+返回并删除字典 d 中随机的键值对
+
+#### d.setdefault( x, [ , y ] )
+
+返回字典 d 中键 x 对应的值，若键 x 不存在，则返回 y， 并将 x : y 作为键值对添加到字典中，y 的默认值为 None
+
+#### d.update( x )
+
+将字典 x 所有键值对添加到字典 d 中（不重复，重复的键值对用字典 x 中的键值对替代字典 d 中）
+
 ## 文件存取
+
+使用`open`方式存取文件，可以设置模式来进行读写限制，'r'为读，'w'为写，'a'为追加，'t'为操作方式为文本，'b'为操作方式为bytes流。
 
 ### 文件读取
 
@@ -260,6 +452,12 @@ f.close()
 line=[line.strip() for line in open('/home/weblogic/DATA/private/shangguanxf/cc_txt1/stopword.txt').readlines()] 
 #readlines()为读取全部行的数据
 #line.strip()为去除每行后面的'\n'
+
+#方法三
+with open(vocab_path, 'rb') as f:
+  		#f.read()为读取f文件
+    	#splitlines()为按行分割
+        words = f.read().splitlines()
 ```
 
 ```python
@@ -269,8 +467,6 @@ f=open('/home/weblogic/DATA/private/shangguanxf/cc_txt1/product.txt',encoding="g
 #按照分隔符进行分割
 line=[line.split(',') for line in f]
 ```
-
-
 
 ### 文件保存
 
@@ -298,8 +494,6 @@ with open('D:/Program Files (x86)/Tencent/WeChat/WeChat Files/s_g_x_f/Files/data
         for i in city:
             f.writelines('%s,%s,%s,%s\n' % (i,data[i][0],data[i][1],data[i][2]))
 ```
-
-
 
 ## json读写
 
@@ -437,6 +631,50 @@ print(r'a\nb')
 a\nb
 ```
 
+### 字符串编码
+
+python3中，我们使用decode()和encode()来进行解码和编码，python使用的中间码为unicode编码，所有字符串读到str类型后都会转换成unicode编码。在python中进行编码转换也需要先转换到unicode再转换到目标编码。字符串编码常用类型：`utf-8,gb2312,cp936,gbk,gb18030,ascii`等。
+
+​     decode              encode
+
+bytes ------> str(unicode)------>bytes
+
+```python
+u = '中文' #指定字符串类型对象u
+str = u.encode('gb2312') #以gb2312编码对u进行编码，获得bytes类型对象str
+u1 = str.decode('gb2312')#以gb2312编码对字符串str进行解码，获得字符串类型对象u1
+u2 = str.decode('utf-8')#如果以utf-8的编码对str进行解码得到的结果，将无法还原原来的字符串内容
+```
+
+我们读取文件时，要对python读取文件的编码方式进行设定，如果读取的编码和保存文件时的编码不一致，会导致无法读取文件。方式如下：
+
+```python
+f = open('test.txt','r')
+s = f.read() #读取文件内容,如果是不识别的encoding格式（识别的encoding类型跟使用的系统有关），这里将读取失败
+'''假设文件保存时以gb2312编码保存'''
+u = s.decode('gb2312') #以文件保存格式对内容进行解码，获得unicode字符串
+'''下面我们就可以对内容进行各种编码的转换了'''
+str = u.encode('utf-8')#转换为utf-8编码的字符串str
+str1 = u.encode('gbk')#转换为gbk编码的字符串str1
+str1 = u.encode('utf-16')#转换为utf-16编码的字符串str1
+```
+
+python给我们提供了一个包codecs进行文件的读取，这个包中的open()函数可以指定编码的类型：
+
+```python
+import codecs
+f = codecs.open('text.text','r+',encoding='utf-8')#必须事先知道文件的编码格式，这里文件编码是使用的utf-8
+content = f.read()#如果open时使用的encoding和文件本身的encoding不一致的话，那么这里将将会产生错误
+f.write('你想要写入的信息')
+f.close()
+```
+
+#### [标准编码表](https://docs.python.org/3/library/codecs.html#standard-encodings)
+
+#### [python特有编码](https://docs.python.org/3/library/codecs.html#Python Specific Encodings)
+
+python特有编码提供了对字节编码和类似于Unicode文本编码的类似字节的对象进行解码。
+
 ### 字符串格式化
 
 **注意：**格式化操作符辅助指令写在字符串格式化符号前面。
@@ -480,11 +718,185 @@ print("My name is %s and weight is %.2f kg!" % ('Zara', 98.2) )
 | (var) | 映射变量(字典参数)                               |
 | m.n.  | m 是显示的最小总宽度,n 是小数点后的位数(如果可用的话)           |
 
+### 格式化字符串
+
+- fill           【可选】空白处填充的字符
+- align        【可选】对齐方式（需配合width使用）
+- - *<，内容左对齐*
+  - *>，内容右对齐(默认)*
+  - *＝，内容右对齐，将符号放置在填充字符的左侧，且只对数字类型有效。 即使：符号+填充物+数字*
+  - *^，内容居中*
+- sign         【可选】有无符号数字
+- - **+，正号加正，负号加负；**
+  - ** -，正号不变，负号加负；**
+  - **空格 ，正号空格，负号加负；**
+- \#            【可选】对于二进制、八进制、十六进制，如果加上#，会显示 0b/0o/0x，否则不显示
+- ，            【可选】为数字添加分隔符，如：1,000,000
+- width       【可选】格式化位所占宽度
+- .precision 【可选】小数位保留精度
+- type         【可选】格式化类型
+- - *传入” 字符串类型 “的参数*
+  - - *s，格式化字符串类型数据*
+    - *空白，未指定类型，则默认是None，同s*
+  - *传入“ 整数类型 ”的参数*
+  - - *b，将10进制整数自动转换成2进制表示然后格式化*
+    - *c，将10进制整数自动转换为其对应的unicode字符*
+    - *d，十进制整数*
+    - *o，将10进制整数自动转换成8进制表示然后格式化；*
+    - *x，将10进制整数自动转换成16进制表示然后格式化（小写x）*
+    - *X，将10进制整数自动转换成16进制表示然后格式化（大写X）*
+  - *传入“ 浮点型或小数类型 ”的参数*
+  - - *e， 转换为科学计数法（小写e）表示，然后格式化；*
+    - *E， 转换为科学计数法（大写E）表示，然后格式化;*
+    - *f ， 转换为浮点型（默认小数点后保留6位）表示，然后格式化；*
+    - *F， 转换为浮点型（默认小数点后保留6位）表示，然后格式化；*
+    - *g， 自动在e和f中切换*
+    - *G， 自动在E和F中切换*
+    - *%，显示百分比（默认显示小数点后6位）*
+
+#### **通过位置映射**
+
+```
+In [1]: '{0},{1}'.format('kzc',18)  
+Out[1]: 'kzc,18'  
+In [2]: '{},{}'.format('kzc',18)  
+Out[2]: 'kzc,18'  
+In [3]: '{1},{0},{1}'.format('kzc',18)  
+Out[3]: '18,kzc,18'
+
+```
+
+字符串的format函数可以接受不限个参数，位置可以*不按顺序*，可以不用或者用*多次*，不过2.6不能为空{}，2.7才可以。
+
+#### **通过关键字参数映射**
+
+```
+In [5]: '{name},{age}'.format(age=18,name='kzc')  
+Out[5]: 'kzc,18'
+
+```
+
+#### **通过对象属性映射**
+
+```
+class Person:  
+    def __init__(self,name,age):  
+        self.name,self.age = name,age  
+        def __str__(self):  
+            return 'This guy is {self.name},is {self.age} old'.format(self=self)  
+
+```
+
+```
+In [2]: str(Person('kzc',18))  
+Out[2]: 'This guy is kzc,is 18 old'
+
+```
+
+#### **通过下标映射**
+
+```
+In [7]: p=['kzc',18]
+In [8]: '{0[0]},{0[1]}'.format(p)
+Out[8]: 'kzc,18'
+```
+
+有了这些便捷的“映射”方式，我们就有了偷懒利器。基本的[Python](http://lib.csdn.net/base/python)知识告诉我们，list和tuple可以通过“打散”成普通参数给函数，而dict可以打散成关键字参数给函数（通过和*）。所以可以轻松的传个list/tuple/dict给format函数。非常灵活。
+
+#### **填充与对齐**
+
+填充常跟对齐一起使用
+`^`、`<`、`>`分别是居中、左对齐、右对齐，后面带宽度
+`:`号后面带填充的字符，只能是一个字符，不指定的话默认是用空格填充
+比如
+
+```
+In [15]: '{:>8}'.format('189')
+Out[15]: '     189'
+In [16]: '{:0>8}'.format('189')
+Out[16]: '00000189'
+In [17]: '{:a>8}'.format('189')
+Out[17]: 'aaaaa189'
+
+```
+
+#### **精度与类型f**
+
+精度常跟类型f一起使用
+
+```
+In [44]: '{:.2f}'.format(321.33345)
+Out[44]: '321.33'
+
+```
+
+其中`.2`表示长度为2的精度，`f`表示float类型。
+
+#### **其他类型**
+
+主要就是进制了，b、d、o、x分别是二进制、十进制、八进制、十六进制。
+
+```
+In [54]: '{:b}'.format(17)
+Out[54]: '10001'
+In [55]: '{:d}'.format(17)
+Out[55]: '17'
+In [56]: '{:o}'.format(17)
+Out[56]: '21'
+In [57]: '{:x}'.format(17)
+Out[57]: '11'
+
+```
+
+用`，`号还能用来做金额的千位分隔符。
+
+```
+In [47]: '{:,}'.format(1234567890)
+Out[47]: '1,234,567,890'
+```
+
+### 大小写转换
+
+对英文字符串进行大小写的格式转换
+
+#### 转换为大写
+
+将字符串中的字符转换为大写
+
+```python
+str = "this is string example....wow!!!";
+
+str.upper()
+-->'THIS IS STRING EXAMPLE....WOW!!!'
+```
+
+#### 转换为小写
+
+将字符串中所有字符转换为小写
+
+```python
+str = "THIS IS STRING EXAMPLE....WOW!!!";
+str.lower()
+-->'this is string example....wow!!!'
+```
+
+#### 转换为名字格式
+
+返回的字符串，所有单词均首字母大写，其余字母小写
+
+```python
+str = "this is string example....wow!!!";
+str.title()
+-->'This Is String Example....Wow!!!'
+```
+
 ### 内置函数
 
 #### str.split()
 
 字符串分割
+
+**注意：**`split()`默认分割字符为空格。 
 
 ```python
 #以 str 为分隔符切片 string，如果 num有指定值，则仅分隔 num 个子字符串
@@ -617,9 +1029,36 @@ os.getcwd()
 
 ### 获取指定目录下的所有文件和目录名
 
+和os.walk的区别为无法遍历得到文件夹下文件的名称，并且列表内中有文件名称无路径。如果要使用需要把os.listdir(path)中的path加上。
+
+另外os.walk返回是generator格式，os.listdir返回为list格式
+
 ```python
 os.listdir('dirname')
-#返回一个列表
+#返回一个文件或文件名列表
+```
+
+### 遍历指定文件夹及子文件夹
+
+返回的是一个三元组(dirpath, dirnames, filenames)
+
+dirpath为路径
+
+dirnames为路径下的文件夹名
+
+filenames为路径下的文件名
+
+```python
+os.walk(top, topdown=True, onerror=None, followlinks=False)
+
+import os
+from os.path import join, getsize
+for root, dirs, files in os.walk('python/Lib/email'):
+    print(root, "consumes", end=" ")
+    print(sum(getsize(join(root, name)) for name in files), end=" ")
+    print("bytes in", len(files), "non-directory files")
+    if 'CVS' in dirs:
+        dirs.remove('CVS') 
 ```
 
 ### 检测文件/文件夹是否存在
@@ -832,7 +1271,83 @@ np.zeros((5))
 np.zeros((3,5))
 ```
 
+### 裁剪数据
 
+将数据变换到指定范围内
+
+```python
+>>> a = np.arange(10)
+#将数据a裁剪到1到8，小于1的为1，大于8的为8
+>>> np.clip(a, 1, 8)
+array([1, 1, 2, 3, 4, 5, 6, 7, 8, 8])
+>>> a
+array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+>>> np.clip(a, 3, 6, out=a)
+array([3, 3, 3, 3, 4, 5, 6, 6, 6, 6])
+>>> a = np.arange(10)
+>>> a
+array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+>>> np.clip(a, [3, 4, 1, 1, 1, 4, 4, 4, 4, 4], 8)
+array([3, 4, 2, 3, 4, 5, 6, 7, 8, 8])
+```
+
+### 打乱排序
+
+将数据原有的顺序打乱，类似洗牌
+
+```python
+numpy.random.shuffle(x)
+#将x的顺序打乱
+>>> arr = np.arange(10)
+>>> np.random.shuffle(arr)
+>>> arr
+[1 7 5 2 9 4 3 6 0 8]
+
+#多列的数据按照行打乱顺序，行内顺序不变
+>>> arr = np.arange(9).reshape((3, 3))
+>>> np.random.shuffle(arr)
+>>> arr
+array([[3, 4, 5],
+       [6, 7, 8],
+       [0, 1, 2]])
+```
+
+### 合并数据
+
+```python
+import numpy as np
+
+# Test 1
+A = np.array([1, 1, 1])
+B = np.array([2, 2, 2])
+# 合并array, 竖直方向
+C = np.vstack((A, B))
+print A.shape
+print C.shape
+print C
+
+# 合并array, 水平方向
+D = np.hstack((A, B))
+print A.shape
+print D.shape
+print D
+```
+
+### 生成等差序列
+
+```python
+np.linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None)
+#start 序列开始值
+#stop 序列结束值
+#num 生成的序列个数
+#endpoint 是否包含最后一个结尾点,默认包含
+#retstep 为True则会返回间距大小
+#dtype 输出数组的类型。 如果没有给出dtype，则从其他输入参数推断数据类型。
+
+#不包含结尾点，并返回间距大小
+np.linspace(0,1,5,endpoint=False,retstep=True)
+(array([ 0. ,  0.2,  0.4,  0.6,  0.8]), 0.2)
+```
 
 ## time
 

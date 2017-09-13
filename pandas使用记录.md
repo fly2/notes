@@ -44,6 +44,50 @@ pandas中iloc是用来对位置索引进行操作，loc是用行索引进行操�
 
 ## DataFrame常用操作
 
+### 数据探查
+
+```python
+#得到数值型，object以及混合类型变量的统计信息
+df.describe(percentiles=None, include=None, exclude=None)
+#percentiles 输出中包含的百分位数。 全部应该在0和1之间。默认值为[.25，.5，.75]，返回第25，第50和第75百分位数。
+#include 结果包含数据类型的白名单。有三种设置：
+'all' 输入的所有列都将包含在输出中。
+类型列表 将结果限制为提供的数据类型。 将结果限制为数字类型，提交numpy.number。 要将其限制为分类对象，请提交numpy.object数据类型。 字符串也可以以select_dtypes的形式使用（例如，df.describe（include = ['0']））
+'None' 默认，结果包含所有数值类型
+#exclude 从结果中忽略的黑名单数据类型。 忽略了系列。 以下是选项：
+类型列表 从结果中排除提供的数据类型。 选择数字类型submit numpy.number。 要选择分类对象，请提交数据类型numpy.object。 字符串也可以以select_dtypes的形式使用（例如，df.describe（include = ['0']））
+'None' 默认，结果将不排除任何类型
+
+
+#得到表的空值，类型及内存大小
+DataFrame.info(verbose=None, buf=None, max_cols=None, memory_usage=None, null_counts=None)
+#verbose{None,True,False} 是否打印完整的摘要。 None跟随display.max_info_columns设置。 True或False覆盖了display.max_info_columns设置。
+#buf 可写缓冲区，默认为sys.stdout
+#max_cols 数值类型或None 确定是否打印完整的摘要或简短摘要。 None则跟随display.max_info_columns设置。
+#memory_usage 指定是否显示DataFrame元素（包括索引）的总内存使用情况。 None则跟随display.memory_usage设置。 True或False覆盖了display.memory_usage设置。 深刻的“deep”值相当于True， 内存使用情况以人类可读的单位（基数2表示）显示。
+#null_counts 是否显示非空计数
+如果None，则只显示df中小于max_info_rows和max_info_columns。
+如果为True，总是显示计数。
+如果False，永不显示。
+```
+
+### 画图
+
+在pandas中可以直接画图，使用plt来展示图片。具体参数见[链接](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.plot.html)
+
+```python
+DataFrame.plot(x=None, y=None, kind='line', ax=None, subplots=False, sharex=None, sharey=False, layout=None, figsize=None, use_index=True, title=None, grid=None, legend=True, style=None, logx=False, logy=False, loglog=False, xticks=None, yticks=None, xlim=None, ylim=None, rot=None, fontsize=None, colormap=None, table=False, yerr=None, xerr=None, secondary_y=False, sort_columns=False, **kwds)
+
+import matplotlib.pyplot as plt 
+import pandas as pd
+
+df = pd.DataFrame({'a': np.random.randn(6).astype('f4'),
+...                    'b': [True, False] * 3,
+...                    'c': [1.0, 2.0] * 3})
+df.plot(y='a')
+plt.show()
+```
+
 ###建表
 
 ```python
@@ -110,6 +154,43 @@ df.iloc[0:4,0:2]
 #单独取一列时可直接使用该列位置.直接取C列的值
 df.iloc[0:4,2]
 
+```
+
+### 获得指定数据类型的变量
+
+```python
+DataFrame.select_dtypes(include=None, exclude=None)
+#选择其中一个，以列表的形式传入所需或不需要的变量类型
+#include 包含的类型
+#exclude 不包含的类型
+
+>>> df = pd.DataFrame({'a': np.random.randn(6).astype('f4'),
+...                    'b': [True, False] * 3,
+...                    'c': [1.0, 2.0] * 3})
+>>> df
+        a      b  c
+0  0.3962   True  1
+1  0.1459  False  2
+2  0.2623   True  1
+3  0.0764  False  2
+4 -0.9703   True  1
+5 -1.2094  False  2
+>>> df.select_dtypes(include=['float64'])
+   c
+0  1
+1  2
+2  1
+3  2
+4  1
+5  2
+>>> df.select_dtypes(exclude=['floating'])
+       b
+0   True
+1  False
+2   True
+3  False
+4   True
+5  False
 ```
 
 ### 数据赋值
@@ -290,6 +371,8 @@ df.sort_values(['B','C'])
 
 **注意：**用第二种方法更改部分列时，即使只有一列也需要用`dft[['a']]`，因为`dft.a`和`dft['a']`都得到的是array形式，`dft[['a']]`得到的是df格式。只有df格式才能用astype。
 
+**注意：**当对数据进行格式更改时，注意index需要唯一，即在pd.concat()后需要做df.reset_index然后再做astype的格式转换。
+
 ```python
 
 dft = pd.DataFrame({'a': [1,2,3], 'b': [4,5,6], 'c': [7, 8, 9]})
@@ -343,6 +426,17 @@ infor2.drop_duplicates(['工作所在地','性别'],False,inplace=True)
 #删除所有性别，工作所在地重复行
 ```
 
+### 得到inf
+
+pandas 无法直接进行inf的查询，需要使用numpy.isinf来进行查找，得到inf的值
+
+```python
+#判断是否为inf
+np.isinf(df)
+#得到包含inf的行
+df[np.isinf(df).values==True]
+```
+
 ### 得到nan
 
 pandas 提供isnull和notnull两种方法。isnull是为nan返回True，notnull是nan返回False。
@@ -354,8 +448,11 @@ pd.isnull(df1.B)
 pd.notnull(df1.B)
 
 #使用df的函数
-df1.B.isnull
-df1.B.notnull
+df1.B.isnull()
+df1.B.notnull()
+#找到值为空的行
+df[df.isnull().values==True]
+df[df.notnull().values==False]
 ```
 
 ### 去除nan
@@ -450,8 +547,6 @@ df.test.value_counts(bins=2)
 #即将列a分成两个离散变量，(0.995,3.5] 频数为6, (3.5,6]频数为3
 ```
 
-
-
 ### 按照条件更改列的值
 
 ```python
@@ -527,10 +622,10 @@ df1.录音编号=np.int64(df1.录音编号)
 
 ### 连接数据库
 
-使用python连接数据库，可以使用sqlalchemy包，通过这个包连接数据库，对里面的数据进行操作。也可以通过pandas内部的函数直接读取数据库中的表。针对oracle，可以使用cx_Oracle包来读取oracle数据。读取oracle数据库出现中文乱码，是由于编码不匹配，需在前面设置编码格式。
+使用python连接数据库，可以使用sqlalchemy包，通过这个包连接数据库，对里面的数据进行操作。也可以通过pandas内部的函数直接读取数据库中的表。针对oracle，可以使用cx_Oracle包来读取oracle数据。读取oracle数据库出现中文乱码，是由于编码不匹配，需在前面设置编码格式。`'NLS_LANG'`为oracle数据库编码环境。
 
 ```python
-#设置编码格式
+#设置oracle编码格式
 import os
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
 #用sqlalchemy创立连接
@@ -768,10 +863,6 @@ DataFrame.apply(func, axis=0, broadcast=False, raw=False, reduce=None, args=(), 
 #args 传递给函数的位置参数
 ```
 
-
-
-
-
 ## 问题解决记录
 
 ### pandas读取csv，前面有\ufeff
@@ -924,6 +1015,35 @@ for i in range(10):
 print(time.time()-t1)
 ->0.3686678409576416
 ->36.97714591026306
+```
+
+### 使用df.astype时报错
+
+**问题：**在对数据进行合并（pd.concat()）后直接进行df.astype()的格式转换时报错。
+
+**解决方法：**在对合并后的数据进行格式转换前使用df.reset_index()来进行重置索引，之后再进行df.astype()的格式转换。
+
+### df中的列有文本数字混在一起的列
+
+**问题：**在对id号进行匹配时，一部分id号前面有标签，格式为'寿险1234567'，需将'寿险'两字去掉。
+
+**解决方法：**通过df.apply函数结合re.findall将id号中的数字匹配出来
+
+```python
+import re
+df.录音编号=df.录音编号.apply(lambda x:re.findall('[1-9]\d*',str(x))[0])
+#'[1-9]\d*'匹配连续数字
+#re.findall()[0]将匹配到的数字从列表中取出，即列表第一位
+```
+
+### 处理英文bytes数据
+
+**问题：**在使用open的`'rb'`得到bytes类型数据后常规编码无法解码('utf-8','gbk','gb2312','gb18030')，导致无法进行str的相关操作。源文件疑似使用unicode编码。
+
+**解决方法：**使用`'unicode_escape'`方式解码，因为python3中使用unicode作为中间编码，而源文件也为unicode编码，故可使用python独有编码`'unicode_escape'`进行处理。
+
+```python
+text.decode('unicode_escape')
 ```
 
 

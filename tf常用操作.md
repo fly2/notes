@@ -1,7 +1,3 @@
-
-
-
-
 # tf常用操作
 
 ## tf函数
@@ -23,29 +19,36 @@ TensorFlow 将图形定义转换成分布式执行的操作, 以充分利用可�
 
 ### TensorFlow的算术操作如下：
 
-| 操作                          | 描述                                       |
-| --------------------------- | ---------------------------------------- |
-| tf.add(x, y, name=None)     | 求和                                       |
-| tf.sub(x, y, name=None)     | 减法                                       |
-| tf.mul(x, y, name=None)     | 乘法                                       |
-| tf.div(x, y, name=None)     | 除法                                       |
-| tf.mod(x, y, name=None)     | 取模                                       |
-| tf.abs(x, name=None)        | 求绝对值                                     |
-| tf.neg(x, name=None)        | 取负 (y = -x).                             |
-| tf.sign(x, name=None)       | 返回符号 y = sign(x) = -1 if x < 0; 0 if x == 0; 1 if x > 0. |
-| tf.inv(x, name=None)        | 取反                                       |
-| tf.square(x, name=None)     | 计算平方 (y = x * x = x^2).                  |
-| tf.round(x, name=None)      | 舍入最接近的整数# ‘a’ is [0.9, 2.5, 2.3, -4.4]tf.round(a) ==> [ 1.0, 3.0, 2.0, -4.0 ] |
-| tf.sqrt(x, name=None)       | 开根号 (y = \sqrt{x} = x^{1/2}).            |
-| tf.pow(x, y, name=None)     | 幂次方 # tensor ‘x’ is [[2, 2], [3, 3]]# tensor ‘y’ is [[8, 16], [2, 3]]tf.pow(x, y) ==> [[256, 65536], [9, 27]] |
-| tf.exp(x, name=None)        | 计算e的次方                                   |
-| tf.log(x, name=None)        | 计算log，一个输入计算e的ln，两输入以第二输入为底              |
-| tf.maximum(x, y, name=None) | 返回最大值 (x > y ? x : y)                    |
-| tf.minimum(x, y, name=None) | 返回最小值 (x < y ? x : y)                    |
-| tf.cos(x, name=None)        | 三角函数cosine                               |
-| tf.sin(x, name=None)        | 三角函数sine                                 |
-| tf.tan(x, name=None)        | 三角函数tan                                  |
-| tf.atan(x, name=None)       | 三角函数ctan                                 |
+| 操作                                       | 描述                                       |
+| ---------------------------------------- | ---------------------------------------- |
+| tf.assign(ref, value, validate_shape=None, use_locking=None, name=None) | 将value的值赋给ref，并输出ref。**注意：**ref需要为tf.Variable(). validate_shape=True验证value和ref的尺寸，False则用value的形状。 |
+| tf.add(x, y, name=None)                  | 求和                                       |
+| tf.subtract(x, y, name=None)             | 减法                                       |
+| tf.multiply(x, y, name=None)             | 乘法,对应元素相乘。tf.multiply([2,3],[[0,1],[2,3]])>>[[0,3],[4,9]] |
+| tf.div(x, y, name=None)                  | 除法                                       |
+| tf.mod(x, y, name=None)                  | 取模                                       |
+| tf.abs(x, name=None)                     | 求绝对值                                     |
+| tf.negative(x, name=None)                | 取负 (y = -x).                             |
+| tf.sign(x, name=None)                    | 返回符号 y = sign(x) = -1 if x < 0; 0 if x == 0; 1 if x > 0. |
+| tf.inv(x, name=None)                     | 取反                                       |
+| tf.square(x, name=None)                  | 计算平方 (y = x * x = x^2).                  |
+| tf.round(x, name=None)                   | 舍入最接近的整数# ‘a’ is [0.9, 2.5, 2.3, -4.4]tf.round(a) ==> [ 1.0, 3.0, 2.0, -4.0 ] |
+| tf.sqrt(x, name=None)                    | 开根号 (y = \sqrt{x} = x^{1/2}).            |
+| tf.pow(x, y, name=None)                  | 幂次方 # tensor ‘x’ is [[2, 2], [3, 3]]# tensor ‘y’ is [[8, 16], [2, 3]]tf.pow(x, y) ==> [[256, 65536], [9, 27]] |
+| tf.exp(x, name=None)                     | 计算e的次方                                   |
+| tf.log(x, name=None)                     | 计算log，一个输入计算e的ln，两输入以第二输入为底              |
+| tf.maximum(x, y, name=None)              | 返回最大值 (x > y ? x : y)                    |
+| tf.minimum(x, y, name=None)              | 返回最小值 (x < y ? x : y)                    |
+| tf.greater(x,y,name=None)                | 返回x>y的bool值                              |
+| tf.greater_equal(x, y, name=None)        | 返回x>=y的bool值                             |
+| tf.less(x, y, name=None)                 | 返回x<y的bool值                              |
+| tf.less_equal(x, y, name=None)           | 返回x<=y的bool值                             |
+| tf.equal(x, y, name=None)                | 返回x==y的bool值                             |
+| tf.not_equal(x, y, name=None)            | 返回x!=y的bool值                             |
+| tf.cos(x, name=None)                     | 三角函数cosine                               |
+| tf.sin(x, name=None)                     | 三角函数sine                                 |
+| tf.tan(x, name=None)                     | 三角函数tan                                  |
+| tf.atan(x, name=None)                    | 三角函数ctan                                 |
 
 ------
 
@@ -65,13 +68,14 @@ TensorFlow 将图形定义转换成分布式执行的操作, 以充分利用可�
 
 - 形状操作Shapes and Shaping
 
-| 操作                                    | 描述                                       |
-| ------------------------------------- | ---------------------------------------- |
-| tf.shape(input, name=None)            | 返回数据的shape# ‘t’ is [[[1, 1, 1], [2, 2, 2]], [[3, 3, 3], [4, 4, 4]]]shape(t) ==> [2, 2, 3] |
-| tf.size(input, name=None)             | 返回数据的元素数量# ‘t’ is [[[1, 1, 1], [2, 2, 2]], [[3, 3, 3], [4, 4, 4]]]]size(t) ==> 12 |
-| tf.rank(input, name=None)             | 返回tensor的rank注意：此rank不同于矩阵的rank，tensor的rank表示一个tensor需要的索引数目来唯一表示任何一个元素也就是通常所说的 “order”, “degree”或”ndims”#’t’ is [[[1, 1, 1], [2, 2, 2]], [[3, 3, 3], [4, 4, 4]]]# shape of tensor ‘t’ is [2, 2, 3]rank(t) ==> 3 |
-| tf.reshape(tensor, shape, name=None)  | 改变tensor的形状# tensor ‘t’ is [1, 2, 3, 4, 5, 6, 7, 8, 9]# tensor ‘t’ has shape [9]reshape(t, [3, 3]) ==> [[1, 2, 3],[4, 5, 6],[7, 8, 9]]#如果shape有元素[-1],表示在该维度打平至一维# -1 将自动推导得为 9:reshape(t, [2, -1]) ==> [[1, 1, 1, 2, 2, 2, 3, 3, 3],[4, 4, 4, 5, 5, 5, 6, 6, 6]] |
-| tf.expand_dims(input, dim, name=None) | 插入维度1进入一个tensor中#该操作要求-1-input.dims()# ‘t’ is a tensor of shape [2]shape(expand_dims(t, 0)) ==> [1, 2]shape(expand_dims(t, 1)) ==> [2, 1]shape(expand_dims(t, -1)) ==> [2, 1] <= dim <= input.dims() |
+| 操作                                       | 描述                                       |
+| ---------------------------------------- | ---------------------------------------- |
+| tf.shape(input, name=None)               | 返回数据的shape# ‘t’ is [[[1, 1, 1], [2, 2, 2]], [[3, 3, 3], [4, 4, 4]]]shape(t) ==> [2, 2, 3] |
+| tf.size(input, name=None)                | 返回数据的元素数量# ‘t’ is [[[1, 1, 1], [2, 2, 2]], [[3, 3, 3], [4, 4, 4]]]]size(t) ==> 12 |
+| tf.rank(input, name=None)                | 返回tensor的rank注意：此rank不同于矩阵的rank，tensor的rank表示一个tensor需要的索引数目来唯一表示任何一个元素也就是通常所说的 “order”, “degree”或”ndims”#’t’ is [[[1, 1, 1], [2, 2, 2]], [[3, 3, 3], [4, 4, 4]]]# shape of tensor ‘t’ is [2, 2, 3]rank(t) ==> 3 |
+| tf.reshape(tensor, shape, name=None)     | 改变tensor的形状# tensor ‘t’ is [1, 2, 3, 4, 5, 6, 7, 8, 9]# tensor ‘t’ has shape [9]reshape(t, [3, 3]) ==> [[1, 2, 3],[4, 5, 6],[7, 8, 9]]#如果shape有元素[-1],表示在该维度打平至一维# -1 将自动推导得为 9:reshape(t, [2, -1]) ==> [[1, 1, 1, 2, 2, 2, 3, 3, 3],[4, 4, 4, 5, 5, 5, 6, 6, 6]] |
+| tf.expand_dims(input, dim, name=None)    | 插入维度1进入一个tensor中#该操作要求-1-input.dims()# ‘t’ is a tensor of shape [2]shape(expand_dims(t, 0)) ==> [1, 2]shape(expand_dims(t, 1)) ==> [2, 1]shape(expand_dims(t, -1)) ==> [2, 1] <= dim <= input.dims() |
+| tf.squeeze(input, squeeze_dims=None, name=None) | 从tensor中删除所有大小是1的维度。给定张量输入，此操作返回相同类型的张量，并删除所有尺寸为1的尺寸。 如果不想删除所有尺寸1尺寸，可以通过指定squeeze_dims来删除特定尺寸1尺寸。# 't' is a tensor of shape [1, 2, 1, 3, 1, 1]，shape(squeeze(t)) ==> [2, 3]。shape(squeeze(t, [2, 4])) ==> [1, 2, 3, 1] |
 
 - 切片与合并（Slicing and Joining）
 
@@ -80,7 +84,7 @@ TensorFlow 将图形定义转换成分布式执行的操作, 以充分利用可�
 | tf.slice(input_, begin, size, name=None) | 对tensor进行切片操作其中size[i] = input.dim_size(i) - begin[i]该操作要求 0 <= begin[i] <= begin[i] + size[i] <= Di for i in [0, n]#’input’ is #[[[1, 1, 1], [2, 2, 2]],[[3, 3, 3], [4, 4, 4]],[[5, 5, 5], [6, 6, 6]]]tf.slice(input, [1, 0, 0], [1, 1, 3]) ==> [[[3, 3, 3]]]tf.slice(input, [1, 0, 0], [1, 2, 3]) ==> [[[3, 3, 3],[4, 4, 4]]]tf.slice(input, [1, 0, 0], [2, 1, 3]) ==> [[[3, 3, 3]],[[5, 5, 5]]] |
 | tf.split(split_dim, num_split, value, name=’split’) | 沿着某一维度将tensor分离为num_split tensors# ‘value’ is a tensor with shape [5, 30]# Split ‘value’ into 3 tensors along dimension 1split0, split1, split2 = tf.split(1, 3, value)tf.shape(split0) ==> [5, 10] |
 | tf.concat(concat_dim, values, name=’concat’) | 沿着某一维度连结tensort1 = [[1, 2, 3], [4, 5, 6]]t2 = [[7, 8, 9], [10, 11, 12]]tf.concat(0, [t1, t2]) ==> [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]]tf.concat(1, [t1, t2]) ==> [[1, 2, 3, 7, 8, 9], [4, 5, 6, 10, 11, 12]]如果想沿着tensor一新轴连结打包,那么可以：tf.concat(axis, [tf.expand_dims(t, axis) for t in tensors])等同于tf.pack(tensors, axis=axis) |
-| tf.pack(values, axis=0, name=’pack’)     | 将一系列rank-R的tensor打包为一个rank-(R+1)的tensor# ‘x’ is [1, 4], ‘y’ is [2, 5], ‘z’ is [3, 6]pack([x, y, z]) => [[1, 4], [2, 5], [3, 6]] # 沿着第一维packpack([x, y, z], axis=1) => [[1, 2, 3], [4, 5, 6]]等价于tf.pack([x, y, z]) = np.asarray([x, y, z]) |
+| tf.stack(values, axis=0, name=’stack’)   | 将一系列rank-R的tensor打包为一个rank-(R+1)的tensor# ‘x’ is [1, 4], ‘y’ is [2, 5], ‘z’ is [3, 6]stack([x, y, z]) => [[1, 4], [2, 5], [3, 6]] # 沿着第一维stack。stack([x, y, z], axis=1) => [[1, 2, 3], [4, 5, 6]]即stack后的三维张量按照[:,i,:]重新排列 |
 | tf.reverse(tensor, dims, name=None)      | 沿着某维度进行序列反转其中dim为列表，元素为bool型，size等于rank(tensor)# tensor ‘t’ is [[[[ 0, 1, 2, 3],#[ 4, 5, 6, 7],#[ 8, 9, 10, 11]],#[[12, 13, 14, 15],#[16, 17, 18, 19],#[20, 21, 22, 23]]]]# tensor ‘t’ shape is [1, 2, 3, 4]# ‘dims’ is [False, False, False, True]reverse(t, dims) ==>[[[[ 3, 2, 1, 0],[ 7, 6, 5, 4],[ 11, 10, 9, 8]],[[15, 14, 13, 12],[19, 18, 17, 16],[23, 22, 21, 20]]]] |
 | tf.transpose(a, perm=None, name=’transpose’) | 调换tensor的维度顺序按照列表perm的维度排列调换tensor顺序，如为定义，则perm为(n-1…0)# ‘x’ is [[1 2 3],[4 5 6]]tf.transpose(x) ==> [[1 4], [2 5],[3 6]]# Equivalentlytf.transpose(x, perm=[1, 0]) ==> [[1 4],[2 5], [3 6]] |
 | tf.gather(params, indices, validate_indices=None, name=None) | 合并索引indices所指示params中的切片![tf.gather](http://img.blog.csdn.net/20160808174705034) |
@@ -159,6 +163,15 @@ TensorFlow 将图形定义转换成分布式执行的操作, 以充分利用可�
 | tf.invert_permutation(x, name=None)    | 置换x数据与索引的关系# tensor `x` is [3, 4, 0, 2, 1]invert_permutation(x) ==> [2, 4, 3, 0, 1] |
 
 ------
+
+### 控制流
+
+| 操作                                      | 描述                                       |
+| --------------------------------------- | ---------------------------------------- |
+| tf.cond(pred, fn1, fn2, name=None)      | pred为判别表达式，  fn1和fn2为运算表达式。当pred为true时，执行fn1操作；当pred为false时，执行fn2操作。 |
+| tf.control_dependencies(control_inputs) | `control_dependencies(control_inputs)`返回一个控制依赖的上下文管理器，使用`with`关键字可以让在这个上下文环境中的操作都在`control_inputs` 执行。 |
+
+
 
 ### 神经网络(Neural Network)
 
