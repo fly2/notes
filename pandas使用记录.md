@@ -570,6 +570,13 @@ df4=pd.merge(df3,df1,how='inner',on=None,left_on=['投保人姓名','保单号']
 #on为关联时匹配的列，当只有一列时用on，多列时on=None，用left_on和right_on来关联
 main=pd.merge(infor4,infor2,how='left',on='姓名')
 #用名字去关联，左边保持不变，右边和左边相同时匹配过去
+             
+#根据索引去匹配
+#将left_index和right_index设为True
+df1=pd.merge(df1,df2,how='left',on=None,left_index=True,right_index=True)   
+
+#合并时如果有重名的列名，使用suffixes参数设置,默认为suffixes=('_x', '_y')
+df=pd.merge(df,df1,how='left',on=None,left_index=True,right_index=True,suffixes=('_1', '_2'))
 ```
 
 
