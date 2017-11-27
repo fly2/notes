@@ -52,6 +52,31 @@ else:
 -->2
 ```
 
+### for的循环技巧
+
+python中的for循环可通过内嵌来用于对列表，字典的循环赋值，也可用于其他数据类型的赋值。通过对for的使用，可以简化代码。
+
+```python
+#列表赋值
+l=[i for i in range(2)]
+
+#字典赋值
+d={i:l[i] for i in l}
+
+#对np.array赋值
+np.array([inputs[batch_id][length_id] for batch_id in range(batch_size)], dtype=np.int32)
+```
+
+### 多变量命名
+
+使用locals()或者globals()，这两个函数提供了基于字典的访问局部和全局变量的方式。key为变量名，value为对应的变量值。
+
+```python
+for i in range(10):
+    locals()['name%s' % i],c = i,10 
+    #通过字典的方式生成命名为name1，name2，。。。，name9的变量
+```
+
 ### @的用法
 
 '@'符号用作函数修饰符，即将被修饰的函数作为参数，返回修饰后的同名函数或其他可调用的东西。修饰符必须出现在函数定义前一行，不允许和函数定义在同一行。也就是说@A def f(): 是非法的。 只可以在模块或类定义层内对函数进行修饰，不允许修修饰一个类。
@@ -120,16 +145,6 @@ AssertionError                            Traceback (most recent call last)
 
 AssertionError: x is not an even number
 
-```
-
-### 多变量命名
-
-使用locals()或者globals()，这两个函数提供了基于字典的访问局部和全局变量的方式。key为变量名，value为对应的变量值。
-
-```python
-for i in range(10):
-    locals()['name%s' % i],c = i,10 
-    #通过字典的方式生成命名为name1，name2，。。。，name9的变量
 ```
 
 ### 函数的参数
@@ -266,6 +281,17 @@ for i in c:
 4.0
 ```
 
+### sorted
+
+```python
+#python内置的sorted函数可用于dict和list的排序，特别是对于[('a',3),('b',2)]这种类型的列表十分有用
+new_list1=sorted(list1, key=lambda x:x[1],  reverse = True)
+#排列结束后需要进行赋值
+#list1为所需排列的列表
+#key为排列所用的值
+#reverse 是否从大到小排列
+```
+
 ### map
 
 `map()`函数接收两个参数，一个是函数，一个是`Iterable`，`map`将传入的函数依次作用到序列的每个元素，并把结果作为新的`Iterator`返回。在python3中map需要list(map(fun,iter))。
@@ -336,6 +362,140 @@ END
 3. 在使用`except`时需要注意的是，它不但捕获该类型的错误，还把其子类也“一网打尽”。比如：当`ValueErroe`在第一个`except`,`UnicodeError`在第二个`except`时，第二个`except`永远也捕获不到`UnicodeError`，因为`UnicodeError`是`ValueError`的子类，如果有，也被第一个`except`给捕获了。
 
 ## 数据类型
+
+### list(列表)
+
+列表是最常用的Python数据类型，它可以作为一个方括号内的逗号分隔值出现。
+
+#### 创建列表
+
+```python
+list1 = ['physics', 'chemistry', 1997, 2000];
+list2 = [1, 2, 3, 4, 5 ];
+list3 = ["a", "b", "c", "d"];
+```
+
+与字符串的索引一样，列表索引从0开始。列表可以进行截取、组合等。
+
+#### 访问列表中的值
+
+使用下标索引来访问列表中的值，同样你也可以使用方括号的形式截取字符，如下所示：
+
+```python
+list1 = ['physics', 'chemistry', 1997, 2000];
+list2 = [1, 2, 3, 4, 5, 6, 7 ];
+
+list1[0]
+->physics
+
+list2[1:5]
+->[2, 3, 4, 5]
+```
+
+#### Python列表截取
+
+Python 的列表截取实例如下：
+
+```python
+L = ['Google', 'Runoob', 'Taobao']
+L[2]
+->'Taobao'
+L[-2]
+->'Runoob'
+L[1:]
+->['Runoob', 'Taobao']
+```
+
+描述：
+
+| Python 表达式 | 结果                   | 描述           |
+| ---------- | -------------------- | ------------ |
+| L[2]       | 'Taobao'             | 读取列表中第三个元素   |
+| L[-2]      | 'Runoob'             | 读取列表中倒数第二个元素 |
+| L[1:]      | ['Runoob', 'Taobao'] | 从第二个元素开始截取列表 |
+
+#### 数据添加
+
+使用append来为列表添加数据，append添加的数据会在list末尾。
+
+```python
+aList = [123, 'xyz', 'zara', 'abc']
+aList.append( 2009 )
+alist
+->[123, 'xyz', 'zara', 'abc', 2009]
+```
+
+#### 数据更新
+
+使用索引对列表进行更新。
+
+```python
+#!/usr/bin/python
+
+list = ['physics', 'chemistry', 1997, 2000];
+
+list[2] = 2001;
+list
+->['physics', 'chemistry', 2001, 2000]
+```
+
+#### 删除列表元素
+
+有del和list.remove两种方法进行删除元素。
+
+```python
+#方法一，使用del删除元素，通过索引定位
+list1 = ['physics', 'chemistry', 1997, 2000];
+del list1[2];
+->['physics', 'chemistry', 2000]
+
+#方法二，使用remove(obj)移除列表中obj(某个值)的第一个匹配项.
+aList = [123, 'xyz', 'zara', 'abc', 'xyz'];
+
+aList.remove('xyz');
+aList
+->[123, 'zara', 'abc', 'xyz']
+```
+
+#### Python列表脚本操作符
+
+列表对 + 和 * 的操作符与字符串相似。+ 号用于组合列表，* 号用于重复列表。
+
+如下所示：
+
+| Python 表达式                   | 结果                           | 描述         |
+| ---------------------------- | ---------------------------- | ---------- |
+| len([1, 2, 3])               | 3                            | 长度         |
+| [1, 2, 3] + [4, 5, 6]        | [1, 2, 3, 4, 5, 6]           | 组合         |
+| ['Hi!'] * 4                  | ['Hi!', 'Hi!', 'Hi!', 'Hi!'] | 重复         |
+| 3 in [1, 2, 3]               | True                         | 元素是否存在于列表中 |
+| for x in [1, 2, 3]: print x, | 1 2 3                        | 迭代         |
+
+#### Python列表函数&方法
+
+Python包含以下函数:
+
+| 序号   | 函数                                       |
+| ---- | ---------------------------------------- |
+| 1    | [cmp(list1, list2)](http://www.runoob.com/python/att-list-cmp.html)比较两个列表的元素 |
+| 2    | [len(list)](http://www.runoob.com/python/att-list-len.html)列表元素个数 |
+| 3    | [max(list)](http://www.runoob.com/python/att-list-max.html)返回列表元素最大值 |
+| 4    | [min(list)](http://www.runoob.com/python/att-list-min.html)返回列表元素最小值 |
+| 5    | [list(seq)](http://www.runoob.com/python/att-list-list.html)将元组转换为列表 |
+
+Python包含以下方法:
+
+| 序号   | 方法                                       |
+| ---- | ---------------------------------------- |
+| 1    | [list.append(obj)](http://www.runoob.com/python/att-list-append.html)在列表末尾添加新的对象 |
+| 2    | [list.count(obj)](http://www.runoob.com/python/att-list-count.html)统计某个元素在列表中出现的次数 |
+| 3    | [list.extend(seq)](http://www.runoob.com/python/att-list-extend.html)在列表末尾一次性追加另一个序列中的多个值（用新列表扩展原来的列表） |
+| 4    | [list.index(obj)](http://www.runoob.com/python/att-list-index.html)从列表中找出某个值第一个匹配项的索引位置 |
+| 5    | [list.insert(index, obj)](http://www.runoob.com/python/att-list-insert.html)将对象插入列表 |
+| 6    | [list.pop(obj=list[-1\])](http://www.runoob.com/python/att-list-pop.html)移除列表中的一个元素（默认最后一个元素），并且返回该元素的值 |
+| 7    | [list.remove(obj)](http://www.runoob.com/python/att-list-remove.html)移除列表中某个值的第一个匹配项 |
+| 8    | [list.reverse()](http://www.runoob.com/python/att-list-reverse.html)反向列表中元素 |
+| 9    | [list.sort([func\])](http://www.runoob.com/python/att-list-sort.html)对原列表进行排序 |
 
 ### dict(字典)
 
@@ -433,12 +593,22 @@ d=['a':1,'b':2,'c':3]
 
 ## 文件存取
 
-使用`open`方式存取文件，可以设置模式来进行读写限制，'r'为读，'w'为写，'a'为追加，'t'为操作方式为文本，'b'为操作方式为bytes流。
+使用`open`方式存取文件，可以设置模式来进行读写限制，'r'为读，'w'为写，'a'为追加，'t'为操作方式为文本，'b'为操作方式为bytes流。对于视频或者图片，只能使用bytes操作。
 
-### 文件读取
+### 图片和视频
 
 ```python
-读取txt
+url = 'http://cv4.jikexueyuan.com/10de45bbf83e450ff5e11ff4599d7166/201603202253/cocos2d-x/course_712/01/video/c712b_01_h264_sd_960_540.mp4'
+r = requests.get(url)
+file_name = str(key)+"_"+str(value)+".mp4"
+with open(file_name, "wb") as code:
+    code.write(r.content)
+```
+
+### txt
+
+```python
+#读取txt
 #方法一
 f=open('test.txt')        
 #返回文件对象
@@ -458,24 +628,29 @@ with open(vocab_path, 'rb') as f:
   		#f.read()为读取f文件
     	#splitlines()为按行分割
         words = f.read().splitlines()
+         
 ```
 
 ```python
-读取csv
+#保存为txt,在win显示需加\r
+with open ('/home/weblogic/DATA/private/shangguanxf/txt_anaysis/create/product_p.txt','wt') as file2:
+    for key in product_p:
+        file2.writelines('%s,%s\n' % (key, product_p[key]))   
+
+```
+
+### csv
+
+```python
+#读取csv
 #按行读取
 f=open('/home/weblogic/DATA/private/shangguanxf/cc_txt1/product.txt',encoding="gb18030").readlines()
 #按照分隔符进行分割
 line=[line.split(',') for line in f]
 ```
 
-### 文件保存
 
-```python
-#保存为txt,在win显示需加\r
-with open ('/home/weblogic/DATA/private/shangguanxf/txt_anaysis/create/product_p.txt','wt') as file2:
-    for key in product_p:
-        file2.writelines('%s,%s\n' % (key, product_p[key]))    
-        
+```python    
 #保存为csv
 with codecs.open(os.path.join("/home/weblogic/DATA/private/shangguanxf/cc_bigdata/create/工单机构分布/画图/",filespath),"w",'gb18030') as datacsv:
             #读取csv文件，返回的是迭代类型
@@ -486,16 +661,14 @@ with codecs.open(os.path.join("/home/weblogic/DATA/private/shangguanxf/cc_bigdat
                 c1.writerow([two[0],two[1]])
 ```
 
-### 文件追加
-
 ```python
-#在原有文件后面追加，即需要设置模式为'a'
+#csv在原有文件后面追加，即需要设置模式为'a'
 with open('D:/Program Files (x86)/Tencent/WeChat/WeChat Files/s_g_x_f/Files/data2007.csv','a') as f:
         for i in city:
             f.writelines('%s,%s,%s,%s\n' % (i,data[i][0],data[i][1],data[i][2]))
 ```
 
-## json读写
+### json
 
 ```python
 import json
@@ -518,7 +691,7 @@ with open('data.json', 'r') as f:
     data = json.load(f)
 ```
 
-## xml读写
+### xml
 
 xml格式简单介绍
 
@@ -1027,6 +1200,20 @@ os.getcwd()
 ->'E:\\code\\python'
 ```
 
+### 路径合并
+
+```python
+os.path.join('/tpdata/CC/区分opcu数据','20170725.csv')
+->'/tpdata/CC/区分opcu数据/20170725.csv'
+```
+
+### 得到绝对路径
+
+```python
+os.path.abspath('os_test.ipynb')
+->'/home/weblogic/CODE/shangguan/test/os_test.ipynb'
+```
+
 ### 获取指定目录下的所有文件和目录名
 
 和os.walk的区别为无法遍历得到文件夹下文件的名称，并且列表内中有文件名称无路径。如果要使用需要把os.listdir(path)中的path加上。
@@ -1099,6 +1286,44 @@ os.removedirs(path)
 os.remove(path)
 #删除指定文件
 os.remove('d:/1111.txt')
+```
+
+### 获取文件大小
+
+```python
+ os.path.getsize(filePath)
+ #获取指定文件的大小，结果为字节
+
+fsize = os.path.getsize(filePath)
+print(fsize,'bytes')
+```
+
+### 获取文件时间
+
+直接获取的时间是时间戳格式，需要转换成日期格式
+
+```python
+#获取文件的访问时间
+t = os.path.getatime(filePath)
+　　　　　　
+#获取文件的创建时间
+t = os.path.getctime(filePath)
+
+#获取文件的修改时间
+t = os.path.getmtime(filePath)
+
+
+import time
+import datetime
+
+import os
+
+#把时间戳转化为时间: 1479264792 to 2016-11-16 10:53:12
+def TimeStampToTime(timestamp):
+　　timeStruct = time.localtime(timestamp)
+　　return time.strftime('%Y-%m-%d %H:%M:%S',timeStruct)
+
+ 
 ```
 
 ## shutil
@@ -1207,8 +1432,6 @@ c.most_common(5)
 del c["a"]
 ```
 
-
-
 ## io
 
 ### 代替文件进行操作（io.StringIO）
@@ -1224,6 +1447,28 @@ pd.read_csv(StringIO(data), error_bad_lines=False)
 ## numpy
 
 numpy生成向量时，不要使用[1,n]/(1,n)这种形式，直接用单个n进行赋值，否则会生成矩阵，不能直接取值，需要array[0]才能取到值
+
+### 生成数据
+
+```python
+#生成5行1列的0向量
+np.zeros((5))
+#生成(3,5)的0矩阵
+np.zeros((3,5))
+#生成指定类型的0向量
+np.zeros((3,5),dtype=np.uint8)
+#生成和a形状一样的指定类型的0向量
+np.zeros_like(a,dtype=np.uint8)
+
+#生成5行1列的1向量
+np.ones((5))
+#生成(3,5)的1矩阵
+np.ones((3,5))
+#生成指定类型的1向量
+np.ones((3,5),dtype=np.uint8)
+#生成和a形状一样的指定类型的1向量
+np.ones_like(a,dtype=np.uint8)
+```
 
 ### np的bool索引赋值
 
@@ -1260,15 +1505,6 @@ import numpy as np
 np.random.randint(a, b, size=(c, d))
 #生成范围在[a,b)的整数
 #size为生成数组行列
-```
-
-### 生成0
-
-```python
-#生成5维的0向量
-np.zeros((5))
-#生成(3,5)的0矩阵
-np.zeros((3,5))
 ```
 
 ### 裁剪数据
@@ -1347,6 +1583,59 @@ np.linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None)
 #不包含结尾点，并返回间距大小
 np.linspace(0,1,5,endpoint=False,retstep=True)
 (array([ 0. ,  0.2,  0.4,  0.6,  0.8]), 0.2)
+```
+
+## random
+
+### random.random()
+
+返回一个[0.0, 1.0)中的随机浮点数
+
+### random.uniform()
+
+```python
+#返回a,b范围内的一个浮点数。
+random.uniform(a, b)
+#min=min(a,b)
+#max=max(a,b)
+#计算过程为min+(max-min)*random.random()
+```
+
+### random.choice()
+
+```python
+#从序列中随机抽取一个元素
+random.choice(seq)
+#seq 序列，可以是列表，字典，字符串
+
+#字符串
+random.choice('12332dasfdasd')
+->'f'
+#列表
+random.choice([i for i in range(10)])
+->7
+#字典，注意字典返回的是value
+random.choice({i:i+10 for i in range(10)})
+->14
+```
+
+### random.sample()
+
+```python
+#从population中无放回抽样k个元素，k小于等于len(population)否则报错
+random.sample(population, k)
+#population 元素列表
+#k 抽样次数
+
+#对于大样本数据可以使用下列方式抽样
+sample(xrange(10000000), 60)
+```
+
+### random.shuffle()
+
+```python
+#对x做重新排列
+random.shuffle(x)
 ```
 
 ## time

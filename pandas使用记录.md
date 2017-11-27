@@ -71,23 +71,6 @@ DataFrame.info(verbose=None, buf=None, max_cols=None, memory_usage=None, null_co
 如果False，永不显示。
 ```
 
-### 画图
-
-在pandas中可以直接画图，使用plt来展示图片。具体参数见[链接](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.plot.html)
-
-```python
-DataFrame.plot(x=None, y=None, kind='line', ax=None, subplots=False, sharex=None, sharey=False, layout=None, figsize=None, use_index=True, title=None, grid=None, legend=True, style=None, logx=False, logy=False, loglog=False, xticks=None, yticks=None, xlim=None, ylim=None, rot=None, fontsize=None, colormap=None, table=False, yerr=None, xerr=None, secondary_y=False, sort_columns=False, **kwds)
-
-import matplotlib.pyplot as plt 
-import pandas as pd
-
-df = pd.DataFrame({'a': np.random.randn(6).astype('f4'),
-...                    'b': [True, False] * 3,
-...                    'c': [1.0, 2.0] * 3})
-df.plot(y='a')
-plt.show()
-```
-
 ###建表
 
 ```python
@@ -554,6 +537,35 @@ df.test.value_counts(bins=2)
 df.loc[df['A'] > 2, 'B'] = new_val
 ```
 
+### 值累加
+
+将一列/行的值逐行累加。
+
+```python
+DataFrame.cumsum(axis=None, skipna=True, *args, **kwargs)
+#axis 按行还是按列，默认按行。0为按行，1为按列
+#skipna 是否跳过空值
+
+df=pd.DataFrame({'a':list(range(5)),'b':list(range(5))})
+
+df.cumsum(0)
+-->
+	a	b
+0	0	0
+1	1	1
+2	3	3
+3	6	6
+4	10	10
+df.cumsum(1)
+-->
+	a	b
+0	0	0
+1	1	2
+2	2	4
+3	3	6
+4	4	8
+```
+
 ### 数据合并
 
 数据合并有两种，一种是行数不变，合并列。一种是列不变，合并行
@@ -627,40 +639,6 @@ df1.录音编号=pd.to_numeric(df1.录音编号)
 df1.录音编号=np.int64(df1.录音编号)
 ```
 
-### 连接数据库
-
-使用python连接数据库，可以使用sqlalchemy包，通过这个包连接数据库，对里面的数据进行操作。也可以通过pandas内部的函数直接读取数据库中的表。针对oracle，可以使用cx_Oracle包来读取oracle数据。读取oracle数据库出现中文乱码，是由于编码不匹配，需在前面设置编码格式。`'NLS_LANG'`为oracle数据库编码环境。
-
-```python
-#设置oracle编码格式
-import os
-os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
-#用sqlalchemy创立连接
-from sqlalchemy import create_engine
-engine = create_engine('oracle+cx_oracle://shangguan:shangguan_test123@sandbox')
-
-#设置编码格式
-import os
-os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
-#直接读取数据库中的表
-df=pd.read_sql_table('id_infor','oracle+cx_oracle://shangguan:shangguan_test123@sandbox')
-#通过schema参数设置表所在空间（即name.table的name）
-#df=pd.read_sql_table('tb_cc_record_analysis','oracle+cx_oracle://shangguan:shangguan_test123@sandbox',schema='sandbox_fixed')
-
-#设置编码格式
-import os
-os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
-#用cx_Oracle读取数据库中的表
-import cx_Oracle as ora
-import pandas as pd
-con = ora.connect('shangguan/shangguan_test123@sandbox')
-cur = con.cursor()
-cur.execute('select * from cc_text_question')
-res = cur.fetchall()[][].read()
-data = eval(res)
-df = pd.DataFrame(res, columns = ['保单号', '录音编号', '问答文本'])
-print(df)
-```
 ## 文件读存
 
 ### csv
@@ -735,17 +713,71 @@ df.to_excel(excel_writer, sheet_name='Sheet1', na_rep='', float_format=None, col
 
 #常用写法
 df.to_excel(os.path.join('/home/weblogic/DATA/private/shangguanxf/cc_copy/create/',res_path,filespath1),sheet_name='sheet1')
+
+#将多个sheet写入同一个excel文件中
+writer = pd.ExcelWriter('output.xlsx')
+df1.to_excel(writer,'Sheet1')
+df2.to_excel(writer,'Sheet2')
+writer.save()
 ```
 
+### sql
 
+#### 连接数据库
+
+使用python连接数据库，可以使用sqlalchemy包，通过这个包连接数据库，对里面的数据进行操作。也可以通过pandas内部的函数直接读取数据库中的表。针对oracle，可以使用cx_Oracle包来读取oracle数据。读取oracle数据库出现中文乱码，是由于编码不匹配，需在前面设置编码格式。`'NLS_LANG'`为oracle数据库编码环境。
+
+**注意：**表名需要为小写，大写无法识别。可以使用'T_CONTRACT_MASTER'.lower()来将表名变成小写。
+
+```python
+#设置oracle编码格式
+import os
+os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
+#用sqlalchemy创立连接
+from sqlalchemy import create_engine
+engine = create_engine('oracle+cx_oracle://shangguan:shangguan_test123@sandbox')
+
+#设置编码格式
+import os
+os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
+#直接读取数据库中的表
+df=pd.read_sql_table('id_infor','oracle+cx_oracle://shangguan:shangguan_test123@sandbox')
+#通过schema参数设置表所在空间（即name.table的name）
+#df=pd.read_sql_table('tb_cc_record_analysis','oracle+cx_oracle://shangguan:shangguan_test123@sandbox',schema='sandbox_fixed')
+
+#设置编码格式
+import os
+os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
+#用cx_Oracle读取数据库中的表
+import cx_Oracle as ora
+import pandas as pd
+con = ora.connect('shangguan/shangguan_test123@sandbox')
+cur = con.cursor()
+cur.execute('select * from cc_text_question')
+res = cur.fetchall()[][].read()
+data = eval(res)
+df = pd.DataFrame(res, columns = ['保单号', '录音编号', '问答文本'])
+print(df)
+```
+
+#### 写入数据库
+
+通过pandas将数据写入数据库。
+
+```python
+DataFrame.to_sql(name, con, flavor=None, schema=None, if_exists='fail', index=True, index_label=None, chunksize=None, dtype=None)
+
+#name 为写入的表名
+#con 连接方式
+#schema 表所在的空间
+#chunksize 如果为空，则一次写入全部。如果不为空，则每次以这样的大小批量写入。
+```
 
 ## 时间类型处理
 
 参考链接:
 
 [pandas 时间序列操作](http://zqdevres.qiniucdn.com/data/20150813205120/index.html)
-
-[pandas时间和日期处理](http://www.360doc.com/content/16/0902/15/1317564_587787225.shtml)
 
 导入的包
 
@@ -797,6 +829,15 @@ df.工单生成时间.dt.strftime('%Y-%m-%d')
 #将时间转换为年月日的格式
 ```
 
+### 转换到周几
+
+```python
+time_list = ["2017-05-10 17:19:19", "2017-05-11 17:19:20", "2017-05-12 17:19:20", "2017-05-13 17:19:20"]  
+time_ser = pd.Series(time_list)  
+time_ser = pd.to_datetime(time_ser)  
+time_weekday=time_ser.apply(lambda x:x.weekday())
+```
+
 ### 进行时间计算
 
 ```python
@@ -838,6 +879,128 @@ pd.date_range('2011-01-02','2016-11-30',freq='W')
 #按周生成时间。起始时间为'2011-01-02'，截止时间为'2016-11-30'
 ```
 
+## 画图
+
+### 基础画图
+
+在pandas中可以直接画图，使用plt来展示图片。具体参数见[链接](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.plot.html)。
+
+通过plot中的参数kind，可以调整画图的类型。除了默认的'line'还有以下类型：
+
+- [‘bar’](http://pandas.pydata.org/pandas-docs/stable/visualization.html#visualization-barplot) or [‘barh’](http://pandas.pydata.org/pandas-docs/stable/visualization.html#visualization-barplot) for bar plots
+- [‘hist’](http://pandas.pydata.org/pandas-docs/stable/visualization.html#visualization-hist) for histogram
+- [‘box’](http://pandas.pydata.org/pandas-docs/stable/visualization.html#visualization-box) for boxplot
+- [‘kde’](http://pandas.pydata.org/pandas-docs/stable/visualization.html#visualization-kde) or `'density'` for density plots
+- [‘area’](http://pandas.pydata.org/pandas-docs/stable/visualization.html#visualization-area-plot) for area plots
+- [‘scatter’](http://pandas.pydata.org/pandas-docs/stable/visualization.html#visualization-scatter) for scatter plots
+- [‘hexbin’](http://pandas.pydata.org/pandas-docs/stable/visualization.html#visualization-hexbin) for hexagonal bin plots
+- [‘pie’](http://pandas.pydata.org/pandas-docs/stable/visualization.html#visualization-pie) for pie plots
+
+```python
+DataFrame.plot(x=None, y=None, kind='line', ax=None, subplots=False, sharex=None, sharey=False, layout=None, figsize=None, use_index=True, title=None, grid=None, legend=True, style=None, logx=False, logy=False, loglog=False, xticks=None, yticks=None, xlim=None, ylim=None, rot=None, fontsize=None, colormap=None, table=False, yerr=None, xerr=None, secondary_y=False, sort_columns=False, **kwds)
+
+import matplotlib.pyplot as plt 
+import pandas as pd
+
+df = pd.DataFrame({'a': np.random.randn(6).astype('f4'),
+...                    'b': [True, False] * 3,
+...                    'c': [1.0, 2.0] * 3})
+df.plot(y='a')
+plt.show()
+```
+
+### 分组柱状图
+
+```python
+#当使用多列数据时，画出的图自然就是分组柱状图
+df2 = pd.DataFrame(np.random.rand(10, 4), columns=['a', 'b', 'c', 'd'])
+#下面为画柱状图的两种写法
+#用法一
+df2.plot.bar()
+#用法二
+df2.plot(kind='bar')
+```
+
+### 堆叠柱状图
+
+```python
+#使用stacked参数，设置其为True则为堆叠状态
+
+df2.plot.bar(stacked=True)
+```
+
+### 堆叠条状图
+
+```python
+df2.plot.barh(stacked=True);
+```
+
+### 画分布图(hist)
+
+```python
+DataFrame.hist(data, column=None, by=None, grid=True, xlabelsize=None, xrot=None, ylabelsize=None, yrot=None, ax=None, sharex=False, sharey=False, figsize=None, layout=None, bins=10, **kwds)
+
+
+import seaborn as sb
+import matplotlib
+import matplotlib.pyplot as plt
+
+#将时间转换成小时得到时间的分布
+login.time=login.time.astype('datetime64')
+login_hour=login.time.dt.strftime('%H')
+login_hour.astype('int32').hist(bins=24)
+plt.show()
+
+
+#分布的柱状图为堆叠状态
+df4 = pd.DataFrame({'a': np.random.randn(1000) + 1, 'b': np.random.randn(1000),'c': np.random.randn(1000) - 1}, columns=['a', 'b', 'c'])
+
+df4.plot.hist(stacked=True, bins=20)
+plt.show()
+```
+
+### 箱线图
+
+```python
+DataFrame.boxplot(column=None, by=None, ax=None, fontsize=None, rot=0, grid=True, figsize=None, layout=None, return_type=None, **kwds)
+#by 讲数据进行分组
+#grid 是否显示网格
+
+df = pd.DataFrame(np.random.rand(10, 5), columns=['A', 'B', 'C', 'D', 'E'])
+df.plot.box()
+
+#设置颜色
+color = dict(boxes='DarkGreen', whiskers='DarkOrange',medians='DarkBlue', caps='Gray')
+df.plot.box(color=color, sym='r+')
+
+#对字段按照分组画图
+login.boxplot(['id'],by='type')
+plt.show()
+
+#设置位置
+login.boxplot(['id'],by='type',positions=[1, 4, 8])
+plt.show()
+
+#设置是否为竖直
+login.boxplot(['id'],by='type',vert=False)
+
+```
+
+### 画图时对缺失数据的处理
+
+| Plot Type      | NaN Handling            |
+| -------------- | ----------------------- |
+| Line           | Leave gaps at NaNs      |
+| Line (stacked) | Fill 0’s                |
+| Bar            | Fill 0’s                |
+| Scatter        | Drop NaNs               |
+| Histogram      | Drop NaNs (column-wise) |
+| Box            | Drop NaNs (column-wise) |
+| Area           | Fill 0’s                |
+| KDE            | Drop NaNs (column-wise) |
+| Hexbin         | Drop NaNs               |
+| Pie            | Fill 0’s                |
+
 ## 分组计算
 
 ### groupby分组
@@ -860,14 +1023,19 @@ df3=df.groupby(level=0)
 
 apply对整行或整列的进行操作，类似matlab中cellfun对单个cell进行操作。
 
+**注意：**apply最后生成的结果为Series或者DataFrame，因此apply中函数返回的值需为value或者series或者list。
+建议使用series最后形成df，或者value（即单个的值）最后形成series。使用list当输出维度大于输入维度时可能会遇到错误。
+
 ```python
 DataFrame.apply(func, axis=0, broadcast=False, raw=False, reduce=None, args=(), **kwds)
 #func 对行/列进行操作的函数，可以自定义函数，多使用匿名函数
 #axis=0 0为行，1为列即操作一列的所有行
 #broadcast=False 是否和输入dataframe的尺寸保持一致
 #raw=False 是否转换为Series格式，False为转换为Series格式，True则使用ndarray代替。如果只使用apply numpy函数，使用ndarray将得到更高的性能。
-#reduce
+#reduce 当为None时自动推断输出为Series还是DataFrame，当为True则默认输出为Series,False则默认输出为DataFrame
 #args 传递给函数的位置参数
+
+
 ```
 
 ## 问题解决记录
@@ -1053,5 +1221,96 @@ df.录音编号=df.录音编号.apply(lambda x:re.findall('[1-9]\d*',str(x))[0])
 text.decode('unicode_escape')
 ```
 
+### 获取文件夹中最新的n个文件
 
+```python
+#定义一个队列，保留该文件内创建时间最新的n个文件
+def newest_file(path,n=2):
+    newest_list=[]
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            if len(newest_list)<n+1:
+                newest_list.append((file,os.path.getctime(os.path.join(root,file))))
+            else:
+                newest_list=sorted(newest_list, key=lambda x:x[1],  reverse = True)
+                nt=os.path.getctime(os.path.join(root,file))
+                if nt>newest_list[n-1][1]:
+                    newest_list[n-1]=(file,nt)
+    return newest_list
+```
+
+### 用df中的值给df赋值
+
+在生成df时想用已有的df中的值进行赋值。
+
+```python
+df2=pd.DataFrame(columns=['录音编号','录音文本','坐席录音文本','客户录音文本'])
+
+#使用下面命令会报错。ValueError: Incompatible indexer with DataFrame（不相容的索引与数据帧）
+df2.loc[0]=pd.DataFrame(df1.loc[df1.inum==i,['录音编号','录音文本','坐席录音文本','客户录音文本']])
+#个人理解这种情况无法赋值是因为会有标题和索引存在的缘故
+df1.loc[df1.inum==i,:].loc[:,['录音编号','录音文本','坐席录音文本','客户录音文本']]
+#输出如下面表格
+```
+
+|      | 录音编号         | 录音文本                                     | 坐席录音文本                                   | 客户录音文本                                   |
+| ---- | ------------ | ---------------------------------------- | ---------------------------------------- | ---------------------------------------- |
+| 2568 | 7.000000e+14 | ￡OP不按。?￡CU嗯。?￡OP不按。?￡OP我您好我是中国太平客服专员柳工号113450沈... | OP不按OP不按OP我您好我是中国太平客服专员柳工号113450沈好天洪这什么噢您好感谢您近... | CU嗯CU嗯CU谢谢吧CU好CU好谢谢CU嗯CU法院去掉了吧CU好CU应该清楚了吧呃它是所有... |
+
+可以使用下面的方法进行赋值
+
+```python
+#方法一，使用iloc进行取值。不过缺点是需要数清对应列的index
+df2.loc[0]=df1.loc[df1.inum==i,:].iloc[0,[2,16,6,10]]
+
+#方法二，单独取每列的值合并到一起
+df1.loc[n]=[df.机构名称[i],m3,df.工单机构分布[i],df.该机构工单量[i],df.有效客户数[i]]
+
+
+```
+
+**注意：**df.loc[i,:]和df.iloc[i,:]取出来的值都有列名信息，需要转换成list。否则会导致值无法插入，新的列表中值为Nan
+
+```python
+#需要列名相匹配，否则值为Nan
+tmp_time=trade.iloc[i,1]
+tmp_login0=login[(login['id']==tmp_id)]
+tmp_login1=tmp_login0[tmp_login0.time<tmp_time]
+result.loc[i,3:]=tmp_login1.iloc[-1,:]
+
+#或者使用list插入
+result.loc[i,3:]=list(tmp_login1.iloc[-1,:])
+```
+
+### 使用apply来建表
+
+使用apply来建表，通过表中的字段关联另一表产生新的表。初用for循环速度太慢，改用apply。但一直无法顺利赋值。后来通过观察发现，当apply中结果为series时需要函数返回单个的值，当apply结果为DataFrame时，需要函数返回Series。
+
+```python
+def concat(x,login):
+    r=pd.Series({'log_id':None, 'timelong':None, 'device':None, 'log_from':None, 'ip':None, 'city':None, 'result':None,'timestamp':None, 'type':None, 'is_scan':None, 'is_sec':None, 'time':None})
+    try:
+        #tmp_login0=login.loc[tmp_id]
+        #tmp_login1=tmp_login0[tmp_login0.time<tmp_time]
+        tmp_login1=login.loc[x[2]][login.loc[x[2]].time<x[1]]
+        try:
+            result=tmp_login1.iloc[-1,:]
+            #login=login.loc[tmp_login0.index[0]:,:]
+        except AttributeError as a:
+            if login.loc[x[2]].time<tmp_time:
+                result=login.loc[x[2]]
+            else:
+                result=r
+        except IndexError as e:
+            result=r
+        finally:
+            pass
+    except KeyError as k:
+        result=r
+    finally:
+        pass
+    return result
+trade1=trade.iloc[0:1000,:]
+r=trade1.apply(lambda x:concat(x,login),axis=1,reduce=False)
+```
 

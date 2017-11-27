@@ -50,6 +50,28 @@ $$
 > | `\bigcup`           | $\bigcup$           |      | `\bigcap`           | $\bigcap$           |
 > | `\bigcup_{i=1}^{N}` | $\bigcup_{i=1}^{N}$ |      | `\bigcap_{i=1}^{N}` | $\bigcap_{i=1}^{N}$ |
 
+### 箭头符号
+
+>| 命令            | 显示            |      | 命令           | 显示           |
+>| ------------- | ------------- | ---- | ------------ | ------------ |
+>| ` \uparrow`   | $ \uparrow$   |      | `\downarrow` | $\downarrow$ |
+>| `\Uparrow`    | $ \Uparrow$   |      | `\Downarrow` | $\Downarrow$ |
+>| `\rightarrow` | $\rightarrow$ |      | `\leftarrow` | $\leftarrow$ |
+>| `\Rightarrow` | $\Rightarrow$ |      | `\Leftarrow` | $\Leftarrow$ |
+>|               |               |      |              |              |
+>
+
+### 数域符号
+
+>| 命令           | 显示           |      | 命令           | 显示           |
+>| ------------ | ------------ | ---- | ------------ | ------------ |
+>| `\mathbb{R}` | $\mathbb{R}$ |      | `\mathbb{N}` | $\mathbb{N}$ |
+>|              |              |      |              |              |
+>|              |              |      |              |              |
+>|              |              |      |              |              |
+>
+>
+
 ### **其它常用命令**
 
 > | 命令                 | 显示                 |      | 命令                       | 显示                     |
@@ -64,7 +86,10 @@ $$
 > | `\notin`           | $\notin$           |      | `$\max \limits_{a<x<b}$` | $\max \limits_{a<x<b}$ |
 > | `\infty`           | $\infty$           |      | `\partial`               | $\partial$             |
 > | `\nabla`           | $\nabla$           |      | `\Delta`                 | $\Delta$               |
-> | `\hat x`           | $\hat x$           |      |                          |                        |
+> | `\hat x`           | $\hat x$           |      | `\forall`                | $\forall$              |
+> | `\exists`          | $\exists$          |      |                          |                        |
+> |                    |                    |      |                          |                        |
+> |                    |                    |      |                          |                        |
 
 > **注意**：上标和下标在只有一个字符时，可以不用中括号: `x^2`和`x^{2}`的结果都是 $x^2$
 >
