@@ -1288,23 +1288,24 @@ result.loc[i,3:]=list(tmp_login1.iloc[-1,:])
 
 ```python
 def concat(x,login):
-    r=pd.Series({'log_id':None, 'timelong':None, 'device':None, 'log_from':None, 'ip':None, 'city':None, 'result':None,'timestamp':None, 'type':None, 'is_scan':None, 'is_sec':None, 'time':None})
+    r=pd.Series({'log_id':None, 'timelong':None, 'device':None, 'log_from':None, 'ip':None, 'city':None, 'result':None,
+       'timestamp':None, 'type':None, 'is_scan':None, 'is_sec':None, 'time':None})
     try:
-        #tmp_login0=login.loc[tmp_id]
-        #tmp_login1=tmp_login0[tmp_login0.time<tmp_time]
         tmp_login1=login.loc[x[2]][login.loc[x[2]].time<x[1]]
         try:
             result=tmp_login1.iloc[-1,:]
-            #login=login.loc[tmp_login0.index[0]:,:]
+        #遇到只有一次登录记录的，如果不是在交易前登录则赋值为None
         except AttributeError as a:
-            if login.loc[x[2]].time<tmp_time:
+            if login.loc[x[2]].time<x[1]:
                 result=login.loc[x[2]]
             else:
                 result=r
+        #遇到没有在购买之前登录的赋值为None
         except IndexError as e:
             result=r
         finally:
             pass
+    #遇到login里面没有登录过的id，赋值为None
     except KeyError as k:
         result=r
     finally:
