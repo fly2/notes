@@ -71,6 +71,21 @@ DataFrame.info(verbose=None, buf=None, max_cols=None, memory_usage=None, null_co
 如果False，永不显示。
 ```
 
+### 建立Series
+
+```python
+pandas.Series(data=None, index=None, dtype=None, name=None, copy=False, fastpath=False)
+#data 为数据
+#index为索引。用在apply中的函数中时，index即为合并后产生的列名
+#dtype 设置数据的类型
+#copy 是否覆盖输入数据
+
+pd.Series({'log_id':None, 'timelong':None, 'device':None, 'log_from':None, 'ip':None, 'city':None, 'result':None,'timestamp':None, 'type':None, 'is_scan':None, 'is_sec':None, 'time':None})
+
+col=['test'+str(i) for i in range(5)]
+pd.Series(np.zeros(5),index=col,dtype='int8')
+```
+
 ###建表
 
 ```python
@@ -848,6 +863,25 @@ DateOffset(months=3,days=10)
 datetime.now()==>datetime.datetime(2017, 4, 15, 16, 2, 24, 663820)
 #加3月10天
 datetime.now()+DateOffset(months=3,days=10)==>Timestamp('2017-07-25 16:03:17.801300')
+```
+
+### 时间转换
+
+将时间差值转换为特定计量单位的差值
+
+时间格式有`"as", "fs", "ps", "ns", "us", "ms", "s", "m","h", "D", "W", "M", "Y"`
+
+```python
+td = pd.Series(pd.date_range('20130101 11:00:00', periods=4)) - pd.Series(pd.date_range('20121201 10:23:00', periods=4))
+
+#将时间差值转换为秒
+#方法一
+td / np.timedelta64(1, 's')
+#方法二
+td.astype('timedelta64[s]')
+
+#将日期中的时间转换为秒
+td.dt.seconds
 ```
 
 ### 转换到月初
