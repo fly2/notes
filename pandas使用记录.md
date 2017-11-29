@@ -874,13 +874,13 @@ datetime.now()+DateOffset(months=3,days=10)==>Timestamp('2017-07-25 16:03:17.801
 ```python
 td = pd.Series(pd.date_range('20130101 11:00:00', periods=4)) - pd.Series(pd.date_range('20121201 10:23:00', periods=4))
 
-#将时间差值转换为秒
+#将时间差值转换为以秒为单位
 #方法一
 td / np.timedelta64(1, 's')
 #方法二
 td.astype('timedelta64[s]')
 
-#将日期中的时间转换为秒
+#将日期中的时间（时分秒）转换为秒
 td.dt.seconds
 ```
 
