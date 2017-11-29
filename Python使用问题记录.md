@@ -2,6 +2,8 @@
 
 本文中使用为py3.5
 
+## 注意事项
+
 ### 条件运算
 
 在条件运算时，&和|比>,<运算等级高，要注意加括号以保证结果正确。
@@ -147,6 +149,10 @@ AssertionError: x is not an even number
 
 ```
 
+### 函数注意事项
+
+1. 函数中的值可以直接用函数外的值而不需要参数传递
+
 ### 函数的参数
 
 python函数参数定义有四种方法：位置参数，默认参数，可变参数，关键字参数，四种如果要同时使用多种参数，需要按照（位置参数，默认参数，可变参数，关键字参数）顺序定义。
@@ -198,6 +204,22 @@ fun(10,s=2,c=3)
 ->s    2
 ```
 
+### 多函数使用
+
+对于多函数直接用字典或列表循环调用即可。
+
+```python
+def a():
+    print('a')
+def b():
+    print('b')
+c=[a,b]
+for i in c:
+    i()
+->a
+->b
+```
+
 ### 类的继承
 
 面向对象的编程带来的主要好处之一是代码的**重用**，实现这种重用的方法之一是通过继承机制。继承完全可以理解成类之间的类型和子类型关系。
@@ -237,24 +259,6 @@ fun(10,s=2,c=3)
  输出：
 
 ![img](./picture/python_5.png)
-
- 
-
-### 多函数使用
-
-对于多函数直接用字典或列表循环调用即可。
-
-```python
-def a():
-    print('a')
-def b():
-    print('b')
-c=[a,b]
-for i in c:
-    i()
-->a
-->b
-```
 
 ### 小数取整
 
@@ -1313,16 +1317,34 @@ t = os.path.getctime(filePath)
 t = os.path.getmtime(filePath)
 
 
+#获取创建日期第二大的文件中名字中日期最大值
 import time
 import datetime
-
 import os
 
 #把时间戳转化为时间: 1479264792 to 2016-11-16 10:53:12
 def TimeStampToTime(timestamp):
 　　timeStruct = time.localtime(timestamp)
 　　return time.strftime('%Y-%m-%d %H:%M:%S',timeStruct)
-
+def get_secendmax(path):
+    mtlist=[]
+    mx=0
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            t = os.path.getmtime(os.path.join(root,file))
+            mt=TimeStampToTime(t)
+            if mt not in mtlist:
+                mtlist.append(mt)
+    mtlist=sorted(mtlist)
+    for root, dirs, files in os.walk(path):
+        for file in files:  
+            t = os.path.getmtime(os.path.join(root,file))
+            mt=TimeStampToTime(t)
+            if mt==mtlist[-2]:
+                nt=int(file.replace('.csv',''))
+                if nt>mx:
+                    mx=nt
+    return mx
  
 ```
 
