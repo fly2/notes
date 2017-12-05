@@ -88,6 +88,8 @@ pd.Series(np.zeros(5),index=col,dtype='int8')
 
 ###建表
 
+**注意：**建表时可通过index参数设置索引，`df=pd.DataFrame(columns=col,index=col)`可建立行列对称矩阵
+
 ```python
 #先建立表，再逐步赋值
 df1=pd.DataFrame(columns=('机构名称','minmax变换乘100','工单/客户数','该机构工单量','有效客户数'))
@@ -111,6 +113,39 @@ a=[1,2,3]
 b=['n','n','m']
 df4=pd.DataFrame(a,b)
 #pandas.DataFrame(data=None, index=None, columns=None, dtype=None, copy=False),故df4中a为列，b为索引。如果想a,b均为列，需要加{}，如df2那般
+```
+
+### 数据赋值
+
+建议使用loc和iloc进行赋值
+
+```python
+#通过索引进行数据赋值
+df.loc[0,['A','B']=[2,3]
+#at和loc等价
+df.at[0,['A','B']=[2,3]
+      
+#通过位置进行数据赋值
+df.iloc[0:3,2]=3
+#iat和iloc类似，但行列只能单选
+df.iat[0:3,2]=3
+```
+
+### 按照条件更改列的值
+
+```python
+#使用.loc来按照条件更改列的值
+df.loc[df['A'] > 2, 'B'] = new_val
+
+df=pd.DataFrame()
+a=np.array([0.3,0.4,0.5,0.6,0.7])
+df['a']=a
+
+df['b']=a>0.5
+df['b']=df['b'].astype('int8')
+
+df['c']=0
+df.loc[df['a']<0.5,'c']=1
 ```
 
 ### 数据选择
@@ -189,22 +224,6 @@ DataFrame.select_dtypes(include=None, exclude=None)
 3  False
 4   True
 5  False
-```
-
-### 数据赋值
-
-建议使用loc和iloc进行赋值
-
-```python
-#通过索引进行数据赋值
-df.loc[0,['A','B']=[2,3]
-#at和loc等价
-df.at[0,['A','B']=[2,3]
-      
-#通过位置进行数据赋值
-df.iloc[0:3,2]=3
-#iat和iloc类似，但行列只能单选
-df.iat[0:3,2]=3
 ```
 
 ### 行索引及多重行索引
@@ -496,6 +515,11 @@ DataFrame.fillna(value=None, method=None, axis=None, inplace=False, limit=None, 
 #inplace 是否代替原有数据
 #limit	当为指定填充模式时，limit为使用前一个/后一个有效数字可以填充的空值最大数目。当没有指定模式时，此值为可以填充的空值的最大数目，当空值多于此值时，只填充从前面开始的limit个空值。limit如果存在，则应为大于0的整数。
 #downcast 用于转换列的格式，说明中表示可以用字典和'infer'两种用法，但在0.20中仍然无法使用字典，只能使用'infer'（推断）。好像pandas中自动后调整输入的数据格式，不太需要用到这个。
+
+df = pd.DataFrame([[np.nan, 2, np.nan, 0],[3, 4, np.nan, 1],[np.nan, np.nan, np.nan, 5],[np.nan, 3, np.nan, 4]],columns=list('ABCD'))
+#可以通过字典来对针对特定的列的空值赋值
+values = {'C': 1,'B':0}
+df.fillna(value=values)
 ```
 
 ### 插值nan
@@ -543,13 +567,6 @@ df.test.value_counts(bins=2)
 0.995    6
 3.500    3
 #即将列a分成两个离散变量，(0.995,3.5] 频数为6, (3.5,6]频数为3
-```
-
-### 按照条件更改列的值
-
-```python
-#使用.loc来按照条件更改列的值
-df.loc[df['A'] > 2, 'B'] = new_val
 ```
 
 ### 值累加
@@ -1072,6 +1089,22 @@ DataFrame.apply(func, axis=0, broadcast=False, raw=False, reduce=None, args=(), 
 
 ```
 
+### agg
+
+agg可以用作多列都进行某种函数计算，即对队列同时apply操作。也可以用作对单列（或多列）同时进行多个函数操作。
+
+```python
+DataFrameGroupBy.agg(func)
+#func 可以输入函数字符串，或者函数列表，或者字典{列名:函数名}
+
+df.groupby('A').agg({'B': ['min', 'max'], 'C': 'sum'})
+    B             C
+  min max       sum
+A
+1   1   2  0.590716
+2   3   4  0.704907
+```
+
 ## 问题解决记录
 
 ### pandas读取csv，前面有\ufeff
@@ -1138,7 +1171,10 @@ print('end')
 
 ### DataFrame相加值全为nan
 
-dataframe相加需要列名一致，否则会导致结果全为nan。将一个dataframe的列名与另一个dataframe改一致。
+**注意：**dataframe相加需要列名且索引（index）一致，否则会导致结果全为nan。解决方法：
+
+1. 将一个dataframe的列名与另一个dataframe改一致。
+2. 将df转换为np.array()，即数组形式，但会丢失列名和索引信息。
 
 ```python
 df1=pd.DataFrame({'A':[1,2,3], 'B':[4,5,6], 'C':[7,8,9]})
@@ -1155,6 +1191,13 @@ df1+df2
 0	2	8	14
 1	4	10	16
 2	6	12	18
+
+#转换为array相加
+np.array(df1)+np.array(df2)
+-->
+array([[ 2,  8, 14],
+       [ 4, 10, 16],
+       [ 6, 12, 18]], dtype=int64)
 ```
 
 ### 查看df中索引是否存在
@@ -1316,14 +1359,25 @@ result.loc[i,3:]=tmp_login1.iloc[-1,:]
 result.loc[i,3:]=list(tmp_login1.iloc[-1,:])
 ```
 
+### 使用计算结果来为df赋值
+
+在利用时间进行计算得到差值来给df的新列赋值后，后续计算遇到错误。考虑预先用None为列赋值，在将结果赋值到列。
+
+```python
+tmp_login['interval']=x[1]-tmp_login.time
+#赋值后进行下列计算遇到格式错误，因为第一次赋值无法改变类型，tmp_login['interval']是int类型
+tmp_login['interval']=tmp_login['interval']/np.timedelta64(1, 'D')
+```
+
+
+
 ### 使用apply来建表
 
 使用apply来建表，通过表中的字段关联另一表产生新的表。初用for循环速度太慢，改用apply。但一直无法顺利赋值。后来通过观察发现，当apply中结果为series时需要函数返回单个的值，当apply结果为DataFrame时，需要函数返回Series。
 
 ```python
 def concat(x,login):
-    r=pd.Series({'log_id':None, 'timelong':None, 'device':None, 'log_from':None, 'ip':None, 'city':None, 'result':None,
-       'timestamp':None, 'type':None, 'is_scan':None, 'is_sec':None, 'time':None})
+    r=pd.Serise([None for i in range(12)],index=login.columns)
     try:
         tmp_login1=login.loc[x[2]][login.loc[x[2]].time<x[1]]
         try:
@@ -1347,5 +1401,50 @@ def concat(x,login):
     return result
 trade1=trade.iloc[0:1000,:]
 r=trade1.apply(lambda x:concat(x,login),axis=1,reduce=False)
+```
+
+### 计算DBI
+
+　$\Large DBI=\frac{1}{k}\sum_{i=1}^{k}\max\limits_{j\neq i}(\frac{avg(C_i)+avg(C_j)}{d_{cen(u_i,u_j)}})$
+
+DB用于计算 任意两类别的类内距离平均距离(CP)之和除以两聚类中心距离 求最大值
+
+DB越小意味着类内距离越小 同时类间距离越大 
+
+缺点：因使用欧式距离 所以对于环状分布  聚类评测很差
+
+```python
+#计算DBI代码
+def dis(data,position,cluster):
+    tmp=pd.DataFrame()
+    for i in position:
+        tmp[i]=np.array(data[i])-np.array(cluster[i])
+    dis=tmp.apply(lambda x:np.sqrt(sum(np.power(np.array(x),2))),axis=1)
+    return dis
+def dbi(data,label,position,cluster,label_c,position_c):
+    #data 数据
+    #label 数据的聚类类列名
+    #position 数据位置列名
+    #cluster 聚类点数据
+    #label_c 聚类类别列名
+    #position_c 聚类中心点位置列名
+    S={}
+    col=data[label].unique()
+    for i in col:
+        tmp_data=data[data[label]==i]
+        tmp_cluster=cluster[cluster[label]==i]
+        tmp_dis=dis(tmp_data,position,tmp_cluster)
+        S[i]=np.sqrt(sum(np.power(tmp_dis,2))/len(tmp_data))
+    M=pd.DataFrame(columns=data[label].unique(),index=data[label].unique())
+    R=pd.DataFrame(columns=data[label].unique(),index=data[label].unique())
+    for i in col:
+        for j in col:
+            if i!=j:
+                Mi=cluster[cluster[label]==i]
+                Mj=cluster[cluster[label]==j]
+                M.loc[i,j]=np.sqrt(sum(np.power((np.array(Mi[position])[0]-np.array(Mj[position]))[0],2)))
+                R.loc[i,j]=(S[i]+S[j])/M.loc[i,j]
+    dbi=R.max(axis=1).mean()
+    return dbi
 ```
 

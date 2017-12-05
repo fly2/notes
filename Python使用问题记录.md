@@ -77,6 +77,9 @@ np.array([inputs[batch_id][length_id] for batch_id in range(batch_size)], dtype=
 for i in range(10):
     locals()['name%s' % i],c = i,10 
     #通过字典的方式生成命名为name1，name2，。。。，name9的变量
+    
+for i in ['a','b']:
+    locals()[i] =[1,23,3] 
 ```
 
 ### @的用法
@@ -1193,6 +1196,18 @@ string = "this is string example....wow!!!"
 trantab=str.maketrans('aeiou', "12345")
 string.translate(trantab)
 -->'th3s 3s str3ng 2x1mpl2....w4w!!!'
+```
+
+#### str.expandtabs
+
+将`\t`转换成空格
+
+```python
+str1 = "this is\tstring example....wow!!!"
+
+print (str1)
+print (str1.expandtabs(24))
+print (str1.expandtabs(16))
 ```
 
 ## os
