@@ -31,6 +31,122 @@ leg.get_frame().set_alpha(0.5)
 plt.show()
 ```
 
+#### 无法显示seaborn的设置
+
+使用`sb.set()`来覆盖`matplotlib`的设置
+
+### 设置seaborn调色板
+
+[官网介绍](http://seaborn.pydata.org/tutorial/color_palettes.html?highlight=cmap)
+
+**注意：**调色板需要设置参数为`as_cmap=True`，才可用于调色板使用
+
+```python
+seaborn.color_palette(palette=None, n_colors=None, desat=None)
+#palette 输入调色板名称或为None，为None时返回当前的调色板。如果输入为序列，则应为颜色的rgb代码的list格式
+#n_colors 调色板的颜色数量。如果为None，则默认为6种。对于list格式，默认为list长度。如果n_colors数量大于list长度，则会将其进行按顺序重复。小于则删除list中多余的颜色。
+#desat 每种颜色的饱和度
+
+#按list生成调色板
+flatui = ["#9b59b6", "#3498db", "#95a5a6", "#e74c3c", "#34495e", "#2ecc71"]
+sns.palplot(sns.color_palette(flatui))
+
+#按照名称生成调色板
+sns.palplot(sns.color_palette("Blues_d"))
+```
+
+#### hls_palette
+
+```python
+seaborn.hls_palette(n_colors=6, h=0.01, l=0.6, s=0.65)
+#在HLS色调空间中获得一组均匀间隔的颜色。
+#n_colors 颜色数量
+#h 色相
+#l 亮度
+#s 饱和度
+#h,l,s均为0,1之间的数字
+
+
+sns.palplot(sns.hls_palette(10, h=.5))
+```
+
+#### xkcd_pallette
+
+```python
+seaborn.xkcd_palette(colors)
+#colors 颜色名称列表
+
+
+colors = ["windows blue", "amber", "greyish", "faded green", "dusty purple"]
+sns.palplot(sns.xkcd_palette(colors))
+```
+
+#### diverging_palette
+
+```python
+#由一个颜色过渡到浅色，再过渡到另一个颜色
+seaborn.diverging_palette(h_neg, h_pos, s=75, l=50, sep=10, n=6, center='light', as_cmap=False)
+#h_neg,h_pos 色相的起始，终止范围
+#s 饱和度
+#l 亮度
+#n 颜色数量
+#seq 颜色变化步长
+#center {'light','dark'}中心颜色白色还是黑色
+
+from numpy import arange
+>>> x = arange(25).reshape(5, 5)
+>>> cmap = sns.diverging_palette(220, 20, sep=20, as_cmap=True)
+>>> ax = sns.heatmap(x, cmap=cmap)
+```
+
+cubehelix_palette
+
+```python
+#制作一个颜色系列
+seaborn.cubehelix_palette(n_colors=6, start=0, rot=0.4, gamma=1.0, hue=0.8, light=0.85, dark=0.15, reverse=False, as_cmap=False)
+#n_colors 颜色数量
+#start 起始色相。0<=start<=3
+#rot
+#gamma
+#hue
+#light
+#dark
+#reverse
+
+```
+
+#### 交互式调色
+
+```python
+#选择来自ColorBrewer的调色方案
+seaborn.choose_colorbrewer_palette(data_type, as_cmap=False)
+#data_type {'sequential','diverging','qualitative'}sequential为序列，即将一个颜色由浅到深排列。diverging为以由一个颜色过渡到浅色，再过渡到另一个颜色。qualitative为使用已经定义好的主题
+
+#将任意两个颜色进行分割过渡
+seaborn.choose_diverging_palette()
+
+#创造一组渐变色
+seaborn.choose_cubehelix_palette(as_cmap=False)
+
+#生成一组一边颜色为白色的分割调色板
+seaborn.choose_light_palette(input='husl', as_cmap=False)
+#input 为调另一边颜色的方式 {'husl','hsl','rgb'}
+
+#生成一组单边颜色为黑色的分割调色板
+seaborn.choose_dark_palette(input='husl', as_cmap=False)
+#input 为调另一边颜色的方式 {'husl','hsl','rgb'}
+```
+
+#### 调色板名字列表
+
+```
+Accent, Accent_r, Blues, Blues_r, BrBG, BrBG_r, BuGn, BuGn_r, BuPu, BuPu_r, CMRmap, CMRmap_r, Dark2, Dark2r, GnBu, GnBu_r, Greens, Greens_r, Greys, Greys_r, OrRd, OrRd_r, Oranges, Oranges_r, PRGn, PRGn_r, Paired, Paired_r, Pastel1, Pastel1r, Pastel2, Pastel2r, PiYG, PiYG_r, PuBu, PuBuGn, PuBuGn_r, PuBu_r, PuOr, PuOr_r, PuRd, PuRd_r, Purples, Purples_r, RdBu, RdBu_r, RdGy, RdGy_r, RdPu, RdPu_r, RdYlBu, RdYlBu_r, RdYlGn, RdYlGn_r, Reds, Reds_r, Set1, Set1r, Set2, Set2r, Set3, Set3r, Spectral, Spectral_r, Wistia, Wistia_r, YlGn, YlGnBu, YlGnBu_r, YlGn_r, YlOrBr, YlOrBr_r, YlOrRd, YlOrRd_r, afmhot, afmhot_r, autumn, autumn_r, binary, binary_r, bone, bone_r, brg, brg_r, bwr, bwr_r, cool, cool_r, coolwarm, coolwarm_r, copper, copper_r, cubehelix, cubehelix_r, flag, flag_r, gist_earth, gist_earth_r, gist_gray, gist_gray_r, gist_heat, gist_heat_r, gist_ncar, gist_ncar_r, gist_rainbow, gist_rainbow_r, gist_stern, gist_stern_r, gist_yarg, gist_yarg_r, gnuplot, gnuplot2, gnuplot2_r, gnuplot_r, gray, gray_r, hot, hot_r, hsv, hsv_r, inferno, inferno_r, jet, jet_r, magma, magma_r, nipy_spectral, nipy_spectral_r, ocean, ocean_r, pink, pink_r, plasma, plasma_r, prism, prism_r, rainbow, rainbow_r, seismic, seismic_r, spectral, spectral_r, spring, spring_r, summer, summer_r, terrain, terrain_r, viridis, viridis_r, winter, winter_r
+```
+
+#### rgb颜色名称表
+
+[官网](https://xkcd.com/color/rgb/)
+
 ### 折线图
 
 #### 2d折线图
@@ -222,6 +338,13 @@ plt.show()
 login_hour=pd.Series(list(login_hour.astype('int32')))
 #输入为int类型即可，无需为pd.Series
 sb.distplot(login_hour)
+plt.show()
+```
+
+### heatmap
+
+```python
+sb.heatmap(df2[0:100],vmin=0,vmax=1，cmap=sb.dark_palette("white",as_cmap=True),yticklabels=False,cbar=False)
 plt.show()
 ```
 

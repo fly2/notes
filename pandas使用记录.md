@@ -262,11 +262,30 @@ age	    gender
         male	Jack
 ```
 
+### 得到行索引
+
+通过.name得到行索引属性
+
+```python
+df=pd.DataFrame(columns=['age','gender','name'])
+#利用索引新添数据，1,2,3为当前行索引
+df.loc[1]=[18,'female','July']
+df.loc[2]=[19,'male','Jeo']
+df.loc[3]=[12,'female','Lily']
+df.loc[4]=[18,'male','Jack']
+#多列索引
+df.set_index(['age','gender'],inplace=True)
+
+df.iloc[0,:].name
+```
+
 ### 重置索引
 
 在使用pd.concat之后需要重置索引，否则df.iloc[0,1]返回合并前每个表的[0,1]
 
 ```python
+#设置索引，将特定列设置为索引
+
 #重置索引
 df.reset_index(inplace=True, drop=True)
 #inplece=True 代替原df
@@ -1115,6 +1134,16 @@ A
 #用utf-8-sig格式读取
 df1=pd.read_csv('/home/weblogic/DATA/private/shangguanxf/cc_txt2/疑似误导录音/疑似诱导录音文本.csv',encoding='utf-8-sig',header=None,names=['录音编号','通话文本'])
 ```
+### pandas 读取csv遇到分割错误，预期数据比实际少
+
+pandas 读取数据时遇到`C error: Expected 24 fields in line 12599, saw 26`，但是数据按照分割符去分确实只有24个，可以考虑换python引擎，c引擎有时会遇到奇怪的bug。
+
+```python
+#将引擎设置为python,会导致速度下降，c引擎遇到bug是可以考虑尝试换python引擎解决
+df=pd.read_csv('/tpdata/DATA/private/shangguanxf/2017白皮书/data/车险报案数据.txt',encoding='gb18030',sep='|',engine='python')
+
+```
+
 ### 根据特定列去除包含空值的行
 
 df.dropna(axis=0)为去除包含空值的行，无法指定只根据特定行删除。如果不需要和其他值关联，可以使用`df.坐席原始意见..dropna(axis=0)`来获取特定列去除空值后的结果。
@@ -1446,5 +1475,24 @@ def dbi(data,label,position,cluster,label_c,position_c):
                 R.loc[i,j]=(S[i]+S[j])/M.loc[i,j]
     dbi=R.max(axis=1).mean()
     return dbi
+```
+
+### 探查缺失值情况
+
+对表中为Nan的值画图
+
+```python
+#导入包
+import matplotlib.pyplot as plt
+import matplotlib
+import pandas as pd
+import seaborn as sb
+#获取数据
+df=pd.read_csv('/tpdata/DATA/private/shangguanxf/2017白皮书/data/车险报案数据.txt',encoding='gb18030',sep='|',engine='python')
+#将数据缺失情况的bool类型转换为int类型
+nullar=df.isnull().values.astype(np.int8)
+#画图
+sb.heatmap(df2[0:100],vmin=0,vmax=1，cmap=sb.dark_palette("white",as_cmap=True),yticklabels=False,cbar=False)
+plt.show()
 ```
 
