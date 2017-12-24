@@ -300,6 +300,10 @@ print(list(zip(a,b)))
 [(1, 6), (2, 7), (3, 8), (4, 9)]
 ```
 
+### id函数
+
+id方法的返回值就是对象的内存地址。
+
 ### sorted
 
 ```python
@@ -1633,6 +1637,30 @@ np.linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None)
 np.linspace(0,1,5,endpoint=False,retstep=True)
 (array([ 0. ,  0.2,  0.4,  0.6,  0.8]), 0.2)
 ```
+
+### 生成相加矩阵
+
+将a，b两个矩阵中的每个元素相加
+
+```python
+np.add.outer(a,b,out=None, where=True,**kwargs)
+#a,b 相加的两个矩阵
+
+```
+
+### 生成相乘矩阵
+
+将a，b两个矩阵中的每个元素相乘
+
+```python
+np.outer(a,b,out=None)
+#a,b 相乘的两个矩阵
+
+```
+
+### 生成相乘矩阵
+
+
 
 ## random
 

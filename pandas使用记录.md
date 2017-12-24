@@ -1033,8 +1033,9 @@ plt.show()
 
 ```python
 DataFrame.boxplot(column=None, by=None, ax=None, fontsize=None, rot=0, grid=True, figsize=None, layout=None, return_type=None, **kwds)
-#by 讲数据进行分组
+#by 将数据进行分组
 #grid 是否显示网格
+#rot 标签旋转角度
 
 df = pd.DataFrame(np.random.rand(10, 5), columns=['A', 'B', 'C', 'D', 'E'])
 df.plot.box()

@@ -17,7 +17,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-zhfont1 = matplotlib.font_manager.FontProperties(fname='/home/weblogic/DATA/private/shangguanxf/sucai/fonts/msyh.ttf')
+zhfont1 = matplotlib.font_manager.FontProperties(fname='/tpdata/DATA/private/shangguanxf/sucai/fonts/msyh.ttf')
 
 ax = plt.subplot(111)
 t1 = np.arange(0.0, 1.0, 0.01)
@@ -34,6 +34,10 @@ plt.show()
 #### 无法显示seaborn的设置
 
 使用`sb.set()`来覆盖`matplotlib`的设置
+
+#### plt.show()和plt.imshow()的区别
+
+plt.imshow()是用于对矩阵画图的函数。plt.show()是将图像展示出来的函数。
 
 ### 设置seaborn调色板
 
@@ -94,25 +98,50 @@ seaborn.diverging_palette(h_neg, h_pos, s=75, l=50, sep=10, n=6, center='light',
 #center {'light','dark'}中心颜色白色还是黑色
 
 from numpy import arange
->>> x = arange(25).reshape(5, 5)
->>> cmap = sns.diverging_palette(220, 20, sep=20, as_cmap=True)
->>> ax = sns.heatmap(x, cmap=cmap)
+x = arange(25).reshape(5, 5)
+cmap = sns.diverging_palette(220, 20, sep=20, as_cmap=True)
+ax = sns.heatmap(x, cmap=cmap)
 ```
 
-cubehelix_palette
+#### cubehelix_palette
 
 ```python
 #制作一个颜色系列
 seaborn.cubehelix_palette(n_colors=6, start=0, rot=0.4, gamma=1.0, hue=0.8, light=0.85, dark=0.15, reverse=False, as_cmap=False)
 #n_colors 颜色数量
 #start 起始色相。0<=start<=3
-#rot
-#gamma
-#hue
-#light
-#dark
-#reverse
+#rot 在调色板的范围内围绕色调轮旋转。
+#gamma gamma因子小于1为强调较暗的颜色，大于1为较亮的颜色
+#hue 色调
+#light 调色板中最亮的颜色的强度。
+#dark 调色板中最暗的颜色的强度。
+#hue,light,dark 均为[0,1]
+#reverse 如果为True,则调色板将从暗到亮
 
+
+sns.palplot(sns.cubehelix_palette(rot=-.4))
+
+sns.palplot(sns.cubehelix_palette(start=2.8, rot=.1))
+```
+
+#### light_palette/dark_palette
+
+```python
+#从浅色/深色到指定的颜色的系列颜色
+seaborn.light_palette(color, n_colors=6, reverse=False, as_cmap=False, input='rgb')
+#color 序列的基础颜色
+#n_color 切分的颜色数量
+#reverse 是否翻转。默认为由浅色/深色到指定颜色
+#input 输入color的方式。 {'rgb','hls','husl','xkcd'}
+
+sns.palplot(sns.dark_palette("purple"))
+
+sns.palplot(sns.dark_palette((260, 75, 60), input="husl"))
+
+from numpy import arange
+x = arange(25).reshape(5, 5)
+cmap = sns.dark_palette("#2ecc71", as_cmap=True)
+ax = sns.heatmap(x, cmap=cmap)
 ```
 
 #### 交互式调色
@@ -343,10 +372,137 @@ plt.show()
 
 ### heatmap
 
+热点地图，根据数据的横纵坐标作为图中的横纵坐标，数值作为颜色的深浅进行作图。
+
 ```python
+seaborn.heatmap(data, vmin=None, vmax=None, cmap=None, center=None, robust=False, annot=None, fmt='.2g', annot_kws=None, linewidths=0, linecolor='white', cbar=True, cbar_kws=None, cbar_ax=None, square=False, xticklabels='auto', yticklabels='auto', mask=None, ax=None, **kwargs)
+#data 数据。二维数据集，可以强制到一个ndarray。 如果提供了Pandas DataFrame，索引/列信息将被用来标记列和行的名称。
+#vmin，vmax 锚定颜色映射的值，否则从数据和其他关键字参数中推断。
+#cmap 从数据值到色彩空间的映射。 如果没有提供，默认将取决于中心是否设置。
+#center 设置色彩空间中心对应的值
+#robust 如果设置为True，而且vmin或vmax不存在，则使用强分位数计算色彩图范围，而不是极值。
+#annot bool或者数据矩阵。如果为True则在每个单元格写入数据值。如果是一个矩阵的形状与data形状相同，那么使用它来标注热图而不是原始数据。
+#fmt 字符串格式化添加注释时使用的代码。
+#annot_kws 当annot为True时，ax.text的关键字参数。以字典格式输入
+#linewidths 分割单元格的线的宽度
+#linecolor 分割单元格线的颜色
+#cbar 是否显示颜色条，即颜色空间。
+#cbar_kws 关于fig.colorbar的关键字参数。一字典格式输入
+#cbar_ax 在其中绘制颜色空间的轴，否则从主轴获取空间。
+#square 如果为True，则将Axes纵横比设置为“相等”，这样每个单元格将是正方形的。如果为False，则会使最终结果为正方形
+#xticklabels, yticklabels 如果为True，则绘制df的列名称。 如果为False，则不要绘制列名称。 如果为list，将这些替代标签绘制为xticklabels。 如果是整数，则使用列名称，但每n个标签绘制一个。 如果“自动”，尝试密集地绘制不重叠的标签。
+#mask 如果通过，数据将不会显示在掩码为True的单元格中。 mask需要和data的shape一致。
+#ax 绘制图的轴，否则使用当前活动的轴。
+
+
 sb.heatmap(df2[0:100],vmin=0,vmax=1，cmap=sb.dark_palette("white",as_cmap=True),yticklabels=False,cbar=False)
 plt.show()
 ```
+
+### 箱线图
+
+箱形图提供了一种只用5个点对[数据集](https://baike.baidu.com/item/%E6%95%B0%E6%8D%AE%E9%9B%86)做简单总结的方式。这5个点包括中点、Q1、Q3、分部状态的高位和低位。箱形图很形象的分为中心、延伸以及分布状态的全部范围。
+
+箱形图中最重要的是对相关统计点的计算,相关统计点都可以通过[百分位](https://baike.baidu.com/item/%E7%99%BE%E5%88%86%E4%BD%8D)计算方法进行实现。
+
+箱形图的绘制步骤：
+
+1、画[数轴](https://baike.baidu.com/item/%E6%95%B0%E8%BD%B4)，度量单位大小和数据批的单位一致，起点比最小值稍小，长度比该数据批的[全距](https://baike.baidu.com/item/%E5%85%A8%E8%B7%9D)稍长。
+
+2、画一个矩形盒，两端边的位置分别对应数据批的上下[四分位数](https://baike.baidu.com/item/%E5%9B%9B%E5%88%86%E4%BD%8D%E6%95%B0)（Q3和Q1）。在矩形盒内部[中位数](https://baike.baidu.com/item/%E4%B8%AD%E4%BD%8D%E6%95%B0)（Xm）位置画一条线段为[中位线](https://baike.baidu.com/item/%E4%B8%AD%E4%BD%8D%E7%BA%BF)。
+
+3、在Q3+1.5IQR和Q1－1.5IQR处画两条与中位线一样的线段，这两条线段为[异常值](https://baike.baidu.com/item/%E5%BC%82%E5%B8%B8%E5%80%BC)截断点，称其为内限；在Q3+3IQR和Q1－3IQR处画两条线段，称其为外限。处于内限以外位置的点表示的数据都是异常值，其中在内限与外限之间的异常值为温和的异常值（mild outliers），在外限以外的为极端的异常值(extreme outliers)。四分位距IQR=Q3-Q1。.
+
+4、从矩形盒两端边向外各画一条线段直到不是异常值的最远点，表示该批数据正常值的分布区间。
+
+5、用“〇”标出温和的异常值，用“*”标出极端的异常值。相同值的数据点并列标出在同一数据线位置上，不同值的数据点标在不同数据线位置上。至此一批数据的箱形图便绘出了。[统计软件](https://baike.baidu.com/item/%E7%BB%9F%E8%AE%A1%E8%BD%AF%E4%BB%B6)绘制的箱形图一般没有标出内限和外限。
+
+```python
+seaborn.boxplot(x=None, y=None, hue=None, data=None, order=None, hue_order=None, orient=None, color=None, palette=None, saturation=0.75, width=0.8, dodge=True, fliersize=5, linewidth=None, whis=1.5, notch=False, ax=None, **kwargs)
+#x,y 为data中的变量名称
+#hue 为data中对数据进行分组的变量名称
+#data DataFrame, array, or list of arrays, optional绘图数据集。如果x,y缺失，将对每个数值列画图。
+#order, hue_order 控制图中分组的顺序。
+#orient {'h','v'}控制图为水平或竖直方向。一般会根据数据进行推断
+#color 所有元素的颜色或渐变调色板的种子
+#palette 用于色调变量不同级别的颜色。 应该是可以由color_palette（）解释的东西，或者是将色调级别映射到matplotlib颜色的字典。
+#saturation 在原来的饱和度绘制颜色的比例。 较大的修补程序通常在略去饱和的颜色下看起来更好，但如果要使绘图颜色与输入颜色规范完美匹配，请将其设置为1。
+#width 箱线图的宽度
+#dodge 当使用hue参数时，是否应该沿着分类轴移动元素。
+#fliesize 用于指示离群值观察的标记的大小。
+#linewidth 线的宽度
+#whis 异常值的定义。Q3+whis(Q3-Q1)
+#notch 是否“切入”方框以指示中位数的置信区间。 还有其他几个参数可以控制凹槽的绘制方式。 请参阅plt.boxplot帮助以获取更多信息。
+#ax Axes对象绘制图形，否则使用当前的Axes。
+#sym 异常值的显示符号。如果不想显示则输入''，如果输入为None，则默认为'b+'。更多操作请使用flierprops属性
+
+import seaborn as sb
+sb.set()
+sb.boxplot(y='id',x='type',hue='is_scan',data=login,)
+plt.show()
+```
+
+#### flierprops属性使用
+
+#### [参考代码](https://matplotlib.org/gallery/statistics/boxplot.html?highlight=flierprops)
+
+### 矩阵画图
+
+plt.imshow()用来给数字矩阵画图。
+
+```python
+plt.imshow(X, cmap=None, norm=None, aspect=None, interpolation=None, alpha=None, vmin=None, vmax=None, origin=None, extent=None, shape=None, filternorm=1, filterrad=4.0, imlim=None, resample=None, url=None, hold=None, data=None, **kwargs)
+'''
+X : 矩阵格式, 形状为 (n, m) 或 (n, m, 3) 或 (n, m, 4)。X可能是一个矩阵或者PIL图片。如果X是矩阵，则如下：MxN – values to be mapped (float or int)	
+MxNx3 – RGB (float or uint8)	
+MxNx4 – RGBA (float or uint8)
+MxNx3 和 MxNx4中的值需为0到1的浮点数。MxN 矩阵则会基于矩阵和cmap画图
+'''
+#cmap : 颜色地图。默认为None。当X为3维时此参数被忽略。
+
+#aspect : 长宽比{'auto', 'equal', scalar}, default: None。如果为'auto'则自动匹配axes，如果为'equal'，且extent=None，则更改轴纵横比以匹配图像的纵横比。 如果extent不是None，则轴宽高比将更改为与范围匹配。如果输入scalar，则将纵横比变为scalar。注意scalar为字符串类型的数字（'10'）。
+
+#interpolation : 插值方式。可用的值有： 'none', 'nearest', 'bilinear', 'bicubic', 'spline16', 'spline36', 'hanning', 'hamming', 'hermite', 'kaiser', 'quadric', 'catrom', 'gaussian', 'bessel', 'mitchell', 'sinc', 'lanczos'.如果参数为None，则默认使用image.interpolation。如果为'none'，对.ps,.Agg,.pdf来源的文件不做插值处理，其他进行'nearest'插值
+
+#norm : 规范化, Normalize实例用于将二维浮点X输入缩放到（0，1）范围以输入到cmap。 如果norm是None，则使用默认的func：normalize。 如果norm是NoNorm的一个实例，那么X必须是一个整数数组，直接索引到cmap的查找表中。
+
+#vmin, vmax : 标量, vmin和vmax与norm结合使用来对数据进行归一化。 请注意，如果您通过标准实例，则vmin和vmax的设置将被忽略。
+
+#alpha : 透明度。标量。alpha的值。介于[0,1]之间。0为透明。
+
+#origin : 原点的位置。{'upper', 'lower'}.'upper'为左上，'lower'为右下
+
+#extent : 标量 (left, right, bottom, top), 坐标轴x，y轴的坐标范围
+
+#shape : scalars (columns, rows),原始缓冲去图像的形状
+
+#filternorm : scalar, optional, default: 1.A parameter for the antigrain image resize filter. From the antigrain documentation, if filternorm = 1, the filter normalizes integer values and corrects the rounding errors. It doesn’t do anything with the source floating point values, it corrects only integers according to the rule of 1.0 which means that any sum of pixel weights must be equal to 1.0. So, the filter function must produce a graph of the proper shape.
+
+#filterrad : 具有半径参数的滤波器的滤波器半径，即当插值是'sinc'，'lanczos'或'blackman'之一时，默认为4.0
+
+import numpy as np
+import matplotlib.cm as cm
+import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
+import matplotlib.cbook as cbook
+from matplotlib.path import Path
+from matplotlib.patches import PathPatch
+
+delta = 0.025
+x = y = np.arange(-3.0, 3.0, delta)
+X, Y = np.meshgrid(x, y)
+Z1 = mlab.bivariate_normal(X, Y, 1.0, 1.0, 0.0, 0.0)
+Z2 = mlab.bivariate_normal(X, Y, 1.5, 0.5, 1, 1)
+Z = Z2 - Z1  # difference of Gaussians
+
+im = plt.imshow(Z, interpolation='bilinear', cmap=cm.RdYlGn,aspect='2'
+                origin='lower', extent=[-3, 3, -3, 3],
+                vmax=abs(Z).max(), vmin=-abs(Z).max())
+
+plt.show()
+```
+
+
 
 ### 多子图
 
