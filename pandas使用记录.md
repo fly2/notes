@@ -42,6 +42,8 @@ df.reset_index(inplace=True, drop=True)
 
 pandas中iloc是用来对位置索引进行操作，loc是用行索引进行操作。
 
+#### 空表可以进行df的方法使用
+
 ## DataFrame常用操作
 
 ### 数据探查

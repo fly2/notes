@@ -327,6 +327,12 @@ def f(x):
 r = map(f, [1, 2, 3, 4, 5, 6, 7, 8, 9])
 list(r)
 [1, 4, 9, 16, 25, 36, 49, 64, 81]
+
+#还可用于df中，df的一行为一个iter
+df=pd.DataFrame({'a':[1,2,3,4,5,6,7,8,9],'b':[1,1,1,1,1,1,1,1,1],'c':[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]})
+def add(x,y,z):
+    return x+y+z
+df['sum']=list(map(lambda x,y,z:add(x,y,z),df['a'],df['b'],df['c']))
 ```
 
 ### reduce
@@ -1620,6 +1626,33 @@ D = np.hstack((A, B))
 print A.shape
 print D.shape
 print D
+```
+
+### 返回最大值的索引
+
+```python
+np.argmax(a, axis=None, out=None)
+#a 输入的array
+#axis 默认将array当成1行n列数组进行取索引。如果指定axis，则沿着指定轴取索引。
+#out 如果提供，结果将被插入到这个数组中。 它应该是适当的形状和dtype。它的形状和默认的输出形状相同，类型一致。
+
+
+a = np.arange(6).reshape(2,3)
+a->
+array([[0, 1, 2],
+       [3, 4, 5]])
+
+np.argmax(a)->
+5
+
+np.argmax(a, axis=0)->
+array([1, 1, 1])
+
+np.argmax(a, axis=1)->
+array([2, 2])
+
+np.argmax(a,axis=1,out=np.array([1,1]))->
+array([2,2])
 ```
 
 ### 生成等差序列
