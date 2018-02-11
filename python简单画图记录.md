@@ -43,6 +43,8 @@ plt.imshow()是用于对矩阵画图的函数。plt.show()是将图像展示出�
 
 [官网介绍](http://seaborn.pydata.org/tutorial/color_palettes.html?highlight=cmap)
 
+[Color Brewer](http://colorbrewer2.org/)配色板，可使用已有的配色方案名称
+
 **注意：**调色板需要设置参数为`as_cmap=True`，才可用于调色板使用
 
 ```python

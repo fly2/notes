@@ -207,8 +207,6 @@ DBSCAN(eps=0.5, min_samples=5, metric='euclidean', metric_params=None, algorithm
 #n_jobs 并行运行数目。
 ```
 
-[距离划分度量](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.distance_metrics.html#sklearn.metrics.pairwise.distance_metrics)
-
 ### EllipticEnvelope
 
 #### 异常值检测
@@ -232,6 +230,10 @@ f1=f1_score(py,test_y)
 res.loc[r,:]=[100,precision,recall,f1]
 r=r+1
 ```
+
+### 距离度量
+
+[距离划分度量](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.distance_metrics.html#sklearn.metrics.pairwise.distance_metrics)
 
 ## 降维算法
 
@@ -324,6 +326,8 @@ recall=sum(py[np.array(test_y==1)])/sum(test_y==1)
 ### 不均衡数据处理
 
 在遇到数据比例相差很大的情况时，对于随机森林，可以使用过采样或欠采样，smote等方法使两者比例接近，然后进行建模。而对于gbdf，其本身会通过迭代增加判断小比例样本的系数权重，而如果人为调整数据比例，反而会使模型失去对小比例样本的关注，在实际识别中导致准确率下降。
+
+另外在随机森林树的深度上，深度越大会导致模型整体效果变好，但对小样本的值会更难识别，如果做异常检测，会导致异常值难以发现。
 
 ## 文本处理
 
@@ -468,11 +472,25 @@ sklearn.model_selection.cross_val_score(estimator, X, y=None, groups=None, scori
 ## 模型保存
 
 ```python
+#方法一
 from sklearn.externals import joblib
 #lr是一个LogisticRegression模型
 #保存模型
 joblib.dump(lr, 'lr.model')
 #加载模型
 lr = joblib.load('lr.model')
+
+#方法二
+from sklearn import svm
+from sklearn import datasets
+s=pickle.dumps(clf)
+f=open('svm.txt','w')
+f.write(s)
+f.close()
+f2=open('svm.txt','r')
+s2=f2.read()
+clf2=pickle.loads(s2)
+clf2.predict(X[0:1])
+
 ```
 

@@ -7,7 +7,7 @@
 
 ### xlsx格式可以保存DataFrame的时间格式，csv无法保存。时间格式导出到csv再回去时会变成str格式。
 
-### 批量处理文件夹里的所有文件
+### 批量处理指定文件夹的所有文件及其子目录下的文件
 
 ```python
 import pandas as pd
@@ -22,6 +22,16 @@ for root,dirs,files in os.walk('/home/weblogic/DATA/public/cc热点大数据/工
             df=pd.read_csv(os.path.join(root,filespath),encoding="gb18030")
             #用os.path.join合成路径
             df1.to_csv(os.path.join('/home/weblogic/DATA/private/shangguanxf/cc_bigdata/create/工单机构分布/标准化',filespath),encoding='gb18030')
+```
+
+### 批量处理指定文件夹的文件
+
+```python
+import pandas as pd
+import os
+for entry in os.scandir(path):
+   if  entry.is_file():
+       print(entry.name)
 ```
 
 ### 使用sample对数据进行重采样
@@ -42,7 +52,28 @@ df.reset_index(inplace=True, drop=True)
 
 pandas中iloc是用来对位置索引进行操作，loc是用行索引进行操作。
 
-#### 空表可以进行df的方法使用
+### df.series.str.split(expand=True)
+
+在`df.serise.str`中的`split`比`python`的`str`类型的`split`多了`expand`参数，可以通过将该参数设置为True，来使分割后的字符扩展成多列而不是一个列表。
+
+```python
+import pandas as pd
+df = pd.DataFrame({'Country':['China','US','Japan','EU','UK/Australia', 'UK/Netherland'],
+               'Number':[100, 150, 120, 90, 30, 2],
+               'Value': [1, 2, 3, 4, 5, 6],
+               'label': list('abcdef')})
+
+df.Country.str.split('/',expand=True)
+```
+
+### 空表可以进行df的方法使用
+
+### apply可以对groupby后的数据进行操作
+
+```python
+#取分组后top5
+report2.groupby('二级机构').apply(lambda x:x.sort_values('渠道出险次数',ascending=False).head())
+```
 
 ## DataFrame常用操作
 
@@ -287,11 +318,25 @@ df.iloc[0,:].name
 
 ```python
 #设置索引，将特定列设置为索引
+df.set_index(keys, drop=True, append=False, inplace=False, verify_integrity=False)
+#keys 列名或列名列表
+#drop 是否删除用来做索引的列，默认删除
+#append 是否保留已有的索引
+#inplace 是否替换原df
+#verfy_intergrity 是否立即检查新索引的重复性。False则推迟检查，直到必要时。设置为False将提高此方法的性能
+
 
 #重置索引
+df.reset_index(level=None, drop=False, inplace=False, col_level=0, col_fill='')
+#level {int, str, tuple}只移除指定的索引级别，默认移除全部
+#inplece 是否替代替原df
+#drop 是否删除原索引
+#col_level	{int,str}当col有多级列索引时，将重置后的索引放置的级别
+#col_fill	当有多级列索引时，重置后索引未放置的级别填充的列名
+
+
 df.reset_index(inplace=True, drop=True)
-#inplece=True 代替原df
-#drop=True 删除原索引
+
 
 #重新排列索引
 df.reindex(new_index)
@@ -355,6 +400,47 @@ DataFrame.insert(loc, column, value, allow_duplicates=False)
 #value插入的值
 #allow_duplicates=False即不允许插入列与已有列名重复
 df.insert(9,'班次',d)
+```
+
+### 列扩行
+
+将多列的数据转换为一列，列名变为二级行索引名。
+
+可和`df.col.str.split()`搭配使用
+
+```python
+DataFrame.stack(level=-1, dropna=True)
+#level {int, string, list}将列转换为行后的列名的行索引级别，默认为最后一级
+#dropna 是否去掉空值
+
+df=pd.DataFrame({'a':[1,2],'b':[3,4]})
+df.stack()
+
+#一般用于将split(expand=True)转为列
+new_df=df.drop('Country', axis=1).join(df['Country'].str.split(',', expand=True).stack().reset_index(level=1, drop=True).rename('Country'))
+```
+
+### 行扩列
+
+```python
+unstack(level=-1, fill_value=None)
+#level 拆分成行的索引名称
+#fill_value	拆分后的nan填充值
+
+
+>>> index = pd.MultiIndex.from_tuples([('one', 'a'), ('one', 'b'),
+...                                    ('two', 'a'), ('two', 'b')])
+>>> s = pd.Series(np.arange(1.0, 5.0), index=index)
+
+s.unstack(level=-1)
+     a   b
+one  1.0  2.0
+two  3.0  4.0
+
+s.unstack(level=0)
+   one  two
+a  1.0   3.0
+b  2.0   4.0
 ```
 
 ### 删除行列
@@ -623,16 +709,23 @@ df.cumsum(1)
 
 数据合并有两种，一种是行数不变，合并列。一种是列不变，合并行
 
+#### concat
+
 ```python
 #列不变，增加行（合并行）
 df2=pd.concat([df,df1])
 #df和df1的列名及排列要一致
+```
 
+#### merge
+
+```python
 #行不变，增加列（合并列）
 df4=pd.merge(df3,df1,how='inner',on=None,left_on=['投保人姓名','保单号'],right_on=['投保人姓名','保单号']
 #根据多列去做关联，需要两列都相同才关联
 #how有'left','right','inner'三种，用法和sql中一致
 #on为关联时匹配的列，当只有一列时用on，多列时on=None，用left_on和right_on来关联
+             
 main=pd.merge(infor4,infor2,how='left',on='姓名')
 #用名字去关联，左边保持不变，右边和左边相同时匹配过去
              
@@ -644,7 +737,24 @@ df1=pd.merge(df1,df2,how='left',on=None,left_index=True,right_index=True)
 df=pd.merge(df,df1,how='left',on=None,left_index=True,right_index=True,suffixes=('_1', '_2'))
 ```
 
+#### join
 
+```python
+#行不变，增加列，比较适合操作同一个df中的不同列
+DataFrame.join(other, on=None, how='left', lsuffix='', rsuffix='', sort=False)
+#other 有相似索引的DataFrame, Series with name field set, or list of DataFrame
+#on 默认使用index做关联，也可以使用列名或者列名列表
+#how 结合方式。{'left','right','outer','inner'}
+#lsuffix 重叠列中左边所用的后缀
+#rsuffix 重叠列中右边所用的后缀
+#sort 是否按照join key排序，如果为False，依赖于join key的类型
+
+caller = pd.DataFrame({'key': ['K0', 'K1', 'K2', 'K3', 'K4', 'K5'],
+...                        'A': ['A0', 'A1', 'A2', 'A3', 'A4', 'A5']})
+other = pd.DataFrame({'key': ['K0', 'K1', 'K2'],
+...                       'B': ['B0', 'B1', 'B2']})
+caller.join(other, lsuffix='_caller', rsuffix='_other')
+```
 
 ### dict转DataFrame
 
@@ -745,6 +855,8 @@ df=pd.read_csv('/home/weblogic/DATA/private/shangguanxf/cc_txt1/warning.txt',enc
 ```
 
 ### excel
+
+**注意：**不要把sheetname写成sheet_name，并没有下划线
 
 ```python
 #读取excel
@@ -884,6 +996,8 @@ df.工单生成时间.dt.strftime('%Y-%m-%d')
 
 ### 转换到周几
 
+**注意：**得到的结果为星期几-1.即返回0是星期一而不是星期日，返回6是星期日不是星期六。
+
 ```python
 time_list = ["2017-05-10 17:19:19", "2017-05-11 17:19:20", "2017-05-12 17:19:20", "2017-05-13 17:19:20"]  
 time_ser = pd.Series(time_list)  
@@ -920,6 +1034,22 @@ td.astype('timedelta64[s]')
 
 #将日期中的时间（时分秒）转换为秒
 td.dt.seconds
+```
+
+### 日期时间戳转换为日期
+
+```python
+import datetime
+from datetime import timedelta
+#日期时间戳转换
+def datetamp2date(date,datestamp,datestamp1):
+    #date 已知的日期,'yyyymmdd'的字符串格式
+    #datestamp 已知日期的时间戳
+    #datestamp1 未知日期的时间戳
+    d1 = datetime.datetime.strptime(date, '%Y%m%d')
+    d2 =d1+timedelta(days=(datestamp1-datestamp))
+    return d2.strftime('%Y%m%d')  
+datetamp2date('20180401',43191,43192)
 ```
 
 ### 转换到月初
@@ -1102,13 +1232,14 @@ apply对整行或整列的进行操作，类似matlab中cellfun对单个cell进�
 ```python
 DataFrame.apply(func, axis=0, broadcast=False, raw=False, reduce=None, args=(), **kwds)
 #func 对行/列进行操作的函数，可以自定义函数，多使用匿名函数
-#axis=0 0为行，1为列即操作一列的所有行
+#axis=0 1为行及操作一行的所有列，0为列即操作一列的所有行
 #broadcast=False 是否和输入dataframe的尺寸保持一致
 #raw=False 是否转换为Series格式，False为转换为Series格式，True则使用ndarray代替。如果只使用apply numpy函数，使用ndarray将得到更高的性能。
 #reduce 当为None时自动推断输出为Series还是DataFrame，当为True则默认输出为Series,False则默认输出为DataFrame
 #args 传递给函数的位置参数
 
-
+df=pd.DataFrame({'a':[1,2,3],'b':[4,5,6],'c':[7,8,9]})
+df.apply(lambda x:print(x),axis=1)
 ```
 
 ### agg
@@ -1401,8 +1532,6 @@ tmp_login['interval']=x[1]-tmp_login.time
 tmp_login['interval']=tmp_login['interval']/np.timedelta64(1, 'D')
 ```
 
-
-
 ### 使用apply来建表
 
 使用apply来建表，通过表中的字段关联另一表产生新的表。初用for循环速度太慢，改用apply。但一直无法顺利赋值。后来通过观察发现，当apply中结果为series时需要函数返回单个的值，当apply结果为DataFrame时，需要函数返回Series。
@@ -1498,4 +1627,43 @@ nullar=df.isnull().values.astype(np.int8)
 sb.heatmap(df2[0:100],vmin=0,vmax=1，cmap=sb.dark_palette("white",as_cmap=True),yticklabels=False,cbar=False)
 plt.show()
 ```
+
+### 一列中的文本拆分为多行
+
+在做数据处理时遇到有一列数据为按照`','`分割的多个值。为了分析，需要把它拆分成多行。
+
+主要是用split的expand参数将其扩展成多列，在利用stack函数进行列转行，最后在将其与原数据合并。
+
+```python
+import pandas as pd
+df = pd.DataFrame({'Country':['China','US','Japan','EU','UK/Australia', 'UK/Netherland'],
+               'Number':[100, 150, 120, 90, 30, 2],
+               'Value': [1, 2, 3, 4, 5, 6],
+               'label': list('abcdef')})
+
+
+new_df=df.drop('Country', axis=1).join(df['Country'].str.split(',', expand=True).stack().reset_index(level=1, drop=True).rename('Country'))
+```
+
+### 用df列中的值是否存在
+
+在使用df中的列进行判断某些值是否存在时发现，`value in df['columns']`是看value是否在`df['columns']`的索引中，而不是是否存在于`df['columns']`的值中。想要看是否存在于`df['columns']`中的值，可以用`df['columns'].values`或者`set(df['columns'])`
+
+```python
+import pandas as pd
+
+df=pd.DataFrame({'a':[3,6,9]})
+6 in df['a']
+->False
+
+df=pd.DataFrame({'a':[3,6,9]})
+6 in df['a'].values
+->True
+
+df=pd.DataFrame({'a':[3,6,9]})
+6 in set(df['a'])
+->True
+```
+
+
 

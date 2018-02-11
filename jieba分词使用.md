@@ -266,16 +266,18 @@ import jieba
 import re
 import pandas as pd
 import os
-#设置停用词
-stopkey=[line.strip() for line in open('/home/weblogic/DATA/private/shangguanxf/cc_txt1/stopword.txt').readlines()] 
-#stopkey=[line.strip().decode('utf-8') for line in open('/home/weblogic/DATA/private/shangguanxf/txt_anaysis/stopword.txt').readlines()] 
-#stop_list = open('/home/weblogic/DATA/private/shangguanxf/txt_anaysis/stopword.txt',encoding="utf-8")
+#safe放在stop上面，避免一些无效词被干掉后又被safe词保留
 #设置安全词
 safeword=[line.strip() for line in open('/home/weblogic/DATA/private/shangguanxf/cc_txt1/safeword.txt',encoding="gb18030").readlines()]
 for sf in safeword:
     jieba.suggest_freq(sf, tune=True)
 #还可以通过jieba.load_userdict(file_name)设置文件类对象或自定义词典路径，自定义词典需为utf-8编码。    
-    
+
+#设置停用词
+stopkey=[line.strip() for line in open('/home/weblogic/DATA/private/shangguanxf/cc_txt1/stopword.txt').readlines()] 
+#stopkey=[line.strip().decode('utf-8') for line in open('/home/weblogic/DATA/private/shangguanxf/txt_anaysis/stopword.txt').readlines()] 
+#stop_list = open('/home/weblogic/DATA/private/shangguanxf/txt_anaysis/stopword.txt',encoding="utf-8") 
+
 #读取路径所有文件
 for root,dirs,files in os.walk('/home/weblogic/DATA/private/shangguanxf/cc_praise/'):
     for filespath in files:

@@ -107,7 +107,7 @@ target=tf.placeholder(tf.int32,[None])
 model=EmbeddingModel(data,target,params)
 
 corpus=Wikipedia(
-    'https://dump.wikimedia.org/enwiki/20160501/'\
+    'https://dump.wikimedia.org/enwiki/20160501/',
     'enwiki-20160501-pages-meta-current1.xml-p000000010p000030303.bz2',
     '/home/uesr/wikipedia',
     params.vocabulary_size
