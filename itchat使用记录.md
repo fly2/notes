@@ -25,3 +25,22 @@ def download_files(msg):
     return '%s received'%msg['Type']
 ```
 
+#### 群体发送消息
+
+```python
+import itchat, time
+from itchat.content import *
+import re
+
+message='你好，朋友'
+#登录
+itchat.auto_login()
+#得到好友列表
+friends_dict=itchat.get_friends()
+#发送给有备注的人
+def to_special(friends_dict):
+	for person in friends_dict:
+    	if person.RemarkName is not '':
+            itchat.send_msg(msg=message,toUserName=person.UserName)
+```
+

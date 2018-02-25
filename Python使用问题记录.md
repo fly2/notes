@@ -17,6 +17,32 @@ print('a is %.3f,b is %.3f'%(0.2,0.5))
 -->a is 0.200,b is 0.500
 ```
 
+### 变量赋值
+
+`_`可以进行赋值
+
+```python
+#给多个变量赋值
+data=['alex',84,[1900,3,38]]
+name,age,birth=data
+print(name)
+print(age)
+print(birth)
+#
+msg='hello'
+a,b,c,d,e=msg
+print(a,b,c,d,e)
+
+
+msg='hello'
+a,_,_,_,b=msg
+print(a)
+print(b)
+#只给第一个和最后一个变量赋值
+a,*_,b=msg
+print(a,b)
+```
+
 ### 空值
 
 ```python
@@ -1911,6 +1937,30 @@ np.searchsorted([1,2,3,4,5], 3)
 ->2
 np.searchsorted([1,2,3,4,5], 3, side='right')
 ->3
+```
+
+### expand_dims
+
+用来增加维度
+
+```python
+numpy.expand_dims(a, axis)
+#a 输入数组
+#axis 扩展的新的轴，或者说扩展后为1的那个轴
+>>> x = np.array([1,2])
+>>> x.shape
+(2,)
+>>> y = np.expand_dims(x, axis=0)
+>>> y
+array([[1, 2]])
+>>> y.shape
+(1, 2)
+>>> y = np.expand_dims(x, axis=1)  # Equivalent to x[:,np.newaxis]
+>>> y
+array([[1],
+       [2]])
+>>> y.shape
+(2, 1)
 ```
 
 ### 保存和加载数据
