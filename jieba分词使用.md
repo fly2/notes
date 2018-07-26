@@ -1,5 +1,11 @@
 ## jieba分词使用
 
+### jieba_fast
+
+可以使用jieba_fast来代替jieba。
+
+jieba_fast使用`cpython`重写了jieba分词库中计算DAG和HMM中的vitrebi函数，速度得到大幅提升。 使用`import jieba_fast as jieba`可以无缝衔接源代码。
+
 ### 分词
 
 - `jieba.cut` 方法接受三个输入参数: 需要分词的字符串；cut_all 参数用来控制是否采用全模式；HMM 参数用来控制是否使用 HMM 模型。

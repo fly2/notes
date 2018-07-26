@@ -13,13 +13,15 @@
 - Python 2.6 or newer
 - NumPy & SciPy
 
-对于使用中绑定的python需要安装：
+对于使用python构建需要安装：
 
 - Python version 2.7 or >=3.4
 - NumPy & SciPy
 - [pybind11](https://github.com/pybind/pybind11)
 
 #### 使用make构建(推荐)
+
+**注意：**使用make安装后只能在文件夹目录下运行(`./fastText-master/`)
 
 ```shell
 $ wget https://github.com/facebookresearch/fastText/archive/v0.1.0.zip
@@ -29,6 +31,8 @@ $ make
 ```
 
 #### 使用python构建
+
+如果需要在python中使用，需要进行python构建。
 
 ```shell
 $ git clone https://github.com/facebookresearch/fastText.git
@@ -103,7 +107,11 @@ The following arguments for quantization are optional:
 
 #### 训练
 
-默认ngram=1,一行一个数据，标签使用前缀`__label__`得到。输出的模型有两个，一个是.bin文件，一个是.vec文件，.bin为受过训练的分类模型，.vec是词的向量表示, one per line.
+默认ngram=1,一行一个数据，标签使用前缀`__label__`得到。下面为每行格式示例：
+
+`__label__sauce __label__cheese How much does potato starch affect a cheese sauce recipe?`
+
+输出的模型有两个，一个是.bin文件，一个是.vec文件，.bin为受过训练的分类模型，.vec是词的向量表示, one per line.
 
 ```shell
 $ ./fasttext supervised -input train.txt -output model
@@ -221,7 +229,17 @@ bordeaux 0.740635
 pigneaux 0.736122
 ```
 
-## [python使用](https://github.com/salestock/fastText.py)
+## python使用（fastText）
+
+官方的python封装，需要使用python构建得到
+
+[代码](https://github.com/facebookresearch/fastText/tree/master/python)
+
+**注意：**在使用fastText.predict()时，如果输入不是字符串的list的话，只会处理第一个文本的predict。而无法返回全部的predict。
+
+## [python使用](https://github.com/salestock/fastText.py)（fasttext）
+
+**注意：**`fasttext`是一个非官方封装包，官方封装包为`fastText`
 
 ### Requirements
 

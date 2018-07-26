@@ -23,6 +23,11 @@ ax = plt.subplot(111)
 t1 = np.arange(0.0, 1.0, 0.01)
 for n in [1, 2, 3, 4]:
     plt.plot(t1, t1**n, label="图例%d"%(n,))
+    
+#对x,y轴，标题进行说明
+plt.xlabel("横轴",fontproperties=myfont)
+plt.ylabel("纵轴",fontproperties=myfont)
+plt.title("pythoner.com",fontproperties=myfont)
 #对标签栏进行设置，loc为设置位置，ncol为列数，mode为，shadow是否为图例后绘制阴影，fancybox是否有边框，prop字体设置
 leg = plt.legend(loc='best', ncol=2, mode="expand", shadow=True, fancybox=True,prop=zhfont1)
 #为边框设置透明度
@@ -30,6 +35,39 @@ leg.get_frame().set_alpha(0.5)
 
 plt.show()
 ```
+
+##### 更改字体设置
+
+[知乎](https://www.zhihu.com/question/25404709)看到的，本人没有尝试成功。
+
+1. 获取设置文件路径
+
+```python
+import matplotlib
+matplotlib.matplotlib_fname()
+```
+
+2. 修改matplotlibrc文件，将下面的注释去掉
+
+```python
+#font.family: sans-serif
+```
+
+修改为下面，注意后面是字体的名称，需要`./fonts/ttf/`里面存在相应的字体
+
+```python
+font.family: msyh
+```
+
+3.  删除.matplotlib/cache里面的两个缓存字体文件
+
+   ```python
+   #得到缓存地址
+   import matplotlib as mpl
+   mpl.get_cachedir()
+   ```
+
+4. 重启python
 
 #### 无法显示seaborn的设置
 
@@ -285,7 +323,7 @@ p1 = plt.bar(ind, menMeans,width,color='black', yerr=menStd)
 #通过bottom来设置底部数据
 p2 = plt.bar(ind, womenMeans, width,color='pink',
              bottom=menMeans, yerr=womenStd)
-#当底部数据不是单独变量时，可以通过前面数据相加来得到底部
+#当底部数据不是单独变量时，可以通过前面数据相加来得到底部.可以认为是把每一个数拆成多份，一份一份叠加。
 p3=plt.bar(ind, other, width,
              bottom=womenMeans+menMeans, yerr=womenStd)
 
@@ -397,7 +435,7 @@ seaborn.heatmap(data, vmin=None, vmax=None, cmap=None, center=None, robust=False
 #ax 绘制图的轴，否则使用当前活动的轴。
 
 
-sb.heatmap(df2[0:100],vmin=0,vmax=1，cmap=sb.dark_palette("white",as_cmap=True),yticklabels=False,cbar=False)
+sb.heatmap(df2[0:100],vmin=0,vmax=1,cmap=sb.dark_palette("white",as_cmap=True),yticklabels=False,cbar=False)
 plt.show()
 ```
 
@@ -503,8 +541,6 @@ im = plt.imshow(Z, interpolation='bilinear', cmap=cm.RdYlGn,aspect='2'
 
 plt.show()
 ```
-
-
 
 ### 多子图
 

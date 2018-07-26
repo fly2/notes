@@ -18,7 +18,7 @@ model = Word2Vec(sentences=None, size=100, alpha=0.025, window=5, min_count=5, m
 #sample: 高频词汇的随机降采样的配置阈值，默认为1e-3，范围是(0,1e-5)
 #workers参数控制训练的并行数。
 #hs: 如果为1则会采用hierarchica·softmax技巧。如果设置为0（defau·t），则negative sampling会被使用。
-#negative: 如果>0,则会采用negativesamp·ing，用于设置多少个noise words
+#negative: 如果>0,则会采用负采样(negativesamp·ing)，用于设置多少个负采样词数(noise words)
 #cbow_mean: 如果为0，则采用上下文词向量的和，如果为1（defau·t）则采用均值。只有使用CBOW的时候才起作用。
 #hashfxn： hash函数来初始化权重。默认使用python的hash函数
 #iter： 迭代次数，默认为5
@@ -48,6 +48,16 @@ model.train(sentences, total_words=None, word_count=0, total_examples=None, queu
 #删除中间参数
 model.delete_temporary_training_data(replace_word_vectors_with_normalized=False)
 #丢弃在训练和得分中使用的参数。 如果您确定已完成模型训练。 如果replace_word_vectors_with_normalized被设置，忘记原始向量，只保留归一化的向量=节约大量的内存！
+
+#得到索引到vocab字典的映射，3.3后index2word函数移动到model.wv下面
+model = Word2Vec(size=h, window=5, min_count=0,workers=24,iter=1)
+model.build_vocab(seg)  
+model.train(seg)
+model.index2word
+->['say', 'cat', 'meow', 'woof', 'dog']
+#3.3后使用以下函数得到vocab表
+model.wv.index2word
+
 
 #得到词向量内容
 model['再见']
@@ -138,8 +148,6 @@ model.save('/home/weblogic/DATA/private/shangguanxf/cc_txt2/doc2vec.bin')
 model= gensim.models.Doc2Vec.load("/home/weblogic/DATA/private/shangguanxf/cc_txt2/doc2vec.bin")
 ```
 
-   ​
-
 ## lda（隐狄利克雷分布）
 
 得到文档主题分布。
@@ -167,4 +175,42 @@ ldamodel[query]
 #得到该查询分类到每个主题的概率
 ```
 
-   
+##  wikicorpus
+
+用于处理wiki数据的模块，这个模块进行操作时文件被即时提取，整个文件可以保持压缩在磁盘上。
+
+下面的token在英文中指代词，中文指代句子。
+
+```python
+gensim.corpora.wikicorpus.WikiCorpus(fname, processes=None, lemmatize=True, dictionary=None, filter_namespaces=('0', ), tokenizer_func=<function tokenize>, article_min_tokens=50, token_min_len=2, token_max_len=15, lower=True)
+#fname 文件路径，支持两种命名格式的文件
+'''
+<LANG>wiki-<YYYYMMDD>-pages-articles.xml.bz2
+<LANG>wiki-latest-pages-articles.xml.bz2
+'''
+#processes 要运行的进程数量，默认为cpu数量 - 1
+#lemmatize 是否使用词形化而不是简单的正则表达式正则化。 如果安装了pattern包，则默认为True。
+#dictionary 字典，如果没有提供，这将扫描一次语料库，以确定其词汇
+#filter_namespaces 命名空间
+#tokenizer_func 用来正则化的函数，默认使用tokenize()。需要支持以下接口tokenizer_func(text: str, token_min_len: int, token_max_len: int, lower: bool)->list of str 
+#article_min_tokens=50 文章中的最小token数。 如果token较少，则条目将被忽略。
+#token_min_len 最小token长度
+#token_max_len=15 最大token长度
+#lower 如果为True，转换所有字母为小写
+
+#获取所有文本 
+#在gensim 3.4.0之前,获取的文本是bytes格式的，需要注意转换
+with open('zhwiki.txt') as f:
+    for i in wiki.get_texts():
+    	f.write(b' '.join(i).decode('utf-8') + '\n')
+
+#从gensim 3.4.0时获取的文本为unicode格式，无需转换
+n=0
+with open(wiki_output,'w') as output:
+    for i in wiki.get_texts():
+        output.write(' '.join(i)+ "\n")
+        n=n+1
+        if n%10000==0:
+            print("Saved " + str(n) + " articles")
+```
+

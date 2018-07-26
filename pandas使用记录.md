@@ -38,14 +38,20 @@ for entry in os.scandir(path):
 
 ```python
 DataFrame.sample(n=None, frac=None, replace=False, weights=None, random_state=None, axis=None)
-#n 返回的采样数据
-#frac 返回的采样比例
+#n 采样数据个数
+#frac 采样比例
 #replace 采样是否替换原有数据
 #weights 采样权重，需与原df列同样长。缺失值被视为0。
 
 #通过设置采样比例为1，对数据进行重新排序。
 df=df.sample(frac=1)
 df.reset_index(inplace=True, drop=True)
+
+>>> s.sample(n=3)
+27   -0.994689
+55   -1.049016
+67   -0.224565
+dtype: float64
 ```
 
 ### iloc和loc
@@ -74,6 +80,46 @@ df.Country.str.split('/',expand=True)
 #取分组后top5
 report2.groupby('二级机构').apply(lambda x:x.sort_values('渠道出险次数',ascending=False).head())
 ```
+
+### 划分训练、测试集
+
+```python
+#数据本身分布为随机分布，且数量足够大，可以直接按照索引切分
+dfl=len(df)
+train=df.iloc[range(int(dfl*0.7)),:]
+test=df.iloc[range(int(dfl*0.7),dfl),:]
+
+#数据分布为有序，可以进行抽样
+train=df.sample(frac=0.7)
+test_index=set(df.index)-set(train.index)
+test=df.loc[test_index,:]
+
+#数据分布符合时间规律，直接按照时间进行划分
+df.date=pd.to_datetime(df.date,format='%Y/%m/%d')
+train=df[df.date<'2017/05/01']
+test=df[df.date>'2017/04/30']
+```
+
+### 在对df或series进行赋值时，注意添加`.copy()`
+
+如果赋值时不加.copy(),会指向原始对象的内存块，更改新的对象时也会使源对象改变。
+
+```python
+import pandas as pd
+df1=pd.DataFrame({'a':[1,1,1,1,1],'b':[2,2,2,2,2]})
+df2=df1
+df2.a=2
+df1
+->
+a	b
+0	2	2
+1	2	2
+2	2	2
+3	2	2
+4	2	2
+```
+
+
 
 ## DataFrame常用操作
 
@@ -123,6 +169,8 @@ pd.Series(np.zeros(5),index=col,dtype='int8')
 
 **注意：**建表时可通过index参数设置索引，`df=pd.DataFrame(columns=col,index=col)`可建立行列对称矩阵
 
+**注意：**建表时用dict赋值时（`pd.DataFrame({'文件名':file,'客服':cc,'客户':customer})`），列名会倒排，df中的列名为（`客户  客服  文件`)。可以使用`columns=`参数来强制指定排序。
+
 ```python
 #先建立表，再逐步赋值
 df1=pd.DataFrame(columns=('机构名称','minmax变换乘100','工单/客户数','该机构工单量','有效客户数'))
@@ -164,6 +212,34 @@ df.iloc[0:3,2]=3
 df.iat[0:3,2]=3
 ```
 
+### 数据复制
+
+**注意：**浅拷贝会和原始数据共享数据
+
+```python
+df.copy(deep=True)
+#复制这个对象的索引和数据。
+#deep 当deep = True（默认值）时，将使用调用对象的数据和索引副本创建一个新对象。 数据或副本索引的修改不会反映在原始对象中（请参阅下面的注释）。当deep = False时，将创建一个新对象而不复制调用对象的数据或索引（只复制对数据和索引的引用）。 对原稿数据的任何更改都会反映在浅拷贝中（反之亦然）。
+>>> s = pd.Series([1, 2], index=["a", "b"])
+>>> deep = s.copy()
+>>> shallow = s.copy(deep=False)
+
+>>> s[0] = 3
+>>> shallow[1] = 4
+>>> s
+a    3
+b    4
+dtype: int64
+>>> shallow
+a    3
+b    4
+dtype: int64
+>>> deep
+a    1
+b    2
+dtype: int64
+```
+
 ### 按照条件更改列的值
 
 ```python
@@ -184,6 +260,8 @@ df.loc[df['a']<0.5,'c']=1
 ### 数据选择
 
 通过标签（df.loc）选择时行[1:3]表示[1,2,3],通过位置(df.iloc)进行选择时行[1:3]表示[1,2]
+
+当对指定列选取最后一行时，`df.col[-1]`会报错，无法这样取数，需要使用iloc来取数`df.col.iloc[-1]`
 
 ```python
 import pandas as pd
@@ -310,6 +388,13 @@ df.loc[4]=[18,'male','Jack']
 df.set_index(['age','gender'],inplace=True)
 
 df.iloc[0,:].name
+```
+
+### 得到最后一个有效的索引
+
+```python
+df=pd.DataFrame({'a':[1,2,3,4,5]})
+df.last_valid_index()
 ```
 
 ### 重置索引
@@ -528,9 +613,9 @@ dtype: object
 ### 得到重复值
 
 ```python
-df.duplicated(cols=None, take_last=False)
-#cols 为考虑是否重复的列，None则考虑全表
-#take_last为重复值标签方式{'first','last',False}
+df.duplicated(subset=None, keep='first')
+#subsets 为考虑是否重复的列，None则考虑全表
+#keep为重复值标签方式{'first','last',False}
 #first:重复值中第一个为false，即不视为重复值
 #last：重复值中最后一个为false，即不视为重复值
 #False：所有重复值均为True。
@@ -649,7 +734,27 @@ DataFrame.interpolate(method='linear', axis=0, limit=None, inplace=False, limit_
 #limit_direction  {'forward', 'backward', 'both'}指定连续NaN填充的方向
 ```
 
+### 列去重
 
+```python
+Series.unique()
+
+df.f1.unique()
+->[0, 1, 2]
+```
+
+### 统计各轴变量种数
+
+```python
+DataFrame.nunique(axis=0, dropna=True)
+#axis 进行统计的轴的方向
+#是否去除空值
+
+df = pd.DataFrame({'A': [1, 2, 3], 'B': [1, 1, 1]})
+>>> df.nunique()
+A    3
+B    1
+```
 
 ### 统计各列的值的数目
 
@@ -674,6 +779,28 @@ df.test.value_counts(bins=2)
 0.995    6
 3.500    3
 #即将列a分成两个离散变量，(0.995,3.5] 频数为6, (3.5,6]频数为3
+```
+
+### 数值分组
+
+cut函数可以用于从连续变量到分类变量。 例如，剪切可以将年龄转换为年龄范围组。
+
+任何NA在结果中仍然是NA。 在所得到的分类对象中，越界值（即使用序列bins时不再分箱中的值）将是NA
+
+```python
+pandas.cut(x, bins, right=True, labels=None, retbins=False, precision=3, include_lowest=False)
+#x 需要分箱的数组，必须是一维数组
+#bins 如果bin是一个int，它定义了x范围内的等宽bin数。 但是，在这种情况下，x的范围在每一边扩展了0.1％，以包含x的最小值或最大值。 如果箱是一个序列，它定义了箱边，允许箱宽度不均匀。 在这种情况下，x的范围没有扩展。
+#right 分箱（分组）是否包含右边， 如果right == True（默认），分组表示为（1,2]，（2,3]，（3,4）。
+#labels 用作分箱结果的标签。 个数必须与分箱个数相同。 如果为False，则只返回数组在分箱中的位置索引。
+#retbins 是否返回分箱节点数组。 如果分箱以标量形式提供，可能会有用。
+#precision 分箱的展示精度
+#include_lowest 第一个时间间隔是否应该包含在内。
+
+pd.cut(np.array([.2, 1.4, 2.5, 6.2, 10.2, 2.1]), [0,5,10], retbins=True,precision=3,include_lowest=False)
+->
+([(0, 5], (0, 5], (0, 5], (5, 10], NaN, (0, 5]]
+ Categories (2, interval[int64]): [(0, 5] < (5, 10]], array([ 0,  5, 10]))
 ```
 
 ### 值累加
@@ -839,6 +966,15 @@ df=pd.read_csv(os.path.join(root,filespath),encoding="gb18030",header=None,names
 #注意，设置列名时需header=None
 ```
 
+#### 读取csv更改列名
+
+跳过第一行的列名，再设置新的列名。在0.22.0中header有了`'infer'`推断,,无需设置header为None。
+
+```python
+ training_set = pd.read_csv("boston_train.csv", skipinitialspace=True,skiprows=1, names=columns)
+ #columns 为列名的list
+```
+
 #### 读取csv有不规范数据，有的行中列和其他行不统一
 
 通过设置 error_bad_lines=True, warn_bad_lines=True来决定是否遇到不合规范的行数进行报错和警告。
@@ -909,6 +1045,8 @@ os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
 df=pd.read_sql_table('id_infor','oracle+cx_oracle://shangguan:shangguan_test123@sandbox')
 #通过schema参数设置表所在空间（即name.table的name）
 #df=pd.read_sql_table('tb_cc_record_analysis','oracle+cx_oracle://shangguan:shangguan_test123@sandbox',schema='sandbox_fixed')
+#如果要连接其他地址，在@后加ip地址和端口
+#cc=pd.read_sql_table('tb_cc_record_analysis','oracle+cx_oracle://shangguan:shangguan_test123@10.1.33.2:1521/sandbox',schema='sandbox_fixed')
 
 #设置编码格式
 import os
@@ -979,12 +1117,95 @@ from datetime import datetime,timedelta
 `%Z:  `时区名称（如果是本地时间，返回空字符串）
 `%%:  `%% => %
 
-### str转换为时间格式
+### dt常用函数
+
+#### **Datetime Properties**
+
+| [`Series.dt.date`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.date.html#pandas.Series.dt.date) | 返回日期                                                     |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [`Series.dt.time`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.time.html#pandas.Series.dt.time) | 返回时间                                                     |
+| [`Series.dt.year`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.year.html#pandas.Series.dt.year) | 返回日期的年                                                 |
+| [`Series.dt.month`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.month.html#pandas.Series.dt.month) | 返回日期的月，January（一月）=1, December（十二月）=12       |
+| [`Series.dt.day`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.day.html#pandas.Series.dt.day) | 返回日期的日                                                 |
+| [`Series.dt.hour`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.hour.html#pandas.Series.dt.hour) | 返回时间的时                                                 |
+| [`Series.dt.minute`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.minute.html#pandas.Series.dt.minute) | 返回时间的分                                                 |
+| [`Series.dt.second`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.second.html#pandas.Series.dt.second) | 返回时间的秒                                                 |
+| [`Series.dt.microsecond`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.microsecond.html#pandas.Series.dt.microsecond) | 返回时间的 microseconds （一百万分之1秒）                    |
+| [`Series.dt.nanosecond`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.nanosecond.html#pandas.Series.dt.nanosecond) | 返回时间的 nanoseconds （10的负9次方秒）                     |
+| [`Series.dt.week`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.week.html#pandas.Series.dt.week) | 一年中的第n个星期                                            |
+| [`Series.dt.weekofyear`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.weekofyear.html#pandas.Series.dt.weekofyear) | 一年中的第n个星期                                            |
+| [`Series.dt.dayofweek`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.dayofweek.html#pandas.Series.dt.dayofweek) | 一周中的第n天，注意，周一返回为0，周日返回为6.               |
+| [`Series.dt.weekday`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.weekday.html#pandas.Series.dt.weekday) | 一周中的第n天，注意，周一返回为0，周日返回为6.               |
+| [`Series.dt.weekday_name`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.weekday_name.html#pandas.Series.dt.weekday_name) | 一周中的第n天的英文 (ex: Friday)                             |
+| [`Series.dt.dayofyear`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.dayofyear.html#pandas.Series.dt.dayofyear) | 一年中的第n天                                                |
+| [`Series.dt.quarter`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.quarter.html#pandas.Series.dt.quarter) | 一年中的第n季度                                              |
+| [`Series.dt.is_month_start`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.is_month_start.html#pandas.Series.dt.is_month_start) | Logical indicating if first day of month (defined by frequency) |
+| [`Series.dt.is_month_end`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.is_month_end.html#pandas.Series.dt.is_month_end) | Logical indicating if last day of month (defined by frequency) |
+| [`Series.dt.is_quarter_start`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.is_quarter_start.html#pandas.Series.dt.is_quarter_start) | Logical indicating if first day of quarter (defined by frequency) |
+| [`Series.dt.is_quarter_end`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.is_quarter_end.html#pandas.Series.dt.is_quarter_end) | Logical indicating if last day of quarter (defined by frequency) |
+| [`Series.dt.is_year_start`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.is_year_start.html#pandas.Series.dt.is_year_start) | Logical indicating if first day of year (defined by frequency) |
+| [`Series.dt.is_year_end`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.is_year_end.html#pandas.Series.dt.is_year_end) | Logical indicating if last day of year (defined by frequency) |
+| [`Series.dt.is_leap_year`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.is_leap_year.html#pandas.Series.dt.is_leap_year) | Logical indicating if the date belongs to a leap year        |
+| [`Series.dt.daysinmonth`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.daysinmonth.html#pandas.Series.dt.daysinmonth) | 该月的天数                                                   |
+| [`Series.dt.days_in_month`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.days_in_month.html#pandas.Series.dt.days_in_month) | 该月的天数                                                   |
+| [`Series.dt.tz`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.tz.html#pandas.Series.dt.tz) |                                                              |
+| [`Series.dt.freq`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.freq.html#pandas.Series.dt.freq) |                                                              |
+
+#### **Datetime Methods**
+
+| [`Series.dt.to_period`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.to_period.html#pandas.Series.dt.to_period)(*args, **kwargs) | Cast to PeriodIndex at a particular frequency                |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [`Series.dt.to_pydatetime`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.to_pydatetime.html#pandas.Series.dt.to_pydatetime)() |                                                              |
+| [`Series.dt.tz_localize`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.tz_localize.html#pandas.Series.dt.tz_localize)(*args, **kwargs) | Localize tz-naive DatetimeIndex to given time zone (using    |
+| [`Series.dt.tz_convert`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.tz_convert.html#pandas.Series.dt.tz_convert)(*args, **kwargs) | Convert tz-aware DatetimeIndex from one time zone to another (using |
+| [`Series.dt.normalize`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.normalize.html#pandas.Series.dt.normalize)(*args, **kwargs) | Return DatetimeIndex with times to midnight.                 |
+| [`Series.dt.strftime`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.strftime.html#pandas.Series.dt.strftime)(*args, **kwargs) | Return an array of formatted strings specified by date_format, which supports the same string format as the python standard library. |
+| [`Series.dt.round`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.round.html#pandas.Series.dt.round)(*args, **kwargs) | round the index to the specified freq                        |
+| [`Series.dt.floor`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.floor.html#pandas.Series.dt.floor)(*args, **kwargs) | floor the index to the specified freq                        |
+| [`Series.dt.ceil`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.ceil.html#pandas.Series.dt.ceil)(*args, **kwargs) | ceil the index to the specified freq                         |
+
+#### **Timedelta Properties**
+
+| [`Series.dt.days`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.days.html#pandas.Series.dt.days) | Number of days for each element.                             |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [`Series.dt.seconds`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.seconds.html#pandas.Series.dt.seconds) | Number of seconds (>= 0 and less than 1 day) for each element. |
+| [`Series.dt.microseconds`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.microseconds.html#pandas.Series.dt.microseconds) | Number of microseconds (>= 0 and less than 1 second) for each element. |
+| [`Series.dt.nanoseconds`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.nanoseconds.html#pandas.Series.dt.nanoseconds) | Number of nanoseconds (>= 0 and less than 1 microsecond) for each element. |
+| [`Series.dt.components`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.components.html#pandas.Series.dt.components) | Return a dataframe of the components (days, hours, minutes, seconds, milliseconds, microseconds, nanoseconds) of the Timedeltas. |
+
+#### **Timedelta Methods**
+
+| [`Series.dt.to_pytimedelta`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.to_pytimedelta.html#pandas.Series.dt.to_pytimedelta)() |                                                      |
+| ------------------------------------------------------------ | ---------------------------------------------------- |
+| [`Series.dt.total_seconds`](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.dt.total_seconds.html#pandas.Series.dt.total_seconds)(*args, **kwargs) | Total duration of each element expressed in seconds. |
+
+### 转换为时间格式
+
+#### 字符串转换为时间
 
 ```python
 pd.to_datetime(df.工单生成时间,format='%Y/%m/%d')
 #df.工单生成时间是格式为'2016/08/12'类型的str的列
 #format识别的字符串格式
+```
+
+#### unix时间戳转换为时间
+
+```python
+#unit 可选参数 D,s,ms,us,ns
+#origin : 定义参考日期scalar, default is ‘unix’
+'''
+If ‘unix’ (or POSIX) time; origin is set to 1970-01-01.
+If ‘julian’, unit must be ‘D’, and origin is set to beginning of Julian Calendar. Julian day number 0 is assigned to the day starting at noon on January 1, 4713 BC.
+If Timestamp convertible, origin is set to Timestamp identified by origin.
+'''
+>>> pd.to_datetime(1490195805, unit='s')
+Timestamp('2017-03-22 15:16:45')
+>>> pd.to_datetime(1490195805433502912, unit='ns')
+Timestamp('2017-03-22 15:16:45.433502912')
+
+#设置新的原点时间戳
+pd.to_datetime([1, 2, 3], unit='D',origin=pd.Timestamp('1960-01-01'))
 ```
 
 ### 标准时间格式转换其他时间格式
@@ -1002,7 +1223,10 @@ df.工单生成时间.dt.strftime('%Y-%m-%d')
 time_list = ["2017-05-10 17:19:19", "2017-05-11 17:19:20", "2017-05-12 17:19:20", "2017-05-13 17:19:20"]  
 time_ser = pd.Series(time_list)  
 time_ser = pd.to_datetime(time_ser)  
+#方法一 利用apply
 time_weekday=time_ser.apply(lambda x:x.weekday())
+#利用dt的函数
+time_weekday=time_ser.dt.dayofweek
 ```
 
 ### 进行时间计算
@@ -1050,6 +1274,10 @@ def datetamp2date(date,datestamp,datestamp1):
     d2 =d1+timedelta(days=(datestamp1-datestamp))
     return d2.strftime('%Y%m%d')  
 datetamp2date('20180401',43191,43192)
+
+#可以使用pandas.to_datetime快速实现,td可为list或series
+td=43191-43192
+pd.to_datetime(td,unit='D',box=True,origin=pd.Timestamp('20180401'))
 ```
 
 ### 转换到月初
@@ -1066,6 +1294,8 @@ datetime.now()+DateOffset(months=3,days=10)+MonthBegin()==>Timestamp('2017-08-01
 
 ### 生成时间范围的列表
 
+可以通过freq参数来得到不同频率的日期。freq的参数可以参照[时间频率列表](#时间频率列表)
+
 ```python
 pandas.date_range(start=None, end=None, periods=None, freq='D', tz=None, normalize=False, name=None, closed=None, **kwargs)
 #start：string或datetime-like，默认值是None，表示日期的起点。
@@ -1080,6 +1310,38 @@ pandas.date_range(start=None, end=None, periods=None, freq='D', tz=None, normali
 pd.date_range('2011-01-02','2016-11-30',freq='W')
 #按周生成时间。起始时间为'2011-01-02'，截止时间为'2016-11-30'
 ```
+
+### 时间频率列表
+
+| Alias    | Description                                      |
+| -------- | ------------------------------------------------ |
+| B        | business day frequency                           |
+| C        | custom business day frequency                    |
+| D        | calendar day frequency                           |
+| W        | weekly frequency                                 |
+| M        | month end frequency                              |
+| SM       | semi-month end frequency (15th and end of month) |
+| BM       | business month end frequency                     |
+| CBM      | custom business month end frequency              |
+| MS       | month start frequency                            |
+| SMS      | semi-month start frequency (1st and 15th)        |
+| BMS      | business month start frequency                   |
+| CBMS     | custom business month start frequency            |
+| Q        | quarter end frequency                            |
+| BQ       | business quarter end frequency                   |
+| QS       | quarter start frequency                          |
+| BQS      | business quarter start frequency                 |
+| A, Y     | year end frequency                               |
+| BA, BY   | business year end frequency                      |
+| AS, YS   | year start frequency                             |
+| BAS, BYS | business year start frequency                    |
+| BH       | business hour frequency                          |
+| H        | hourly frequency                                 |
+| T, min   | minutely frequency                               |
+| S        | secondly frequency                               |
+| L, ms    | milliseconds                                     |
+| U, us    | microseconds                                     |
+| N        | nanoseconds                                      |
 
 ## 画图
 
@@ -1264,6 +1526,8 @@ A
 
 用pandas读取csv时，有时前面会有\ufeff，这是因为读取为'utf-8'+bom文件。可以通过'utf-8-sig'读取方式解决。
 
+注意首行可能会有`'\ufeff'`，注意剔除。
+
 ```python
 #用utf-8-sig格式读取
 df1=pd.read_csv('/home/weblogic/DATA/private/shangguanxf/cc_txt2/疑似误导录音/疑似诱导录音文本.csv',encoding='utf-8-sig',header=None,names=['录音编号','通话文本'])
@@ -1397,6 +1661,33 @@ a[np.array(df.A>3)]
 a[np.array(df.A>3)]=1
 a
 -->array([1, 2, 3, 1, 1, 1, 1, 1])
+```
+
+### df无法用真值赋值
+
+在使用真值为df赋值时，出现以下错误提示：
+
+`IndexingError: Unalignable boolean Series provided as indexer (index of the boolean Series and of the indexed object do not match`
+
+这时由于df匹配真值时是按照索引进行匹配，而df如果是抽样或者合并取得，会导致索引变化，而真值仍为从0开始，所以索引会无法匹配。解决办法为对df进行索引重排序。
+
+```python
+from sklearn.ensemble import RandomForestClassifier
+
+train=df.sample(n=30000)
+test_index=set(df.index)-set(train.index)
+test=df.loc[test_index,:]
+
+clf = RandomForestClassifier(n_estimators=500,max_depth=2, random_state=0)
+clf.fit(train_vec, train_label)
+p_y=clf.predict(test_vec)
+#会报错
+err_df=df[p_y!=test_label]
+
+#需进行重排序
+train=train.reset_index(drop=True)
+test=test.reset_index(drop=True)
+err_df=df[p_y!=test_label]
 ```
 
 ### 判断df是否存在
@@ -1663,6 +1954,52 @@ df=pd.DataFrame({'a':[3,6,9]})
 df=pd.DataFrame({'a':[3,6,9]})
 6 in set(df['a'])
 ->True
+```
+
+### df中赋值后的表更改会导致源表的变化
+
+在进行表的运算时发现新的表运算会导致原表值的变化，了解发现，直接赋值是映射内存块，不会产生新的副本。只有使用`.copy()`函数后才会产生新的副本或者新建一个df，再一列一列的赋值。
+
+```python
+import pandas as pd
+df1=pd.DataFrame({'a':[1,1,1,1,1],'b':[2,2,2,2,2]})
+df2=df1
+df2.a=2
+df1
+->
+a	b
+0	2	2
+1	2	2
+2	2	2
+3	2	2
+4	2	2
+
+#正确用法一
+df1=pd.DataFrame({'a':[1,1,1,1,1],'b':[2,2,2,2,2]})
+df2=df1.copy()
+df2.a=2
+df1
+->
+	a	b
+0	1	2
+1	1	2
+2	1	2
+3	1	2
+4	1	2
+
+#正确用法二
+df1=pd.DataFrame({'a':[1,1,1,1,1],'b':[2,2,2,2,2]})
+df2=pd.DataFrame()
+df2['a']=df1['a']
+df2.a=2
+df1
+->
+	a	b
+0	1	2
+1	1	2
+2	1	2
+3	1	2
+4	1	2
 ```
 
 

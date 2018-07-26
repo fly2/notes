@@ -48,7 +48,7 @@ d = path.dirname('.')
 #定义色系
 def grey_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
     return "hsl(0, 0%%, %d%%)" % random.randint(60, 100)
-def get_wc(f,name):
+def get_wc(f,name,path):
     #读取文本，需分好词（以空格隔开词）
     #text = open('/home/weblogic/DATA/private/shangguanxf/cc_bigdata/create/寿险预约咨询工单.txt', 'r', encoding='utf-8').read()
     #backgroud_Image = plt.imread('/home/weblogic/DATA/private/shangguanxf/pictures/colored_3.png')
@@ -63,8 +63,11 @@ def get_wc(f,name):
                     stopwords = STOPWORDS,        # 设置停用词
                     font_path='C:/Users/shangguanxf/Desktop/fonts/msyh.ttf',
                     max_font_size = 100,            # 设置字体最大值
-                    random_state = 1             # 设置有多少种随机生成状态，即有多少种配色方案
+                    random_state = 1,             # 设置有多少种随机生成状态，即有多少种配色方案
+                   	relative_scaling=0.5,          #单词频率对字体大小影响的权重。relative_scaling = 0时，只考虑单词排序。 使用relative_scaling = 1时，频率为两倍的单词将具有两倍的大小。 如果你想考虑单词的频率，而不仅仅是他们的排序，那么0.5左右的relative_scaling通常看起来不错。
+                   	colormap='nipy_spectral'     #Matplotlib colormap为每个单词随机绘制颜色。 如果指定了“color_func”，则忽略。
                     )
+    #从文本中生成词云
     #wc.generate(text)
     '''
     #得到词频并导出
@@ -76,7 +79,7 @@ def get_wc(f,name):
         n=n+1
     df.to_excel('/home/weblogic/DATA/private/shangguanxf/cc_bigdata/create/词云/'+name+'.xlsx',sheet_name='Sheet1')
     '''
-    #用词频画图 f应为字典的list格式
+    #用词频画图 f应为字典格式
     wc.generate_from_frequencies(f)
     # 从背景图片生成颜色值
     image_colors = ImageColorGenerator(back_coloring)
@@ -89,6 +92,12 @@ def get_wc(f,name):
     plt.figure()
     #绘制灰色系的图片
     plt.imshow(wc.recolor(color_func=grey_color_func, random_state=5))
+    
+    #自定义
+    #plt.imshow(wc.recolor(colormap=sb.light_palette('greyish blue', input="xkcd",as_cmap=True)))
+    #plt.imshow(wc.recolor(colormap=sb.color_palette("hls", 8,as_cmap=True)))
+    #plt.imshow(wc.recolor(colormap=sb.diverging_palette(220, 10, sep=25,center='light',as_cmap=True)))
+    
     # 绘制以背景图片颜色为颜色的图片
     # recolor wordcloud and show
     # we could also give color_func=image_colors directly in the constructor
@@ -100,14 +109,6 @@ def get_wc(f,name):
     plt.axis("off")
     '''
     plt.show()
-    # 保存图片
-    wc.to_file('/home/weblogic/DATA/private/shangguanxf/cc_bigdata/create/词云/'+name+'.png')
-    #wc.to_file(path.join(d, name+'.png'))
-    #太寿投诉工单售后服务问题
-f=pd.read_csv('C:/Users/shangguanxf/Desktop/太寿投诉工单售后服务词频.csv',encoding='gb18030',header=None,names=['词','频数'])
-f1={}
-for i in range(len(f.词)):
-    f1[f.词[i]]=f.频数[i]
-get_wc(f1,'太寿投诉工单售后服务问题')
+    wc.to_file(path+name+'.png')
 ```
 

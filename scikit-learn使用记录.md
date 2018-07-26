@@ -1,4 +1,4 @@
-# sicikit-learn使用记录
+# scikit-learn使用记录
 
 ## 常用距离
 
@@ -16,6 +16,50 @@ $$\Large  1-Cos_\theta=1-\frac{\sum_1^n(x_i y_i)}{\sqrt{\sum_1^n x_i^2}\sqrt{\su
 
 ```python
 cosine_distances(X, Y=None)
+```
+
+## 特征处理
+
+### onehot编码
+
+需要输入为int类型，且不能有负数。
+
+```python
+sklearn.preprocessing.OneHotEncoder(n_values=’auto’, categorical_features=’all’, dtype=<class ‘numpy.float64’>, sparse=True, handle_unknown=’error’)
+#n_values 每个特征的值数量。有三种输入方式，{'auto',int,array}
+'''
+'auto'：从训练数据中确定数值范围。
+int：每个要素的分类值数量。每个特征值应该在range(n_values)
+array：n_values[i]是X[:,i]中的分类值的数量。每个特征的值数量应该在范围内（n_values [i]）
+'''
+#categorical_features 指定哪些特征被视为分类变量。有三种输入方式，{'all',array,mask}
+'''
+'all' 所有特征都被视为分类。
+array 分类特征的索引的数组
+mask 是否视为分类特征的True，False数组，长度为特征数目。
+非分类特征总是堆叠在矩阵的右侧。
+'''
+#dtype 期望输出的数据类型
+#sparse 如果设置为True则返回sparse矩阵，否则返回array
+#handle_unknown {'error','ignore'}如果在变换过程中出现未知的分类特征，是提出报错还是忽略。
+```
+
+### minmax
+
+将特征变化到指定范围内，下面为转换公式：
+
+`X_std = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))`
+`X_scaled = X_std * (max - min) + min`
+
+```python
+sklearn.preprocessing.MinMaxScaler(feature_range=(0, 1), copy=True)
+#feature_range 指定变换到的范围，用tuple表示
+#copy 当copy=False时，则直接在原数据上进行规范化操作。注意：当输入是一个np.array()时，此参数才有效，否则总是会新建np.array数据进行操作。
+
+from sklearn.preprocessing import MinMaxScaler
+data = [[-1, 2], [-0.5, 6], [0, 10], [1, 18]]
+scaler = MinMaxScaler()
+data=scaler.fit_transform(data)
 ```
 
 ## 常用算法
@@ -103,11 +147,9 @@ MiniBatchKMeans(n_clusters=8, init='k-means++', max_iter=100, batch_size=100, ve
 #reassignment_ratio 控制要重新分配的中心的最大计数数量的分数。 较高的值意味着低计数中心更容易重新分配，这意味着模型将需要更长的时间来收敛，可能产生更好的聚类效果。
 ```
 
-
-
 #### 分类/回归
 
-最近邻有两种方法，一种是根据最近的邻居表现做分类（回归），一种是根据一定范围半径r内的邻居的表现做分类(回归)。  
+最近邻有两种方法，一种是根据最近的邻居表现做分类（回归），一种是根据一定范围半径r内的邻居的表现做分类(回归)。 
   在用KNeighborsRegressor或RadiusNeighborsRegressor做回归，即对近邻的值做平均`weights = 'uniform'`,也可以按照距离加权平均`weights = 'distance'`。**在scikit-learn中distance加权是按照距离倒数作加权**
 
 ```python
@@ -153,15 +195,60 @@ RadiusNeighborsClassifier(radius=1.0, weights='uniform', algorithm='auto', leaf_
 #radius 使用的参数空间范围，即近邻判定的半径。在半径内的即为近邻。
 #weights 预测时的权重函数{'uniform','distance'}.'uniform'为均值平均，'distance'加权平均，权重为距离的倒数。我们也可以自定义权重，即自定义一个函数，输入是距离值，输出是权重值。这样我们可以自己控制不同的距离所对应的权重。
 #algorithm 计算最近邻时使用的算法{‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}。当输入是稀疏矩阵时，会无视此参数使用暴力计算{'brute'}的方法。
-#'brute':暴力计算，无任何优化
-#'ball_tree':适用于高维数据，在kd-tree能够处理的数据范围内要慢于kd-tree。
-#'kd_tree':适用于低维数据，维数小于20时效率最高
+#'brute':暴力计算，无任何优化,时间复杂度O[DN]（D为维度，N为变量数）
+#'ball_tree':适用于高维数据，在kd-tree能够处理的数据范围内要慢于kd-tree，时间复杂度约为O[Dlog(N)]
+#'kd_tree':适用于低维数据，维数小于20时效率最高，D小于20的时间复杂度大约是O[Dlog(N)]
 #leaf_size 叶的尺寸，停止建子树的叶子节点数量的阈值，不影响结果。只影响内存大小和查询结果的速度。leaf_size一般leaf_size<n_samples<2*leaf_size,除非n_samples<leaf_size。leaf_size越大速度越快。
 #p 闵可夫斯基距离的p值，1时为曼哈顿距离，2时为欧式距离，无穷时为切比雪夫距离。
 #metric 字符串或距离矩阵对象。默认为闵可夫斯基距离（'minkowski'）
 #metric_params 度量函数的附加关键字参数。主要是用于带权重闵可夫斯基距离的权重，以及其他一些比较复杂的距离度量的参数。
 #outlier_label 主要用于预测时，如果目标点半径内没有任何训练集的样本点时，应该标记的类别，不建议选择默认值 none,因为这样遇到异常点会报错。可设置为训练集没有的类别以表明异常。
 ```
+
+##### knn算法选择
+
+**KD树**
+
+为了解决效率低下的暴力计算方法，已经发明了大量的基于树的数据结构。总的来说， 这些结构试图通过有效地编码样本的 aggregate distance (聚合距离) 信息来减少所需的距离计算量。 基本思想是，若A点距离B点非常远，B点距离C点非常近， 可知点与C点很遥远，*不需要明确计算它们的距离*。 通过这样的方式，近邻搜索的计算成本可以降低为O[DNlog(N)]或更低。 这是对于暴力搜索在大样本数N中表现的显著改善。
+
+利用这种聚合信息的早期方法是 *KD tree* 数据结构（* K-dimensional tree* 的简写）, 它将二维 *Quad-trees* 和三维 *Oct-trees*推广到任意数量的维度. KD 树是一个二叉树结构，它沿着数据轴递归地划分参数空间，将其划分为嵌入数据点的嵌套的各向异性区域。 KD 树的构造非常快：因为只需沿数据轴执行分区, 无需计算D-dimensional 距离。 一旦构建完成, 查询点的最近邻距离计算复杂度仅为O[log(N)]。 虽然 KD 树的方法对于低维度 (D<20) 近邻搜索非常快, 当D增长到很大时, 效率变低: 这就是所谓的 “维度灾难” 的一种体现。 
+
+------
+
+**ball树**
+
+为了解决 KD 树在高维上效率低下的问题, *ball 树* 数据结构就被研发出来了. 其中 KD 树沿卡迪尔轴（即坐标轴）分割数据, ball 树在沿着一系列的 hyper-spheres 来分割数据. 通过这种方法构建的树要比 KD 树消耗更多的时间, 但是这种数据结构对于高结构化的数据是非常有效的, 即使在高维度上也是一样.
+
+ball 树将数据递归地划分为由质心 C和半径r定义的节点,使得节点中的每个点位于由r和C
+
+定义的 hyper-sphere 内. 通过使用 *triangle inequality（三角不等式）* 减少近邻搜索的候选点数:|x+y|<=|x|+|y|通过这种设置, 测试点和质心之间的单一距离计算足以确定距节点内所有点的距离的下限和上限. 由于 ball 树节点的球形几何, 它在高维度上的性能超出 *KD-tree*, 尽管实际的性能高度依赖于训练数据的结构。
+
+------
+
+**最近邻算法的选择**
+
+对于给定数据集的最优算法是一个复杂的选择, 并且取决于多个因素:
+
+- 样本数量 N(i.e. `n_samples`) 和维度(例如. `n_features`).
+- *Brute force* 查询时间以 O[DN]增长
+- *Ball tree* 查询时间大约以 O[Dlog(N)]增长
+- *KD tree* 的查询时间 D的变化是很难精确描述的.对于较小的D(小于20) 的成本大约是O[Dlog(N)], 并且 KD 树更加有效.对于较大的D成本的增加接近O[DN], 由于树结构引起的开销会导致查询效率比暴力还要低.
+
+对于小数据集 (N小于30),log(N)相当于N, 暴力算法比基于树的算法更加有效.`KDTree` 和 `BallTree` 通过提供一个 *leaf size* 参数来解决这个问题:这控制了查询切换到暴力计算样本数量. 使得两种算法的效率都能接近于对较小的N的暴力计算的效率.
+
+- 数据结构: 数据的 *intrinsic dimensionality* (本征维数) 和/或数据的 *sparsity* (稀疏度). 本征维数是指数据所在的流形的维数d<=D, 在参数空间可以是线性或非线性的. 稀疏度指的是数据填充参数空间的程度(这与“稀疏”矩阵中使用的概念不同, 数据矩阵可能没有零项, 但是从这个意义上来讲,它的 **structure** 仍然是 “稀疏” 的)。
+- *Brute force* (暴力查询)时间不受数据结构的影响。
+- *Ball tree* 和 *KD tree* 的数据结构对查询时间影响很大. 一般地, 小维度的 sparser (稀疏) 数据会使查询更快. 因为 KD 树的内部表现形式是与参数轴对齐的, 对于任意的结构化数据它通常不会表现的像 ball tree 那样好.
+
+在机器学习中往往使用的数据集是非常结构化的, 而且非常适合基于树结构的查询。
+
+- query point（查询点）所需的近邻数k。
+- *Brute force* 查询时间几乎不受k值的影响.
+- *Ball tree* 和 *KD tree* 的查询时间会随着k的增加而变慢. 这是由于两个影响: 首先, k的值越大在参数空间中搜索的部分就越大. 其次, 使用k>1进行树的遍历时, 需要对内部结果进行排序.
+
+当k相比N变大时, 在基于树的查询中修剪树枝的能力是减弱的. 在这种情况下, 暴力查询会更加有效.
+
+- query points（查询点）数. ball tree 和 KD Tree 都需要一个构建阶段. 在许多查询中分摊时，这种结构的成本可以忽略不计。 如果只执行少量的查询, 可是构建成本却占总成本的很大一部分. 如果仅需查询很少的点, 暴力方法会比基于树的方法更好.
 
 ### Logistic Model
 
@@ -258,9 +345,17 @@ TSNE(n_components=2, perplexity=30.0, early_exaggeration=12.0, learning_rate=200
 #random_state 如果int，random_state是随机数生成器使用的种子; 如果RandomState的实例，random_state是随机数生成器; 如果None，则随机数生成器是由np.random使用的RandomState实例。 注意，不同的初始化可能导致成本函数的不同局部最小值。
 #method 默认情况下，梯度计算算法使用在O（NlogN）时间运行的Barnes-Hut近似（method='barnes_hut'）。 method='exact'将运行较慢但精确的算法在O（N ^ 2）时间。 当最近邻错误需要优于3％时，应使用'exact'的算法。 然而，'exact'的方法不能扩展到数百万的例子。
 #angle 只用于method ='barnes_hut'这是Barnes-Hut T-SNE的速度和精度之间的权衡。 “角度”是从一个点测量的远距离节点的角度大小（在[3]中称为θ）。 如果这个大小低于'angle'，那么它将被用作其中包含的所有点的汇总节点。 该方法对0.2〜0.8范围内的参数变化不敏感。 小于0.2的角具有很快的计算时间而大于0.8的角误差增大很快。
+
+
+
+
+import numpy as np
+from sklearn.manifold import TSNE
+X = np.array([[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 1]])
+#利用fit_transform将x嵌入到低维空间，并返回x的低维嵌入
+X_embedded = TSNE(n_components=2).fit_transform(X)
+X_embedded.shape
 ```
-
-
 
 ## 集成算法
 
@@ -331,18 +426,98 @@ recall=sum(py[np.array(test_y==1)])/sum(test_y==1)
 
 ## 文本处理
 
-### text
+scikit中自带有对文本处理的函数。
 
-  scikit中自带有对文本处理的函数。
+### HashingVectorizer
 
-  `HashingVectorizer`输入为列表格式的文本(支持'/'分词的文本)，输出为onehot词矩阵，出现为1，未出现为0
-  `CountVectorizer`输入为列表格式的文本，输出为词出现次数onehot矩阵
+  `HashingVectorizer`输入为列表格式的文本(支持`'/'`或者`' '`分词的文本)，输出为出现次数的onehot词矩阵。可以使用'l1'或'l2'范数。
 
-  `sklearn.feature_extraction.text.``CountVectorizer`(*input=u'content'*, *encoding=u'utf-8'*, *decode_error=u'strict'*, *strip_accents=None*, *lowercase=True*, *preprocessor=None*, *tokenizer=None*, *stop_words=None*, *token_pattern=u'(?u)\b\w\w+\b'*, *ngram_range=(1*, *1)*, *analyzer=u'word'*, *max_df=1.0*, *min_df=1*, *max_features=None*, *vocabulary=None*, *binary=False*, *dtype=<type 'numpy.int64'>*)
+```python
+#n_features : integer, default=(2 ** 20)输出矩阵中的特征（列）数量。 少量的特征可能会导致散列冲突，但大量数字将导致线性学习者的系数维数更大。
+#norm : ‘l1’, ‘l2’ or None, optional范数类型。'l1'或'l2'范数，None为无正则处理
+#alternate_sign : boolean, optional, default True
+```
+
+### CountVectorizer  
+
+CountVectorizer`输入为列表格式的文本，输出为词出现次数onehot矩阵。
+
+**注意：**当内存报错时可以考虑使用`max_feature`或者`max_df`和`min_df`来进行限制列的数量。也可以考虑使用`dtype`来改变结果类型降低内存损耗。
+
+```python
+class sklearn.feature_extraction.text.CountVectorizer(input=’content’, encoding=’utf-8’, decode_error=’strict’, strip_accents=None, lowercase=True, preprocessor=None, tokenizer=None, stop_words=None, token_pattern=’(?u)\b\w\w+\b’, ngram_range=(1, 1), analyzer=’word’, max_df=1.0, min_df=1, max_features=None, vocabulary=None, binary=False, dtype=<class ‘numpy.int64’>)
+#input : 输入类型，有三种可选 {‘filename’, ‘file’, ‘content’}
+'''
+选项‘filename’,表示输入为一个文件名列表
+选项‘file’,输入为具有'read'对象的文件 
+选项'content'，输入为文本列表
+'''
+#encoding 输入文件的编码格式
+#decode_error : 解码错误时的处理方式，默认为'strict'，{‘strict’, ‘ignore’, ‘replace’}
+'''
+'strict'当解码错误时会报错
+'ignore'当解码错误时会忽视
+'''
+#analyzer : string, {‘word’, ‘char’, ‘char_wb’} or callable
+'''
+特征是否应由单词(word)或n元字符(character)组成。 选项'char_wb'仅从字边界内的文本创建字符n-gram; 单词边缘的n-gram用空格填充。
+如果通过可调用，它将用于从原始未处理输入中提取特征序列。'''
+#stop_words : string {‘english’}, list, or None (default)
+'''
+如果使用'endlisg'的内置停用词表“英语”。
+如果一个list被假定为包含停用词，那么所有这些都将从结果标记中删除。 仅适用于分析器=='单词'。
+如果None，则不会使用停用词。 可以将max_df设置为范围[0.7,1.0）中的一个值，以根据术语内部语料库文档频率自动检测和过滤停用词。'''
+#lowercase : boolean类型,默认为True。标记之前将所有字符转换为小写。
+#token_pattern : string表示什么构成“标记”的正则表达式，仅在analyzer=='word'时使用。 默认的正则表达式选择2个或更多字母数字字符的标记（标点符号被完全忽略并始终被视为标记分隔符）。
+
+#max_df : 保留词语的最大阈值，如果为float，则表示比例，即剔除频数高于对应比例的部分，例如0.8，则剔除频数最高的20%。如果为int，则表示剔除频数高于max_df的部分。
+#min_df : 保留词语的最小阈值，如果为float，则表示比例，即剔除频数低于对应比例的部分，例如0.2，则剔除频数最低的20%。如果为int，则表示剔除频数低于max_df的部分。
+#max_features : int or None, default=None如果为int，则字典只保留频数最大的max_features个词
+#vocabulary : Mapping or iterable, optional
+#binary : boolean, default=False 如果为True，则所有非零计数都设置为1.这对建模二元事件而非整数计数的离散概率模型非常有用。
+#dtype : type, 由fit_transform（）或transform（）返回的矩阵的类型。
+```
+
+### TfidfTransformer
 
   `TfidfTransformer`输入为`CountVectorizer`的结果，输出为tf-idf，当只有一列时返回为tf即词频
 
+```python
+class sklearn.feature_extraction.text.TfidfTransformer(norm=’l2’, use_idf=True, smooth_idf=True, sublinear_tf=False)
+#use_idf : boolean, default=True。是否启用文档逆词频
+#smooth_idf : boolean, default=True 是否对idf进行平滑，避免零分割 idf(d, t) = log [ (1 + n) / (1 + df(d, t)) ] + 1.
+#sublinear_tf : boolean, default=False。应用次线性tf缩放，即用1 + log（tf）替换tf。
+```
+
+### TfidfVectorizer
+
   `TfidfVectorizer`输入为列表格式的文档，输出为tf-idf
+
+```python
+class sklearn.feature_extraction.text.TfidfVectorizer(input=’content’, encoding=’utf-8’, decode_error=’strict’, strip_accents=None, lowercase=True, preprocessor=None, tokenizer=None, analyzer=’word’, stop_words=None, token_pattern=’(?u)\b\w\w+\b’, ngram_range=(1, 1), max_df=1.0, min_df=1, max_features=None, vocabulary=None, binary=False, dtype=<class ‘numpy.int64’>, norm=’l2’, use_idf=True, smooth_idf=True, sublinear_tf=False)
+#max_df : 保留词语的最大阈值，如果为float，则表示比例，即剔除频数高于对应比例的部分，例如0.8，则剔除频数最高的20%。如果为int，则表示剔除频数高于max_df的部分。
+#min_df : 保留词语的最小阈值，如果为float，则表示比例，即剔除频数低于对应比例的部分，例如0.2，则剔除频数最低的20%。如果为int，则表示剔除频数低于max_df的部分。
+#max_features : int or None, default=None如果为int，则字典只保留频数最大的max_features个词
+```
+
+### 示例
+
+```python
+import string
+import sys
+from sklearn import feature_extraction
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.feature_extraction.text import CountVectorizer
+corpus = []
+for line in open('/tpdata/DATA/private/shangguanxf/cc_txt1/create/product1.txt', 'rt').readlines():  #读取一行语料作为一个文档
+    corpus.append(line.strip())
+vectorizer=CountVectorizer(max_df=0.8, min_df=0.2)#该类会将文本中的词语转换为词频矩阵，矩阵元素a[i][j] 表示j词在i类文本下的词频
+transformer=TfidfTransformer()#该类会统计每个词语的tf-idf权值
+
+tfidf=transformer.fit_transform(vectorizer.fit_transform(corpus))#第一个fit_transform是计算tf-idf，第二个fit_transform是将文本转为词频矩阵
+word=vectorizer.get_feature_names()#获取词袋模型中的所有词语
+weight=tfidf.toarray()#将tf-idf矩阵抽取出来，元素a[i][j]表示j词在i类文本中的tf-idf权重
+```
 
 ## 特征选择
 
@@ -449,7 +624,43 @@ X_new.shape
 ->(150, 2)
 ```
 
+## 分类度量
+
+### classification_report
+
+```python
+sklearn.metrics.classification_report(y_true, y_pred, labels=None, target_names=None, sample_weight=None, digits=2)
+#y_true : 真实值。1d array-like, or label indicator array / sparse matrix 
+#y_pred : 预测值。1d array-like, or label indicator array / sparse matrix
+#labels : 输出时标签的排列顺序。array, shape = [n_labels]
+#target_names : 输出时标签的展示名字，顺序和labels中相同。list of strings
+#sample_weight : 样本权重。array-like of shape = [n_samples], optional
+#digits : 格式化输出浮点值的位数。int
+
+
+from sklearn.metrics import classification_report
+y_true = [0, 1, 2, 2, 2]
+y_pred = [0, 0, 2, 2, 1]
+target_names = ['class 0', 'class 1', 'class 2']
+print(classification_report(y_true, y_pred, target_names=target_names))
+```
+
 ## 模型验证
+
+### 划分训练集数据集
+
+```python
+sklearn.model_selection.train_test_split(*arrays, **options)
+#arrays 输入数据，可以为list，np.array,scipy-sparse matrices or pandas dataframes
+#test_size : 训练集尺寸，如果输入为float，需在0到1之间，如果为Int则为抽样数目，如果为None，则依赖于train_size，如果train_size也未指定，则默认为0.25,
+#train_size :  训练集尺寸，如果输入为float，需在0到1之间，如果为Int则为抽样数目，如果为None，则依赖于test_size
+#random_state :如果是int，random_state是随机数发生器使用的种子; 如果RandomState实例，random_state是随机数生成器; 如果为None，则随机数生成器是np.random使用的RandomState实例。
+#shuffle : 分裂前是否洗牌数据。 如果shuffle = False，那么stratify必须是None。
+#stratify : 如果不是None，则数据以分层方式分割，将其用作类标签。
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+
+```
 
 ### cross-validation
 
@@ -470,6 +681,13 @@ sklearn.model_selection.cross_val_score(estimator, X, y=None, groups=None, scori
 ```
 
 ## 模型保存
+
+注意当保存的模型需要在py2和py3中使用时，需要注意保存时的protocol参数。即下面两种方法中的dump参数
+
+Pickle uses different `protocols` to convert your data to a binary stream.
+
+- In python 2 there are [3 different protocols](https://docs.python.org/2/library/pickle.html#data-stream-format) (`0`, `1`, `2`) and the default is `0`.
+- In python 3 there are [5 different protocols](https://docs.python.org/3/library/pickle.html#data-stream-format) (`0`, `1`, `2`, `3`, `4`) and the default is `3`
 
 ```python
 #方法一

@@ -1,5 +1,26 @@
 ## sql使用记录
 
+### oracle表赋权
+
+```sql
+GRANT   [select：查询
+
+    insert：插入
+
+    update：更新
+
+    delete：删除
+
+    rule：
+
+    all：所有]
+
+ON   tablename    TO   username
+
+--例子
+grant select,insert,update on CC_GETDATA_TO_YYFX to zhongrx
+```
+
 ### 修改列名
 
 修改输出的列名。**注意：**as后面接的新的列名无需加引号''。
@@ -85,9 +106,14 @@ to_number('000012134')
 
 ### 内容转换
 
-将字段中的内容替换为想要的内容。**注意：**记得写在最后end结束符。
+将字段中的内容替换为想要的内容,有两种实现方法：
+
+一种是用case ... when ... then 的方法。**注意：**记得写在最后end结束符；
+
+一种是用decode()函数,只可用于oracle中。
 
 ```sql
+--方法一
 CASE sex
          WHEN '1' THEN '男'
          WHEN '2' THEN '女'
@@ -102,6 +128,16 @@ t.birth_date,
 case t.gender  when 'M' then '男' 
 when 'F' then '女' end  
 as 性别 
+from SANDBOX_FIXED.CC_TB_INDIVIDUAL t
+
+
+--方法二
+Select decode(列名，值1,翻译值1,值2,翻译值2,...值n,翻译值n,缺省值) From talbename
+
+
+select t.full_name,
+t.birth_date,
+decode(t.gender, 'M', '男', 'F', '女',0) as 性别
 from SANDBOX_FIXED.CC_TB_INDIVIDUAL t
 ```
 
@@ -144,7 +180,22 @@ group by t.companycode
 | last(列名)  | 最后一条记录 | 仅Access支持      |
 | count(列名) | 统计记录数  | 注意和count(*)的区别 |
 
-### 一表多字段关联另一张表同一字段
+### 分组排序
+
+row_number()函数为从1开始，为每一条分组记录返回一个数字。
+
+```sql
+ROW_NUMBER() OVER(PARTITION BY t2.PARTY_ID ORDER BY t2.AG_END_DATE desc)
+--将t2按照t2.PARTY_ID进行分组,在分组内按照t2.AG_END_DATE进行倒序排序。
+--row_number()表示为分组记录返回数字
+--PARTITION BY表示分组所用字段
+--ORDER BY表示排列所用字段
+--desc表示倒序排列。
+```
+
+### 问题记录
+
+#### 一表多字段关联另一张表同一字段
 
 where和inner join不能联用
 

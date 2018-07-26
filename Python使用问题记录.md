@@ -2,6 +2,45 @@
 
 本文中使用为py3.5
 
+## python开发
+
+### `__init__.py`
+
+`__init__.py` 文件的作用是将文件夹变为一个Python模块,Python 中的每个模块的包中，都有`__init__.py` 文件。
+
+通常`__init__.py` 文件为空，但是我们还可以为它增加其他的功能。我们在导入一个包时，实际上是导入了它的`__init__.py`文件。这样我们可以在`__init__.py`文件中批量导入我们所需要的模块，而不再需要一个一个的导入。
+
+### classmethod 和 staticmethod的用法
+
+staticmethod() 函数该方法不强制要求传递参数，类可以不用实例化就可以调用该方法 。
+
+```python
+class C(object):
+    @staticmethod
+    def f():
+        print('runoob');
+ 
+C.f();          # 静态方法无需实例化
+cobj = C()
+cobj.f()        # 也可以实例化后调用
+```
+
+**classmethod** 修饰符对应的函数不需要实例化，不需要 self 参数，但第一个参数需要是表示自身类的 cls 参数，可以来调用类的属性，类的方法，实例化对象等。
+
+```python
+class A(object):
+    bar = 1
+    def func1(self):  
+        print ('foo') 
+    @classmethod
+    def func2(cls):
+        print ('func2')
+        print (cls.bar)
+        cls().func1()   # 调用 foo 方法
+ 
+A.func2()               # 不需要实例化
+```
+
 ## 注意事项
 
 ### 条件运算
@@ -80,7 +119,7 @@ else:
 -->2
 ```
 
-### for的循环技巧
+### for技巧
 
 python中的for循环可通过内嵌来用于对列表，字典的循环赋值，也可用于其他数据类型的赋值。通过对for的使用，可以简化代码。
 
@@ -95,6 +134,81 @@ d={i:l[i] for i in l}
 np.array([inputs[batch_id][length_id] for batch_id in range(batch_size)], dtype=np.int32)
 ```
 
+### if技巧
+
+python中if的几种简便写法
+
+```python
+#常规写法
+if a>b:
+    c = a
+else:
+    c = b
+#表达式写法
+c = a if a>b else b 
+
+#列表写法
+#利用了列表的索引，True为1，False为0，从列表中取值
+c=[b,a][a>b]
+
+#逻辑写法，即使下面的逻辑控制的综合应用
+#利用了or如果第一项为真不会判断第二项的特性，如果a>b为True，则a为True，or操作结束。如果a>b为False，则or左边为False，得到b
+c = (a>b and a or b)
+```
+
+### 逻辑控制
+
+关于python中的逻辑控制。
+
+下面例子中的a和b不一定为bool型，可以是数字和字符串
+
+#### and
+
+```python
+#在使用and时，返回结果有以下几种情况
+a and b
+'''
+当a和b均为true时，返回b
+当a和b存在False时，返回False
+'''
+```
+
+#### or
+
+```python
+#在使用or时，返回结果有以下几种情况
+a or b
+'''
+当a为True时，直接返回a
+当a为False时，b为True则返回b。
+a和b均为False时，返回False
+'''
+```
+
+### 全局变量和局部变量
+
+函数内部的变量名如果第一次出现，且出现在`=`前面，即被视为定义一个局部变量。 
+
+```python
+num = 100
+def func():
+    num = 123
+    print(num)
+
+func()
+->123
+
+#说明函数中定义的num是一个局部变量，会将全局变量覆盖。再例如：
+
+num = 100
+def func():
+    num += 100
+    print(num)
+
+func()
+->UnboundLocalError: local variable 'num' referenced before assignment
+```
+
 ### 多变量命名
 
 使用locals()或者globals()，这两个函数提供了基于字典的访问局部和全局变量的方式。key为变量名，value为对应的变量值。
@@ -106,6 +220,31 @@ for i in range(10):
     
 for i in ['a','b']:
     locals()[i] =[1,23,3] 
+```
+
+### 多条件执行
+
+当需要多个条件判断来执行时，可以使用字典格式，条件为key,动作为value。下面是根据条件来选用不同函数的例子。
+
+```python
+class test():
+
+    def __init__(self,fun='a'):
+        self.fun=fun
+        
+    def _a(self):
+        print('a')
+    def _b(self):
+        print('b')
+        
+    def c(self):
+        #得到条件字典
+        fun_list={'a':self._a,'b':self._b}
+        #根据输入来选择需要执行的函数
+        fun_list[self.fun]()
+        
+t=test(fun='b')
+t.c()
 ```
 
 ### @的用法
@@ -315,6 +454,65 @@ for i in c:
 >>> import math
 >>> math.ceil(3.25)
 4.0
+```
+
+### int函数
+
+```python
+int(x,base)
+#将数字转换为10进制的整数
+#x 字符串或数字
+#base 数字的进制数，当有base参数时，x需要为字符串
+
+>>>int()               # 不传入参数时，得到结果0
+0
+>>> int(3)
+3
+>>> int(3.6)
+3
+>>> int('12',16)        # 如果是带参数base的话，12要以字符串的形式进行输入，12 为 16进制
+18
+>>> int('0xa',16)  
+10  
+>>> int('10',8)
+8
+```
+
+### bin函数
+
+**注意：**返回二进制为字符串格式，且以`'0b'`开头
+
+```python
+bin(x)
+#返回一个int或long int的二进制表示
+#x int或long int
+
+>>>bin(10)
+'0b1010'
+>>> bin(20)
+'0b10100'
+```
+
+### type函数
+
+得到变量的类型。
+
+```python
+#用来判断是否变量为列表
+a=[1,2,3]
+if type(a)==list:
+    print('ok')
+```
+
+### isinstance函数
+
+用来判断变量是不是某种类型
+
+```python
+a=[1,2,3]
+if isinstance(a,list):
+    print('ok')
+
 ```
 
 ### zip函数
@@ -653,6 +851,160 @@ Python包含以下方法:
 | 8    | [list.reverse()](http://www.runoob.com/python/att-list-reverse.html)反向列表中元素 |
 | 9    | [list.sort([func\])](http://www.runoob.com/python/att-list-sort.html)对原列表进行排序 |
 
+### set(集合)
+
+#### 创建集合
+
+可以从dict,list,tuple来创建集合
+
+```python
+#从tuple来创建
+L = [('Jonh',18), ('Nancy',19)]  
+T = tuple(L)
+set(T)
+->{('Jonh', 18), ('Nancy', 19)}
+
+#从list来创建
+a=['白云山','坐落','在']
+set(a)
+
+
+#从dict来创建
+d1={'a':1,'b':2}
+set(d1.items())
+->{('a', 1), ('b', 2)}
+
+set(d1)
+->{'a', 'b'}
+```
+
+#### 判断是否存在元素
+
+```python
+#x是否属于集合s，是返回True
+x in s
+
+#x是否不属于集合s，不属于返回True
+x not in s
+```
+
+#### s.update(other)
+
+更新集合s，添加所有出现在other中的元素
+
+等价于`s|=other`
+
+#### s.intersection_update(other)
+
+更新集合s，只保留两者的交集
+
+等价于 `s&=other`
+
+#### s.difference_update(other)
+
+更新集合s。保留s和other的差集
+
+等价于`s-=other`
+
+#### s.symmetric_difference_update(other)
+
+更新集合s.保留s和other并集减去差集
+
+等价于`s^=other`
+
+#### s.add(elm)
+
+添加元素elm到集合s中
+
+#### s.remove(elm)
+
+移除元素elm从集合s中，如果elm在集合s中不存在，报错KeyError
+
+#### s.discard(elm)
+
+如果元素elm在集合s中存在，移除elm
+
+#### s.clear()
+
+移除s中的全部元素
+
+#### s.pop(elm)
+
+删除并返回该集合中的任意元素。 如果该集合为空，则引发KeyError。
+
+#### 常用函数
+
+| 函数                 | 符号用法     | 函数说明                                                     |
+| -------------------- | ------------ | ------------------------------------------------------------ |
+| isdisjoint(other)    |              | 如果该集合没有与其他元素相同的元素，则返回True。 当且仅当它们的交集是空集时，集合才是不相交的。 |
+| issubset(other)      | set <= other | 集合是否是other的子集                                        |
+|                      | set<other    | 集合是否是other的真子集                                      |
+| issuperset(othe)     | set>=other   | other是否是set的子集                                         |
+|                      | set>other    | other是否是set的真子集                                       |
+| union                | set\|other   | set和other的并集                                             |
+| intersection         | set&other    | set和other的交集                                             |
+| difference           | set-other    | set和other的差集                                             |
+| symmetric_difference | set^other    | set和other的并集减去差集（(set(a)\|set(b))-(set(a)&set(b))） |
+| cop()                |              | 用s的拷贝返回一个新的集合                                    |
+|                      |              |                                                              |
+|                      |              |                                                              |
+|                      |              |                                                              |
+|                      |              |                                                              |
+
+
+
+- `isdisjoint`(*other*)
+
+  Return `True` if the set has no elements in common with *other*. Sets are disjoint if and only if their intersection is the empty set.
+
+- `issubset`(*other*)
+
+- `set <= other`
+
+  Test whether every element in the set is in *other*.
+
+- `set < other`
+
+  Test whether the set is a proper subset of *other*, that is, `set <= other and set != other`.
+
+- `issuperset`(*other*)
+
+- `set >= other`
+
+  Test whether every element in *other* is in the set.
+
+- `set > other`
+
+  Test whether the set is a proper superset of *other*, that is, `set >= other and set != other`.
+
+- `union`(**others*)
+
+- `set | other | ...`
+
+  Return a new set with elements from the set and all others.
+
+- `intersection`(**others*)
+
+- `set & other & ...`
+
+  Return a new set with elements common to the set and all others.
+
+- `difference`(**others*)
+
+- `set - other - ...`
+
+  Return a new set with elements in the set that are not in the others.
+
+- `symmetric_difference`(*other*)
+
+- `set ^ other`
+
+  Return a new set with elements in either the set or *other* but not both.
+
+- `copy`()
+
+  Return a new set with a shallow copy of *s*.
+
 ### dict(字典)
 
 字典是一种以key-value键值对的方式存贮，在提取值是只用使用key即可取得对应value，适用于查询操作，查询复杂度为O(n)。但由于其内部为无序结构，如果需要顺序之类的信息则无能为力。
@@ -780,7 +1132,7 @@ line=[line.strip() for line in open('/home/weblogic/DATA/private/shangguanxf/cc_
 #line.strip()为去除每行后面的'\n'
 
 #方法三
-with open(vocab_path, 'rb') as f:
+with open(vocab_path, 'rb',encoding='utf-8') as f:
   		#f.read()为读取f文件
     	#splitlines()为按行分割
         words = f.read().splitlines()
@@ -870,8 +1222,6 @@ xml格式简单介绍
   </data>
 ```
 
-
-
 xml读取有三种方法SAX，DOM，以及ElementTree。因DOM需要将XML数据映射到内存中的树，一是比较慢，二是比较耗内存，而SAX流式读取XML文件，比较快，占用内存少，但需要用户实现回调函数（handler）。ElementTree相对DOM速度要快，api接口也相对友善，因此这里只介绍ElementTree。
 
 **注意：**
@@ -916,6 +1266,260 @@ tree.write(out_path, encoding="utf-8",xml_declaration=True,method="xml")
 #encoding 编码，默认为"us-ascii"
 #xml_declaration 是否将xml声明添加到文件中，默认为None。True为始终添加，False为从添加，None为不是这三种编码时添加（US-ASCII or UTF-8 or Unicode）
 #method设置输出格式，可选'xml','html','txt',默认为'xml'
+```
+
+### yaml
+
+在提取文本上有时直接按照txt文本读取通过正则进行匹配搜索会更有效率。
+
+```python
+#读取yaml
+import yaml
+with open('/tpdata/DATA/private/shangguanxf/cc_txt3/太平保险文本格式确认/879001010321183.yaml','r') as file:
+    stream=file.read()
+data=yaml.load(stream)
+```
+
+```python
+#保存yaml
+import yaml
+with open('/tpdata/DATA/private/shangguanxf/cc_txt3/太平保险文本格式确认/879001010321183.yaml','w') as file:
+    #将data保存到stream文件中
+	yaml.dump(data,stream)
+```
+
+### pdf
+
+需要使用命令`pip install pdfminer.six`安装包。
+
+[官网](https://euske.github.io/pdfminer/index.html)
+
+```python
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.converter import TextConverter
+from pdfminer.pdfdocument import PDFDocument
+from pdfminer.layout import LAParams
+from pdfminer.pdfpage import PDFPage
+from io import StringIO
+
+def extract_pdf_content(pdf):
+    rsrcmgr = PDFResourceManager()
+    codec = 'utf-8'
+    outfp = StringIO()
+    laparams = LAParams()
+    device = TextConverter(rsrcmgr=rsrcmgr, outfp=outfp, codec=codec, laparams=laparams)
+    if not doc.is_extractable:
+        raise PDFTextExtractionNotAllowed
+    with open(pdf, 'rb') as fp:
+        interpreter = PDFPageInterpreter(rsrcmgr, device)
+        #检测是否允许文本提取，不允许则跳过
+        parser = PDFParser(fp)
+        # Create a PDF document object that stores the document structure.
+        # Supply the password for initialization.
+        document = PDFDocument(parser, password)
+        # Check if the document allows text extraction. If not, abort.
+        if not document.is_extractable:
+            #raise PDFTextExtractionNotAllowed
+            mystr=''
+            is_succeed=0#失败返回0
+        else:    
+            password = ""
+            maxpages = 0
+            caching = True
+            pagenos=set()
+            for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password,caching=caching, check_extractable=True):
+                interpreter.process_page(page)
+            mystr = outfp.getvalue()
+            is_succeed=1#读取成功返回1
+            device.close()
+            outfp.close()
+    return mystr,is_succeed
+
+```
+
+## 文件压缩
+
+gz： 即gzip。通常仅仅能压缩一个文件。与tar结合起来就能够实现先打包，再压缩。
+
+xz:	xz是一种压缩文件格式，采用LZMA SDK压缩，目标文件较[gzip](https://baike.baidu.com/item/gzip/4487553)压缩文件(.gz或·tgz)小30%，较·bz2小15%。
+
+tar： linux系统下的打包工具。仅仅打包。不压缩
+
+tgz：即tar.gz。先用tar打包，然后再用gz压缩得到的文件
+
+zip： 不同于gzip。尽管使用相似的算法，能够打包压缩多个文件。只是分别压缩文件。压缩率低于tar。
+
+rar：打包压缩文件。最初用于DOS，基于window操作系统。压缩率比zip高，但速度慢。随机訪问的速度也慢。
+
+### gz/xz/bz2/tar/tgz
+
+`tarfile`支持 [`gzip`](https://docs.python.org/3.6/library/gzip.html#module-gzip), [`bz2`](https://docs.python.org/3.6/library/bz2.html#module-bz2) and [`lzma`](https://docs.python.org/3.6/library/lzma.html#module-lzma)（即后缀为.xz的文件）这三种格式的压缩读写。
+
+[官方文档](https://docs.python.org/3.6/library/tarfile.html#module-tarfile)
+
+`tarfile.open`(*name=None*, *mode='r'*, *fileobj=None*, *bufsize=10240*, **\*kwargs*)
+
+```python
+tarfile.open(name=None, mode='r', fileobj=None, bufsize=10240, **kwargs)
+#name 文件路径
+#mode 执行的模式
+#fileobj 如果指定了fileobj，那么它将用作以二进制模式打开的名称文件对象的替代方案。 它应该在位置0。
+#bufsize 每次读取的块大小，单位为bytes
+```
+
+| mode            | action                                                       |
+| --------------- | ------------------------------------------------------------ |
+| `'r' or 'r:*'`  | Open for reading with transparent compression (recommended). |
+| `'r:'`          | 无压缩打开                                                   |
+| `'r:gz'`        | 用gzip的方式解压缩                                           |
+| `'r:bz2'`       | 用bzip2的方式解压缩                                          |
+| `'r:xz'`        | 用lzma的方式解压缩                                           |
+| `'x'` or `'x:'` | 创建一个tarfile而不压缩。 引发FileExistsError异常（如果它已存在）。 |
+| `'x:gz'`        | 创建一个tarfile使用gzip压缩。 引发FileExistsError异常（如果它已存在）。 |
+| `'x:bz2'`       | 创建一个tarfile使用bzip2压缩。 引发FileExistsError异常（如果它已存在）。 |
+| `'x:xz'`        | 创建一个tarfile使用lzma压缩。 引发FileExistsError异常（如果它已存在）。 |
+| `'a' or 'a:'`   | Open for appending with no compression. The file is created if it does not exist. |
+| `'w' or 'w:'`   | 创建一个tarfile而不压缩。                                    |
+| `'w:gz'`        | 创建一个tarfile使用gzip压缩。                                |
+| `'w:bz2'`       | 创建一个tarfile使用bzip2压缩。                               |
+| `'w:xz'`        | 创建一个tarfile使用lzma压缩。                                |
+
+**注意：**`w`和`x`的区别就是当文件已存在时是否会报错。`x`会报错，`w`会直接覆盖。
+
+下面的模式返回的是tar块流
+
+| Mode      | Action                                        |
+| --------- | --------------------------------------------- |
+| `'r|*'`   | 透明压缩打开一个tar块流供阅读。               |
+| `'r|'`    | 无压缩打开一个tar块流                         |
+| `'r|gz'`  | Open a gzip compressed *stream* for reading.  |
+| `'r|bz2'` | Open a bzip2 compressed *stream* for reading. |
+| `'r|xz'`  | Open an lzma compressed *stream* for reading. |
+| `'w|'`    | Open an uncompressed *stream* for writing.    |
+| `'w|gz'`  | Open a gzip compressed *stream* for writing.  |
+| `'w|bz2'` | Open a bzip2 compressed *stream* for writing. |
+| `'w|xz'`  | Open an lzma compressed *stream* for writing. |
+
+#### 解压文件
+
+解压文件常用有两种方法`extract`,`extractall`
+
+##### extractall()
+
+解压所有文件到指定目录
+
+```python
+TarFile.extractall(path=".", members=None, *, numeric_owner=False)
+#path 解压后的路径，默认为当前工作路径
+#members 解压的文件列表，可通过getmembers()得到
+
+import tarfile
+tar = tarfile.open("/tpdata/CC/科大讯飞文本/yl204/yl204_2017051416.tgz")
+#将所有文件都解压到指定路径
+tar.extractall('/tpdata/CC/科大讯飞文本/yl204/')
+tar.close()
+
+#解压缩文件列表里的前十个文件
+import tarfile
+tar = tarfile.open("/tpdata/CC/科大讯飞文本/yl204/yl204_2017051416.tgz")
+tar.extractall('/tpdata/CC/科大讯飞文本/yl204/',members=tar.getmembers()[0:10])
+tar.close()
+```
+
+##### extract()
+
+解压指定文件到指定目录
+
+```python
+TarFile.extract(member, path="", set_attrs=True, *, numeric_owner=False)
+#member 需要解压的文件，输入文件在压缩包里路径地址（例如：'home/iflytek/out/yl204_2017051416/1600004002800217.txt'）
+#path 解压后的文件存放路径
+
+#解压指定的文件
+tar = tarfile.open("/tpdata/CC/科大讯飞文本/yl204/yl204_2017051416.tgz")
+tar.extract('home/iflytek/out/yl204_2017051416/1600004002800217.txt','/tpdata/CC/科大讯飞文本/yl204/')
+tar.close()
+```
+
+#### 压缩文件
+
+通过`add`函数将待压缩的文件放入列表中
+
+```python
+TarFile.add(name, arcname=None, recursive=True, exclude=None, *, filter=None)
+#name 待压缩文件的名称，需要包含路径
+#arcname 将待压缩的文件重命名
+#recursive 是否迭代的读入数据
+#exclude 是否排除，输入为一个函数名，函数需要输入为文件名，输出为True（不加该文件加入压缩列表），输出为False（将该文件加入压缩列表）
+#filter 是一个对tarinfo进行操作的函数，输入为tarinfo，如果返回为None，则该文件不加入压缩列表
+
+#最简单的压缩
+tar=tarfile.open('/tpdata/DATA/private/shangguanxf/test.tar','w')
+for name in ['/tpdata/DATA/private/shangguanxf/poems.txt']:
+    tar.add(name)
+tar.close()
+
+#利用exclude参数对输入文件做筛选
+def f(name):
+    if name.find('.py')>-1:
+        return True
+    else:
+        return False
+tar=tarfile.open('/tpdata/DATA/private/shangguanxf/test.tar','w')
+for name in ['/tpdata/DATA/private/shangguanxf/poems.txt']:
+    tar.add(name,'t1.txt',exclude=f)
+tar.close()
+
+#利用filter对文件做筛选
+def reset(tarinfo):
+    tarinfo.uid = tarinfo.gid = 0
+    tarinfo.uname = tarinfo.gname = "root"
+    return tarinfo
+tar = tarfile.open("sample.tar.gz", "w:gz")
+tar.add("foo", filter=reset)
+tar.close()
+```
+
+#### 其他常用函数
+
+##### TarInfo.isfile()
+
+返回True如果`Tarinfo` 对象是一个规则的文件。
+
+##### TarInfo.isreg()
+
+等同于 [`isfile()`](https://docs.python.org/3.6/library/tarfile.html#tarfile.TarInfo.isfile)
+
+### zip
+
+```python
+import zipfile
+def un_zip(file_name):
+    """unzip zip file"""
+    zip_file = zipfile.ZipFile(file_name)
+    if os.path.isdir(file_name + "_files"):
+        pass
+    else:
+        os.mkdir(file_name + "_files")
+    for names in zip_file.namelist():
+        zip_file.extract(names,file_name + "_files/")
+    zip_file.close()
+```
+
+### rar
+
+```python
+import rarfile
+def un_rar(file_name):
+    """unrar zip file"""
+    rar = rarfile.RarFile(file_name)
+    if os.path.isdir(file_name + "_files"):
+        pass
+    else:
+        os.mkdir(file_name + "_files")
+    os.chdir(file_name + "_files")
+    rar.extractall()
+    rar.close()
 ```
 
 ## str
@@ -1573,6 +2177,32 @@ def get_secendmax(path):
 shutil.rmtree('d:/test')
 ```
 
+### 移动文件
+
+```python
+shutil.move(src, dst, copy_function=copy2)
+#src 源地址
+#dst 目标地址
+#copy_function 复制的方式
+```
+
+### 复制文件
+
+有两个方法`copy()`和`copy2()`都可以用来复制文件，copy()得到的新的复制文件是新建的，copy2()得到的复制文件会保留创建日期等原数据。
+
+```python
+#复制文件
+shutil.copy(src, dst, *, follow_symlinks=True)
+#src 源文件地址
+#dst 复制件保存的文件地址
+#follow_symlinks
+
+shutil.copy2(src, dst, *, follow_symlinks=True)
+#src 源文件地址
+#dst 复制件保存的文件地址
+#follow_symlinks
+```
+
 ## multiprocessing
 
 得到电脑的cpu核心数
@@ -1671,6 +2301,50 @@ c.most_common(5)
 del c["a"]
 ```
 
+## itertools
+
+[官方文档](https://docs.python.org/3/library/itertools.html)
+
+http://python.jobbole.com/87455/
+
+**Infinite iterators:**
+
+| Iterator                                                     | Arguments     | Results                                        | Example                                 |
+| ------------------------------------------------------------ | ------------- | ---------------------------------------------- | --------------------------------------- |
+| [`count()`](https://docs.python.org/3/library/itertools.html#itertools.count) | start, [step] | start, start+step, start+2*step, …             | `count(10) --> 10 11 12 13 14 ...`      |
+| [`cycle()`](https://docs.python.org/3/library/itertools.html#itertools.cycle) | p             | p0, p1, … plast, p0, p1, …                     | `cycle('ABCD') --> A B C D A B C D ...` |
+| [`repeat()`](https://docs.python.org/3/library/itertools.html#itertools.repeat) | elem [,n]     | elem, elem, elem, … endlessly or up to n times | `repeat(10, 3) --> 10 10 10`            |
+
+**Iterators terminating on the shortest input sequence:**
+
+| Iterator                                                     | Arguments                   | Results                                    | Example                                                    |
+| ------------------------------------------------------------ | --------------------------- | ------------------------------------------ | ---------------------------------------------------------- |
+| [`accumulate()`](https://docs.python.org/3/library/itertools.html#itertools.accumulate) | p [,func]                   | p0, p0+p1, p0+p1+p2, …                     | `accumulate([1,2,3,4,5]) --> 1 3 6 10 15`                  |
+| [`chain()`](https://docs.python.org/3/library/itertools.html#itertools.chain) | p, q, …                     | p0, p1, … plast, q0, q1, …                 | `chain('ABC', 'DEF') --> A B C D E F`                      |
+| [`chain.from_iterable()`](https://docs.python.org/3/library/itertools.html#itertools.chain.from_iterable) | iterable                    | p0, p1, … plast, q0, q1, …                 | `chain.from_iterable(['ABC', 'DEF']) --> A B C D E F`      |
+| [`compress()`](https://docs.python.org/3/library/itertools.html#itertools.compress) | data, selectors             | (d[0] if s[0]), (d[1] if s[1]), …          | `compress('ABCDEF', [1,0,1,0,1,1]) --> A C E F`            |
+| [`dropwhile()`](https://docs.python.org/3/library/itertools.html#itertools.dropwhile) | pred, seq                   | seq[n], seq[n+1], starting when pred fails | `dropwhile(lambda x: x<5, [1,4,6,4,1]) --> 6 4 1`          |
+| [`filterfalse()`](https://docs.python.org/3/library/itertools.html#itertools.filterfalse) | pred, seq                   | elements of seq where pred(elem) is false  | `filterfalse(lambda x: x%2, range(10)) --> 0 2 4 6 8`      |
+| [`groupby()`](https://docs.python.org/3/library/itertools.html#itertools.groupby) | iterable[, key]             | sub-iterators grouped by value of key(v)   |                                                            |
+| [`islice()`](https://docs.python.org/3/library/itertools.html#itertools.islice) | seq, [start,] stop [, step] | elements from seq[start:stop:step]         | `islice('ABCDEFG', 2, None) --> C D E F G`                 |
+| [`starmap()`](https://docs.python.org/3/library/itertools.html#itertools.starmap) | func, seq                   | func(*seq[0]), func(*seq[1]), …            | `starmap(pow, [(2,5), (3,2), (10,3)]) --> 32 9 1000`       |
+| [`takewhile()`](https://docs.python.org/3/library/itertools.html#itertools.takewhile) | pred, seq                   | seq[0], seq[1], until pred fails           | `takewhile(lambda x: x<5, [1,4,6,4,1]) --> 1 4`            |
+| [`tee()`](https://docs.python.org/3/library/itertools.html#itertools.tee) | it, n                       | it1, it2, … itn splits one iterator into n |                                                            |
+| [`zip_longest()`](https://docs.python.org/3/library/itertools.html#itertools.zip_longest) | p, q, …                     | (p[0], q[0]), (p[1], q[1]), …              | `zip_longest('ABCD', 'xy', fillvalue='-') --> Ax By C- D-` |
+
+**Combinatoric iterators:**
+
+| Iterator                                                     | Arguments          | Results                                                      |
+| ------------------------------------------------------------ | ------------------ | ------------------------------------------------------------ |
+| [`product()`](https://docs.python.org/3/library/itertools.html#itertools.product) | p, q, … [repeat=1] | cartesian product, equivalent to a nested for-loop           |
+| [`permutations()`](https://docs.python.org/3/library/itertools.html#itertools.permutations) | p[, r]             | r-length tuples, all possible orderings, no repeated elements |
+| [`combinations()`](https://docs.python.org/3/library/itertools.html#itertools.combinations) | p, r               | r-length tuples, in sorted order, no repeated elements       |
+| [`combinations_with_replacement()`](https://docs.python.org/3/library/itertools.html#itertools.combinations_with_replacement) | p, r               | r-length tuples, in sorted order, with repeated elements     |
+| `product('ABCD', repeat=2)`                                  |                    | `AA AB AC AD BA BB BC BD CA CB CC CD DA DB DC DD`            |
+| `permutations('ABCD', 2)`                                    |                    | `AB AC AD BA BC BD CA CB CD DA DB DC`                        |
+| `combinations('ABCD', 2)`                                    |                    | `AB AC AD BC BD CD`                                          |
+| `combinations_with_replacement('ABCD', 2)`                   |                    | `AA AB AC AD BB BC BD CC CD DD`                              |
+
 ## io
 
 ### 代替文件进行操作（io.StringIO）
@@ -1701,6 +2375,236 @@ mode([1,2,3,4,1,2,2,2,3])
 ->ModeResult(mode=array([2]), count=array([4]))
 ```
 
+### 稀疏矩阵
+
+#### 生成稀疏矩阵
+
+将array或实矩阵转换为稀疏矩阵使用bsr_matrix。
+
+##### bsr_matrix
+
+块压缩行（BSR）格式与压缩稀疏行（CSR）格式非常相似。 BSR适用于密集子矩阵的稀疏矩阵，如下面的最后一个例子。 块矢量矩阵通常出现在矢量值有限元离散化中。 
+
+优点：
+
+​	块矢量矩阵通常出现在矢量值有限元离散化中。 在这种情况下，对于许多稀疏算术运算，BSR比CSR和CSC效率更高。
+
+```python
+scipy.sparse.bsr_matrix(arg1, shape=None, dtype=None, copy=False, blocksize=None)
+#几种实例化的方法
+'''
+bsr_matrix(D, [blocksize=(R,C)])
+where D is a dense matrix or 2-D ndarray.
+
+bsr_matrix(S, [blocksize=(R,C)])
+with another sparse matrix S (equivalent to S.tobsr())
+
+bsr_matrix((M, N), [blocksize=(R,C), dtype])
+to construct an empty matrix with shape (M, N) dtype is optional, defaulting to dtype=’d’.
+
+bsr_matrix((data, ij), [blocksize=(R,C), shape=(M, N)])
+where data and ij satisfy a[ij[0, k], ij[1, k]] = data[k]
+
+bsr_matrix((data, indices, indptr), [shape=(M, N)])
+is the standard BSR representation where the block column indices for row i are stored in indices[indptr[i]:indptr[i+1]] and their corresponding block values are stored in data[ indptr[i]: indptr[i+1] ]. If the shape parameter is not supplied, the matrix dimensions are inferred from the index arrays.
+'''
+#利用array直接转换
+x=np.eye(10)
+bsr_matrix(x,blocksize=(5,10)).todense()
+
+#用数据加横纵坐标的方式生成sparse
+row = np.array([0, 0, 1, 2, 2, 2])
+col = np.array([0, 2, 2, 0, 1, 2])
+data = np.array([1, 2, 3 ,4, 5, 6])
+bsr_matrix((data, (row, col)), shape=(3, 3)).toarray()
+
+#用bsr格式生成sparse
+indptr = np.array([0, 2, 3, 6])
+indices = np.array([0, 2, 2, 0, 1, 2])
+data = np.array([1, 2, 3, 4, 5, 6]).repeat(4).reshape(6, 2, 2)
+bsr_matrix((data,indices,indptr), shape=(6, 6)).toarray()
+
+```
+
+##### coo_matrix
+
+COO格式的优点:
+	便于稀疏格式之间的快速转换
+	允许重复条目（请参阅示例）
+	与CSR / CSC格式之间的转换非常快速
+COO格式的缺点
+	不直接支持算术运算
+	不直接支持切片
+预期用途
+COO是构造稀疏矩阵的一种快速格式
+一旦构建了矩阵，转换为CSR或CSC格式以进行快速算术和矩阵矢量运算
+默认情况下，转换为CSR或CSC格式时，重复的（i，j）条目将汇总在一起。 这有助于有限元矩阵等的有效构造。 （见例子）
+
+```python
+scipy.sparse.coo_matrix(arg1, shape=None, dtype=None, copy=False)
+'''
+coo_matrix(D)
+with a dense matrix D
+
+coo_matrix(S)
+with another sparse matrix S (equivalent to S.tocoo())
+
+coo_matrix((M, N), [dtype])
+to construct an empty matrix with shape (M, N) dtype is optional, defaulting to dtype=’d’.
+
+coo_matrix((data, (i, j)), [shape=(M, N)])
+to construct from three arrays:
+data[:] the entries of the matrix, in any order
+i[:] the row indices of the matrix entries
+j[:] the column indices of the matrix entries
+Where A[i[k], j[k]] = data[k]. When shape is not specified, it is inferred from the index arrays
+'''
+#直接生成指定形状的empty矩阵
+from scipy.sparse import coo_matrix
+coo_matrix((3, 4), dtype=np.int8).toarray()
+#通过行列，数据来生成稀疏矩阵，允许有重复，会对行列相同的值进行叠加
+row  = np.array([0, 0, 1, 3, 1, 0, 0])
+col  = np.array([0, 2, 1, 3, 1, 0, 0])
+data = np.array([1, 1, 1, 1, 1, 1, 1])
+coo_matrix((data, (row, col)), shape=(4, 4)).toarray()
+```
+
+##### csc_matrix
+
+CSC格式的优点:
+	高效的算术运算CSC + CSC，CSC * CSC等
+	高效的柱切片
+	快速矩阵向量产品（CSR，BSR可能会更快）
+CSC格式的缺点:
+	慢行切片操作（考虑CSR）
+	稀疏结构的变化很昂贵（考虑LIL或DOK）
+
+```python
+scipy.sparse.csc_matrix(arg1, shape=None, dtype=None, copy=False)
+'''
+csc_matrix(D)
+with a dense matrix or rank-2 ndarray D
+
+csc_matrix(S)
+with another sparse matrix S (equivalent to S.tocsc())
+
+csc_matrix((M, N), [dtype])
+to construct an empty matrix with shape (M, N) dtype is optional, defaulting to dtype=’d’.
+
+csc_matrix((data, (row_ind, col_ind)), [shape=(M, N)])
+where data, row_ind and col_ind satisfy the relationship a[row_ind[k], col_ind[k]] = data[k].
+
+csc_matrix((data, indices, indptr), [shape=(M, N)])
+is the standard CSC representation where the row indices for column i are stored in indices[indptr[i]:indptr[i+1]] and their corresponding values are stored in data[indptr[i]:indptr[i+1]]. If the shape parameter is not supplied, the matrix dimensions are inferred from the index arrays.
+'''
+
+```
+
+##### csr_matrix
+
+CSR格式的优点：
+	高效的算术运算CSR + CSR，CSR * CSR等
+	高效的行切片
+	快速矩阵矢量产品
+CSR格式的缺点
+	慢柱切割操作（考虑CSC）
+	稀疏结构的变化很昂贵（考虑LIL或DOK）
+
+```python
+scipy.sparse.csr_matrix(arg1, shape=None, dtype=None, copy=False)
+'''
+csr_matrix(D)
+with a dense matrix or rank-2 ndarray D
+
+csr_matrix(S)
+with another sparse matrix S (equivalent to S.tocsr())
+
+csr_matrix((M, N), [dtype])
+to construct an empty matrix with shape (M, N) dtype is optional, defaulting to dtype=’d’.
+
+csr_matrix((data, (row_ind, col_ind)), [shape=(M, N)])
+where data, row_ind and col_ind satisfy the relationship a[row_ind[k], col_ind[k]] = data[k].
+
+csr_matrix((data, indices, indptr), [shape=(M, N)])
+is the standard CSR representation where the column indices for row i are stored in indices[indptr[i]:indptr[i+1]] and their corresponding values are stored in data[indptr[i]:indptr[i+1]]. If the shape parameter is not supplied, the matrix dimensions are inferred from the index arrays.
+'''
+```
+
+##### dia_matrix
+
+可用于算术运算：它们支持加法，减法，乘法，除法和矩阵功能。
+
+```python
+scipy.sparse.dia_matrix(arg1, shape=None, dtype=None, copy=False)
+'''
+dia_matrix(D)
+with a dense matrix
+
+dia_matrix(S)
+with another sparse matrix S (equivalent to S.todia())
+
+dia_matrix((M, N), [dtype])
+to construct an empty matrix with shape (M, N), dtype is optional, defaulting to dtype=’d’.
+
+dia_matrix((data, offsets), shape=(M, N))
+where the data[k,:] stores the diagonal entries for diagonal offsets[k] (See example below)
+'''
+data = np.array([[1, 2, 3, 4]]).repeat(3, axis=0)
+offsets = np.array([0, -1, 2])
+dia_matrix((data, offsets), shape=(4, 4)).toarray()
+```
+
+##### dok_matrix
+
+稀疏矩阵可用于算术运算：它们支持加法，减法，乘法，除法和矩阵功能。
+
+允许高效的O（1）访问个别元素。 重复是不允许的。 可以有效地转换成coo_matrix构建完成。
+
+```python
+scipy.sparse.dok_matrix(arg1, shape=None, dtype=None, copy=False)
+'''
+dok_matrix(D)
+with a dense matrix, D
+
+dok_matrix(S)
+with a sparse matrix, S
+
+dok_matrix((M,N), [dtype])
+create the matrix with initial shape (M,N) dtype is optional, defaulting to dtype=’d’
+'''
+```
+
+##### lil_matrix
+
+LIL格式的优点:
+	支持灵活的切片
+	矩阵稀疏结构的变化是有效的
+LIL格式的缺点：
+	算术运算LIL + LIL很慢（考虑CSR或CSC）
+	慢列切片（考虑CSC）
+	慢矩阵向量产品（考虑CSR或CSC）
+预期用途
+	LIL是构造稀疏矩阵的一种方便的格式
+	一旦构建了矩阵，就可以转换为CSR或CSC格式，以便进行快速算术和矩阵矢量运算
+	在构建大型矩阵时考虑使用COO格式
+数据结构
+	行数组（self.rows），每个数组都是非零元素列索引的排序列表。
+	相应的非零值以类似的方式存储在self.data中。
+
+```python
+scipy.sparse.lil_matrix(arg1, shape=None, dtype=None, copy=False)
+'''
+lil_matrix(D)
+with a dense matrix or rank-2 ndarray D
+
+lil_matrix(S)
+with another sparse matrix S (equivalent to S.tolil())
+
+lil_matrix((M, N), [dtype])
+to construct an empty matrix with shape (M, N) dtype is optional, defaulting to dtype=’d’.
+'''
+```
+
 ## numpy
 
 numpy生成向量时，不要使用[1,n]/(1,n)这种形式，直接用单个n进行赋值，否则会生成矩阵，不能直接取值，需要array[0]才能取到值
@@ -1725,6 +2629,17 @@ np.ones((3,5))
 np.ones((3,5),dtype=np.uint8)
 #生成和a形状一样的指定类型的1向量
 np.ones_like(a,dtype=np.uint8)
+```
+
+### 更换矩阵形状
+
+通过`reshape`改变形状，通常用于矩阵相乘时，调整形状使其可以相乘。
+
+```python
+numpy.reshape(a,new_shape)
+import numpy as np
+a=np.array([1,2,3])
+a.reshape(1,3)
 ```
 
 ### np的bool索引赋值
@@ -1805,27 +2720,6 @@ array([[3, 4, 5],
        [0, 1, 2]])
 ```
 
-### 合并数据
-
-```python
-import numpy as np
-
-# Test 1
-A = np.array([1, 1, 1])
-B = np.array([2, 2, 2])
-# 合并array, 竖直方向
-C = np.vstack((A, B))
-print A.shape
-print C.shape
-print C
-
-# 合并array, 水平方向
-D = np.hstack((A, B))
-print A.shape
-print D.shape
-print D
-```
-
 ### 返回最大值的索引
 
 ```python
@@ -1869,7 +2763,52 @@ np.linspace(0,1,5,endpoint=False,retstep=True)
 (array([ 0. ,  0.2,  0.4,  0.6,  0.8]), 0.2)
 ```
 
-### 生成相加矩阵
+### 矩阵合并
+
+#### 方法一
+
+```python
+numpy.concatenate((a1, a2, ...), axis=0, out=None)
+#沿指定轴合并数据
+#a1, a2, … : 矩阵列表，除了合并的轴外需要具有相同的尺寸
+#axis : int, 合并所沿着的轴
+#out : ndarray, 如果提供，结果将被插入到这个数组中。 它应该是适当的形状和dtype。它的形状和默认的输出形状相同，类型一致。
+
+a = np.array([[1, 2], [3, 4]])
+b = np.array([[5, 6]])
+np.concatenate((a, b), axis=0)
+->array([[1, 2],
+       [3, 4],
+       [5, 6]])
+np.concatenate((a, b.T), axis=1)
+->array([[1, 2, 5],
+       [3, 4, 6]])
+```
+
+#### 方法二
+
+```python
+import numpy as np
+
+# Test 1
+A = np.array([1, 1, 1])
+B = np.array([2, 2, 2])
+# 合并array, 竖直方向
+C = np.vstack((A, B))
+print A.shape
+print C.shape
+print C
+
+# 合并array, 水平方向
+D = np.hstack((A, B))
+print A.shape
+print D.shape
+print D
+```
+
+### 矩阵运算
+
+#### 矩阵+矩阵
 
 将a，b两个矩阵中的每个元素相加
 
@@ -1879,7 +2818,7 @@ np.add.outer(a,b,out=None, where=True,**kwargs)
 
 ```
 
-### 生成相乘矩阵
+#### 矩阵*矩阵
 
 将a，b两个矩阵中的每个元素相乘
 
@@ -1887,6 +2826,101 @@ np.add.outer(a,b,out=None, where=True,**kwargs)
 np.outer(a,b,out=None)
 #a,b 相乘的两个矩阵
 
+```
+
+#### 列*矩阵
+
+将矩阵和向量相乘，通常用于加权操作.
+
+向量和矩阵相乘时，向量等同于一行n列的矩阵。想要每行乘向量的一个数，需要对向量做`reshape`转换成n列一行。
+
+```python
+a=np.array([[10,10,10],[20,20,20],[30,30,30]])
+b=np.array([0.5,0.3,0.2])
+print(b.shape)
+->(3,)
+print(a*b)
+->
+[[  5.   3.   2.]
+ [ 10.   6.   4.]
+ [ 15.   9.   6.]]
+print(a*b.reshape(1,3))
+->
+[[  5.   3.   2.]
+ [ 10.   6.   4.]
+ [ 15.   9.   6.]]
+a*b.reshape(3,1)
+->
+array([[ 5.,  5.,  5.],
+       [ 6.,  6.,  6.],
+       [ 6.,  6.,  6.]])
+```
+
+### dot
+
+**注意：**np.array直接乘（a*b）是对应元素相乘，
+
+```python
+numpy.dot(a, b, out=None)
+#a,b 为输入的矩阵
+'''
+当a,b为一维矩阵时，结果为a,b内积
+当a,b为二维矩阵时，结果为a,b矩阵相称，但更推荐使用np.matmul或者a@b
+'''
+```
+
+### solve
+
+求解线性矩阵方程或线性标量方程组。*ax = b*
+
+```python
+numpy.linalg.solve(a, b)
+'''
+a 系数矩阵
+b 纵坐标或“因变量”值。
+'''
+
+>>> a = np.array([[3,1], [1,2]])
+>>> b = np.array([9,8])
+>>> x = np.linalg.solve(a, b)
+>>> x
+array([ 2.,  3.])
+```
+
+
+
+### 得到范数
+
+$$\Large ||x||_p=(\sum_i|x|^p)^{\frac{1}{p}}$$
+
+下面1，-1,2，-2的计算公式都如上面的公式。
+
+```python
+numpy.linalg.norm(x, ord=None, axis=None, keepdims=False)
+#x 输入矩阵，如果不指定axis则必须为一维或二维矩阵
+#ord 范数的方法 默认为2.
+'''
+ord	norm for matrices	norm for vectors
+‘fro’	Frobenius norm	–
+‘nuc’	nuclear norm	–
+inf	max(sum(abs(x), axis=1))	max(abs(x))
+-inf	min(sum(abs(x), axis=1))	min(abs(x))
+0	–	sum(x != 0)
+1	
+-1	
+2	
+-2	
+other	–	sum(abs(x)**ord)**(1./ord)
+'''
+#axis 如果为int类型则指定计算向量范数的轴，如果为2-tuple，则指定计算矩阵范数的两个轴。
+#keepdims 保持矩阵维度特性
+
+import numpy as np
+from numpy import linalg as LA
+arr=np.array([[1,2,3,4,5],[1,2,3,4,5]])
+print(LA.norm(arr,ord=1,keepdims=False))
+print(LA.norm(arr,ord=1,keepdims=True))
+print(LA.norm(arr,ord=1,axis=0,keepdims=True))
 ```
 
 ### 得到中位数
@@ -1901,6 +2935,35 @@ numpy.median(a, axis=None, out=None, overwrite_input=False, keepdims=False)
 #out 如果提供，结果将被插入到这个数组中。 它应该是适当的形状和dtype。它的形状和默认的输出形状相同，类型一致。
 #overwrite_input 如果为True，则允许使用输入数组a的内存进行计算。 输入数组将通过调用中位数进行修改。 当您不需要保留输入数组的内容时，这将节省内存。 将输入视为未定义，但可能完全或部分排序。 默认是False。 如果overwrite_input为True且a不是ndarray，则会引发错误。
 #keepdims 将取中位数的那维降为1，其他保持原有维度
+```
+
+### 矩阵求和
+
+对矩阵进行求和
+
+```python
+numpy.sum(a, axis=None, dtype=None, out=None, keepdims=<class 'numpy._globals._NoValue'>)
+#a 输入的向量或矩阵
+#axis 求和的索引列，如果为None则会将矩阵转换成向量求和
+#dtype 返会的矩阵的类型
+#out 在其中放置结果的替代输出数组。 它必须具有与预期输出相同的形状，但输出值的类型将根据需要进行转换。
+
+#所选的求和维度即为可变的数字，例如在三维矩阵中axis=0，表示[0,:,:]+[1,:,:]+...+[n,:,:]
+arr=np.array([[[1,2],[1,2]],[[1,2],[1,2]],[[1,2],[1,2]]])
+arr.sum(axis=0)
+->
+array([[3, 6],
+       [3, 6]])
+arr.sum(axis=1)
+->
+array([[2, 4],
+       [2, 4],
+       [2, 4]])
+arr.sum(axis=2)
+->
+array([[3, 3],
+       [3, 3],
+       [3, 3]])
 ```
 
 ### 得到累积和
@@ -2091,6 +3154,15 @@ random.uniform(a, b)
 #计算过程为min+(max-min)*random.random()
 ```
 
+### random.betavariate(*alpha*, *beta*)
+
+```python
+#返回alpha,beta的贝塔分布
+random.betavariate(alpha, beta)
+#E(x)=a/(a+b)
+#var(x)=ab/((a+b)^2(a+b+1))
+```
+
 ### random.choice()
 
 ```python
@@ -2158,6 +3230,19 @@ t=time.strftime('%Y%m%d',time.localtime(time.time()))
 #得到当前时间，以年月日格式返回。
 ```
 
+### 时间戳转换成时间
+
+```python
+import time
+
+timestamp = 1462451334
+
+#转换成localtime
+time_local = time.localtime(timestamp)
+#转换成新的时间格式(2016-05-05 20:28:54)
+dt = time.strftime("%Y-%m-%d %H:%M:%S",time_local)
+```
+
 ## datetime
 
 [官网](https://docs.python.org/3.5/library/datetime.html#module-datetime)
@@ -2192,3 +3277,59 @@ d1+delta
  datetime.datetime.strptime('20170101', '%Y%m%d')
 ```
 
+### datetime()
+
+指年、月、日、小时、分、秒、毫秒的事件类型
+
+### date()
+
+指年月日的时间类型
+
+## tempfile
+
+该模块创建临时文件和目录。 它适用于所有支持的平台。 TemporaryFile，NamedTemporaryFile，TemporaryDirectory和SpooledTemporaryFile是提供自动清理并可用作上下文管理器的高级接口。 mkstemp（）和mkdtemp（）是需要手动清理的低级函数。
+
+#### mkdtemp()
+
+生成临时文件，只能由创建用户可读，可写和可搜索。
+
+```python
+tempfile.mkdtemp(suffix=None, prefix=None, dir=None)
+#suffix 后缀，如果不为None，则临时文件将以其为后缀
+#prefix 前缀，如果不为None，则临时文件将以其为后缀
+#dir 如果dir不是None，则该文件将在该目录中创建;否则，使用默认目录。
+```
+
+## pdb
+
+一个用于python进行debug的包
+
+| 一些常用指令：                                      | 功能介绍                             |
+| --------------------------------------------------- | ------------------------------------ |
+| h(elp) [comman]                                     | 打印可用指令及帮助信息               |
+| r(eturn)                                            | 运行代码直到下一个断点或当前函数返回 |
+| b(reak)[[filename:]lineno \| function[, condition]] | 指定文件某行或函数体来设置断点       |
+| l(ist) [first[, last]]                              | 查看指定代码段                       |
+| n(ext)                                              | 执行下一行                           |
+| s(tep)                                              | #执行下一行，若为函数则进入函数体    |
+| p                                                   | 打印某个变量                         |
+| a(rgs)                                              | 打印当前函数的参数                   |
+| w(here)                                             | 打印堆栈信息                         |
+| d(own)                                              | 移至下层堆栈                         |
+| u(p)                                                | 移至上层堆栈                         |
+| j(ump)                                              | 跳转到指定行                         |
+| c(ontinue)                                          | 继续执行                             |
+| disable [bpnumber [bpnumber]]                       | 失效断点                             |
+| enable[bpnumber [bpnumber]]                         | 启用断点                             |
+| cl(ear) [filename:lineno \| bpnumber [bpnumber]]    | 删除断点                             |
+| q(uit)/exit                                         | 中止调试并退出                       |
+|                                                     |                                      |
+|                                                     |                                      |
+
+设置断点
+
+import pdb
+
+在需要设置断点的地方加入pdb.set_trace()
+
+执行python -m pdb test.py
